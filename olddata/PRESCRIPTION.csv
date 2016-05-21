@@ -1,0 +1,79 @@
+Căng da mặt
+Uống	sáng,tối	viên	viên		MI5	2	2	1	Augmentin 1g
+Uống	sáng	viên	viên	Uống sau khi ăn no	MI69	1	1	1	Medrol 16mg
+Uống	sáng,tối	viên	viên		MI249	2	4	2	Alphachymotrypsin
+Uống	sáng,tối	viên	viên		MI83	2	2	1	Vita C 500mg
+Uống	sáng,trưa,tối	viên	viên		MI66	3	6	2	Paracetamol 500mg
+Thoa	sáng,tối	ít	ít	Thoa lên vết mổ vùng không có tóc	MI323	2	1	1	PolyBamycine Pommade
+Thoa	sáng,tối	ít	ít	Thoa lên vết mổ vùng có tóc	MI207	2	1	1	Povidine Solution
+bôi	sáng,tối	ít	ít	rửa vết thương	MI253	2	1	1	Alcol 90 
+end
+Căng trán thái dương
+Uống	sáng,chiều	viên	viên		MI5	2	2	1	Augmentin 1g
+Uống	sáng,chiều	viên	viên	Uống sau khi ăn	MI69	2	2	1	Medrol 16mg
+Uống	trưa	viên	viên		MI83	1	1	1	Vita C 500mg
+Uống	tối	viên	viên	uống trước khi ngủ 30 phút	MI165	1	1	1	Rotunda
+Thoa	sáng,tối	ít	ít	bôi lên vết mổ	MI207	2	1	1	Povidine Solution
+uống	sáng,chiều,tối	viên	viên	Hòa tan trong nước	MI67	3	1	1	Efferalgan codein
+end
+Chỉnh hình mí - Treo cung mày
+Uống	sáng,chiều	viên	viên		MI328	2	2	1	Acticef 500mg
+Uống	sáng	viên	viên	Uống sau khi ăn	MI69	1	1	1	Medrol 16mg
+Uống	trưa,tối	viên	viên	Uống 2 ngày.	MI66	2	4	2	Paracetamol 500mg
+Thoa	sáng,tối	viên	viên	Thoa lên vết mổ	MI323	2	1	1	PolyBamycine Pommade
+end
+Chỉnh hình mũi Fascia
+uống	sáng,chiều	viên	viên		MI5	2	2	1	Augmentin 1g
+Uống	sáng,trưa,tối	viên	viên		MI66	3	6	2	Paracetamol 500mg
+uống	sáng	viên	viên	Uống sau khi ăn	MI69	1	1	1	Medrol 16mg
+bôi	sáng,tối	ít	ít	rửa vết thương	MI253	2	1	1	Alcol 90 
+bôi	sáng,tối	ít	ít	Bôi lên vết mổ 	MI207	2	1	1	Povidine Solution
+end
+Chỉnh hình mũi Silas
+Uống	sáng,chiều	viên	viên		MI285	2	2	1	Klamentin 1g
+uống	sáng,trưa,chiều,tối	viên	viên		MI66	4	4	1	Paracetamol 500mg
+bôi	sáng,tối	ít	ít	bôi vào vết mổ mũi	MI323	2	1	1	PolyBamycine Pommade
+uống	sáng	viên	viên	Uống sau khi ăn	MI69	1	1	1	Medrol 16mg
+rửa mũi	sáng,tối	ít	ít	rửa vết thương	MI253	2	1	1	Alcol 90 
+end
+Chỉnh hình mũi Sili
+Uống	sáng,chiều	viên	viên		MI5	2	2	1	Augmentin 1g
+Uống	sáng,trưa,tối	viên	viên		MI66	3	6	2	Paracetamol 500mg
+Thoa	sáng,tối	viên	viên	Thoa lên vết mổ mũi	MI323	2	1	1	PolyBamycine Pommade
+uống	sáng	viên	viên	Uống sau khi ăn	MI69	1	1	1	Medrol 16mg
+end
+Đặt túi ngực
+Uống	sáng,tối	viên	viên		MI5	2	2	1	Augmentin 1g
+Uống	sáng,trưa,tối	viên	viên		MI18	3	3	1	Metronidazole 250mg
+uống	sáng	viên	viên	Uống sau khi ăn	MI69	1	1	1	Medrol 16mg
+uống	sáng	viên	viên		MI83	1	1	1	Vita C 500mg
+uống	sáng,chiều,tối	viên	viên	Uống sau khi ăn	MI67	3	3	1	Efferalgan codein
+rửa mũi	sáng,tối	ít	ít	rửa vết thương	MI253	2	1	1	Alcol 90 
+bôi	sáng,tối	ít	ít	bôi lên vết mổ sau 3 ngày	MI394	2	1	1	PolyBamycine Pommade
+end
+Đau dây thần kinh sau mổ
+Uống	sáng,trưa,tối	viên	viên		MI64	3	21	1	Diantalvic
+Chích	sáng	ống	ống	Tiêm bắp	MI226	1	7	1	Mobic 7,5 mg
+Uống	sáng,trưa,chiều	viên	viên	Ngậm tan trong miệng	MI249	3	21	1	Alphachymotrypsin
+end
+Đau nhức do tổn thương thần kinh
+Uống	sáng,trưa,tối	viên	viên		MI350	3	42	2	Tramadol 50mg
+Uống	sáng,tối	viên	viên		MI351	2	14	1	Lyrica 75 mg
+Uống	tối	viên	viên		MI352	1	4	1/2	Elavil 25 mg
+end
+Hậu phẫu chỉnh hình mũi, mắt
+uống	sáng,chiều	gói	gói		MI283	2	10	1	Opedroxil 250mg
+uống	sáng,trưa,tối	viên	viên		MI66	3	18	2	Paracetamol 500mg
+uống	sáng,chiều	viên	viên		MI289	2	20	2	Petizen
+bôi	sáng,chiều	ít	ít	bôi vào vết mổ	MI253	2	1	1	Alcol 90 
+uống	sáng	viên	viên		MI203	1	5	1	Centovit
+uống	sáng,trưa,tối	viên	viên		MI107	3	15	1	Daflon 500mg
+end
+Sili môi
+Uống	sáng,trưa,tối	viên	viên		MI328	3	21	1	Acticef 500mg
+Uống	sáng,tối	viên	viên	Ngậm tan trong miệng	MI249	2	28	2	Alphachymotrypsin
+Uống	sáng	viên	viên	Uống sau khi ăn no	MI69	1	7	1	Medrol 16mg
+Uống	sáng,tối	viên	viên		MI66	2	12	2	Paracetamol 500mg
+Súc	sáng,trưa,tối	chai	chai	Pha loãng với nước	MI40	3	1	1	ORAFAR
+Thoa	sáng,trưa,tối	tuýp	tuýp	Bôi lên vết mổ	MI323	3	1	1	PolyBamycine Pommade
+end
