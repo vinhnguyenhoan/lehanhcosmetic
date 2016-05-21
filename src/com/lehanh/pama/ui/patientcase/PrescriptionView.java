@@ -86,7 +86,7 @@ public class PrescriptionView extends PamaFormUI implements IPatientViewPartList
 	private Text useNumSSPerDayText;
 	private Text numberPerUseText;
 	private Label totalNoteLabel;
-	private Text drugDescText;
+	private Text drugOriginalText;
 	private CCombo useCombo;
 	private CCombo sessionCombo;
 	private CCombo noteCombo;
@@ -267,8 +267,8 @@ public class PrescriptionView extends PamaFormUI implements IPatientViewPartList
 		Label lblTnGc = new Label(composite_5, SWT.NONE);
 		lblTnGc.setText(Messages.PrescriptionView_tengoc);
 		
-		this.drugDescText = new Text(composite_5, SWT.BORDER);
-		drugDescText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+		this.drugOriginalText = new Text(composite_5, SWT.BORDER);
+		drugOriginalText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 		
 		Composite composite_6 = new Composite(composite_4, SWT.NONE);
 		composite_6.setLayout(new GridLayout(1, false));
@@ -426,7 +426,7 @@ public class PrescriptionView extends PamaFormUI implements IPatientViewPartList
 			clearDetailForm();
 			return;
 		}
-		setText(this.drugDescText, modelObj.getDesc());
+		setText(this.drugOriginalText, modelObj.getDesc());
 		
 		setText(this.numberDayText, String.valueOf(modelObj.getNumDay()));
 		setText(this.unitLabel, modelObj.getUnit());
@@ -578,7 +578,7 @@ public class PrescriptionView extends PamaFormUI implements IPatientViewPartList
 	private PrescriptionItem getCurrentItem() {
 		PrescriptionItem result = new PrescriptionItem();
 		result.setDrug(surgeryNameCombo.getText());
-		result.setDrugDesc(drugDescText.getText());
+		result.setDrugDesc(drugOriginalText.getText());
 		result.setUnit(unitLabel.getText());
 		result.setUnitPer(unitPerText.getText());
 		result.setNumDay(UIControlUtils.getTextAsFloat(numberDayText, Messages.PrescriptionView_nhapsochosongay));
@@ -669,7 +669,7 @@ public class PrescriptionView extends PamaFormUI implements IPatientViewPartList
 	private void viewPrescriptionItem(PrescriptionItem modelObj) {
 		selectComboOrSetTextByName(this.surgeryNameCombo, modelObj.getDrug());
 		setText(this.otherDrugText, modelObj.getOtherDrug());
-		setText(this.drugDescText, modelObj.getDrugDesc());
+		setText(this.drugOriginalText, modelObj.getDrugDesc());
 		
 		setText(this.numberDayText, String.valueOf(modelObj.getNumDay()));
 		setText(this.unitLabel, modelObj.getUnit());
@@ -702,7 +702,7 @@ public class PrescriptionView extends PamaFormUI implements IPatientViewPartList
 		revert(this.surgeryNameCombo);
 		final String empty = StringUtils.EMPTY;
 		this.otherDrugText.setText(empty);
-		this.drugDescText.setText(empty);
+		this.drugOriginalText.setText(empty);
 		this.unitLabel.setText(empty);
 		this.unitPerText.setText(empty);
 		setText(this.numberDayText, empty);

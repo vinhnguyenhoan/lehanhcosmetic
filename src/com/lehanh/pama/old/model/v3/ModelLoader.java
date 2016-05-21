@@ -53,7 +53,19 @@ public class ModelLoader {
 		loadPatient();
 		//loadBS();
 		//Exception in thread "main" java.lang.IllegalArgumentException: Infinity is not a valid double value as per JSON specification. To override this behavior, use GsonBuilder.serializeSpecialFloatingPointValues() method.
+		//loadThuoc();
+	}
+	
+	public static void loadThuoc() {
+		List<Thuoc> list = ModelLoader.getDSThuoc();
+		list.stream().forEach(new Consumer<Thuoc>() {
 
+			@Override
+			public void accept(Thuoc t) {
+				System.out.println(t.id + "\t" + t.ten + "\t" + t.cachSuDung + "\t" + t.cu + "\t" + t.donVi + "\t" + t.donViSuDung + "\t" + t.luuY + "\t" + t.soLanSuDungTrenNgay
+						 + "\t" + t.soLuong + "\t" + t.soLuongSuDungTrenLan + "\t" + t.tenGoc);
+			}
+		});
 	}
 	
 	public static void loadBS() {
@@ -180,9 +192,9 @@ public class ModelLoader {
 				}
 				
 				// for debug , TODO remove after debug
-				 if (bn.id != 16943) {
-				 return;
-				 }
+				// if (bn.id != 16943) {
+				// return;
+				// }
 				
 				Patient pa = null;;
 				try {
@@ -517,14 +529,24 @@ public class ModelLoader {
 		}
 		try {
 			Connection conn = getSession();
-			PreparedStatement ps = conn.prepareStatement("select mesISN,mimID,mesMedicineName from dbo.MedicineStock");
+			PreparedStatement ps = conn.prepareStatement("select medISN,medName,mimMedicineOriginalName,mexUsage,mexQuantityPerUnit,mexTakePerDay,mexQuantityPerDay,mexUsagePerDay,mexUsageUnit,mexNote,mexMoreDetails from Medicine");
 			ResultSet re = ps.executeQuery();
 			dsThuoc = new ArrayList<Thuoc>();
 			while (re.next()) {
 				Thuoc dr = new Thuoc(
-						re.getLong("mesISN"), 
-						re.getString("mimID"),		
-						re.getString("mesMedicineName")		
+						re.getLong("medISN"), 
+						re.getString("medName"),		
+						null,		
+						re.getInt("mexQuantityPerUnit"), 
+						re.getString("mexUsageUnit"),		
+						re.getInt("mexTakePerDay"), 
+						re.getString("mexQuantityPerDay"), 
+						re.getString("mexUsageUnit"),		
+						re.getString("mexUsagePerDay"),		
+						re.getString("mexUsage"),		
+						re.getString("mexNote"),
+						re.getString("mimMedicineOriginalName"),
+						re.getString("mexMoreDetails")
 				);
 				dsThuoc.add(dr);
 				mapThuoc.put(dr.id, dr);
@@ -548,11 +570,11 @@ public class ModelLoader {
 		try {
 			Connection conn = getSession();
 			PreparedStatement ps = conn.prepareStatement("SELECT patID,patName,patBirthDate,patAge,patSex,patAddress,patTel,patMobile,patOccupation, "+
-				"case when isnull(patHasPic,0)=1 then 'PatientPic\\'+patID+'.jpg' else '' end patImg, "+
+				"case when isnull(patHasPic,0)=1 then 'PatientPic/'+patID+'.jpg' else '' end patImg, "+
 				"clrISN,clrMedicalHistory, clr.clrSickHistory,clr.clrSickChange,clr.clrPulse,clr.clrBloodPressure, "+
 				"clr.clrTemperature,clr.clrWeigh,clr.empISN,clr.clrSickNotInList,clr.clrPathologicalSigns, "+
 				"clr.clrSurgery,clr.clrRexamination4Surgery,clr.clrSkill,clr.clrExaminationTimes,clr.clrRexaminationTimes, "+
-				"clr.clrExaminationDate,clr.clrFollowUpExaminationDate,clrMedicalAdvice "+
+				"clr.clrExaminationDate,clr.clrFollowUpExaminationDate,clrMedicalAdvice,clrAppointmentDate "+
 				"FROM Patients pt left join ClinicalRecord clr on pt.patISN = clr.patISN "+
 				"order by patID,clrExaminationTimes,clrRexaminationTimes;");
 			ResultSet re = ps.executeQuery();
@@ -593,7 +615,8 @@ public class ModelLoader {
 							re.getInt("clrRexaminationTimes"),		
 							re.getDate("clrExaminationDate"),		
 							re.getDate("clrFollowUpExaminationDate"),		
-							re.getString("clrMedicalAdvice")		
+							re.getString("clrMedicalAdvice"),
+							re.getDate("clrAppointmentDate")
 					);
 					benhNhan.addLanKhamBenh(lanKham);
 					mapLanKham.put(lanKham.id, lanKham);
@@ -701,7 +724,7 @@ public class ModelLoader {
 					lk.danhSachChiTietToaThuoc.add(d);
 				}
 			}
-			ps = conn.prepareStatement("SELECT clrISN,clpISN,clpPicName,clpPicture,clpPicDate FROM [ClinicalPicture]");
+			ps = conn.prepareStatement("SELECT clrISN,clpISN,replace(clpPicture,'\','/') clpPicture, clpPicName,clpPicDate FROM [ClinicalPicture]");
 			re = ps.executeQuery();
 			while (re.next()) {
 				LanKhamBenh lk = mapLanKham.get(re.getLong("clrISN"));

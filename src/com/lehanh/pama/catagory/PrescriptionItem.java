@@ -44,13 +44,13 @@ public class PrescriptionItem implements IJsonDataObject, Serializable {
 
 	//ct.cachSuDung, ct.cu, ct.donVi, ct.donViSuDung, ct.luuY, ct.ma, ""+ct.soLanSuDungTrenNgay, ""+ct.soLuong, ct.soLuongSuDungTrenLan, ct.ten
 	public PrescriptionItem(String cachSuDung, String cu, String donVi, String donViSuDung, String luuY,
-			String ma, int soLanSuDungTrenNgay, int soLuong, String soLuongSuDungTrenLanText, String ten) {
+			String drugDesc, int soLanSuDungTrenNgay, int soLuong, String soLuongSuDungTrenLanText, String ten) {
 		this.use = cachSuDung;
 		this.ss = cu;
 		this.unit = donVi;
 		this.unitPer = donViSuDung;
 		this.note = luuY;
-		// TODO this.drugDesc = ma;
+		this.drugDesc = drugDesc;
 		this.drug = ten;
 		
 		this.numSs = soLanSuDungTrenNgay;

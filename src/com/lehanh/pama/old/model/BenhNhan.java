@@ -190,7 +190,7 @@ public class BenhNhan {
 				if (serviceNames != null && !serviceNames.isEmpty()) {
 					detail.setServiceNames(serviceNames);
 				}
-				// TODO detail.setSurgeryDate(surgeryDate);
+				detail.setSurgeryDate(DateUtils.sqlDateToutilDate(lkb.ngayPhauThuat));
 				
 				detail.setAdviceFromDr(lkb.loiKhuyen);
 				detail.setSmallSurgery(lkb.thuThuat);
@@ -221,7 +221,7 @@ public class BenhNhan {
 					for (HinhAnh ha : lkb.danhSachHinhAnh) {
 						// name: 4154-Nose Aug Silas_1__B.JPG, thumuc: Nose Aug Silas\4150-4159
 						String thuMucAnh = ha.thuMucAnh; //-> sym, image name, "id":5.0,"u_date":"12/05/2016"
-						String[] thuMucAnhS = thuMucAnh.split("///");
+						String[] thuMucAnhS = thuMucAnh.split("\\\\");
 						String sym = thuMucAnhS[0];
 						TreeMap<String, TreeMap<String, Object>> bySym = picInfos.get(sym);
 						if (bySym == null) {
@@ -242,7 +242,7 @@ public class BenhNhan {
 				if (lkb.danhSachChiTietToaThuoc != null) {
 					List<PrescriptionItem> pL = new LinkedList<>();
 					for (ChiTietToaThuoc cttt : lkb.danhSachChiTietToaThuoc) {
-						PrescriptionItem item = new PrescriptionItem(cttt.cachSuDung, cttt.cu, cttt.donVi, cttt.donViSuDung, cttt.luuY, cttt.ma, 
+						PrescriptionItem item = new PrescriptionItem(cttt.cachSuDung, cttt.cu, cttt.donVi, cttt.donViSuDung, cttt.luuY, "",// TODO ten goc 
 								cttt.soLanSuDungTrenNgay, cttt.soLuong, cttt.soLuongSuDungTrenLan, cttt.ten);
 						pL.add(item);
 					}

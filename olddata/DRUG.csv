@@ -1,350 +1,122 @@
-9	Augmentin 1g/gói	MI6
-11	Fixx 100mg	MI8
-15	Loxof 500mg	MI12
-17	Klacid 125mg/bột	MI14
-19	Roxiphar 150mg	MI16
-20	Dalacin C 300mg	MI17
-27	Popydexa Auriculaire	MI24
-29	Xylometazolin Pediatric	MI26
-33	Diergo Spray	MI30
-34	Becotide	MI31
-36	Flixotide 250mg	MI33
-40	Givalex solution	MI37
-42	Fluomedic solution	MI39
-45	Atussin siroup	MI42
-46	Solmux Broncho siroup	MI43
-49	Bacitracine Ointment	MI46
-51	Decamisol Cream	MI48
-54	Metrogyl Cream	MI51
-55	Banitch (histamine blocker)	MI52
-56	Dezor cream	MI53
-59	Xyzall 5mg	MI56
-65	Tobitol	MI62
-70	Efferalgan codein	MI67
-73	Medrol 40mg/inject	MI70
-80	Toplexil	MI77
-93	Methyl Cobal/ inject	MI90
-96	Tanganil 500	MI93
-100	Atarax 100mg	MI97
-115	Nicobion Fort	MI112
-116	Nabica/ viên	MI113
-127	Vitamine AD	MI114
-144	Ciprofloxacin 500mg	MI13
-190	Cimetidine 300mg	MI117
-203	Decocort Cream	MI54
-207	Atarax 25mg	MI96
-208	Methyl Cobal/viên	MI89
-210	Flixotide 125mg	MI32
-211	Neumomicid 3M	MI15
-217	Medrol 125mg/ inject	MI71
-220	Madecassol Cream	MI49
-222	ATP	MI86
-223	Lexomil 6mg	MI98
-305	Daflon 500mg	MI107
-325	Ribomunyl/gói	MI115
-328	Physiomer	MI27
-340	PivaloneNeomycine	MI22
-343	Bevitine 250mg	MI102
-424	Optalidon	MI63
-448	Givalex	MI34
-481	Fixx 200mg	MI9
-488	Nimesulide 100mg	MI61
-566	Nopyl	MI60
-578	Zinnat 500mg	MI2
-605	Polaramine 2mg	MI58
-607	Vioxx 25mg	MI65
-622	Solmux Broncho/ viên	MI44
-645	NACL 0,9%	MI29
-649	Myonal	MI92
-652	Oscal D	MI101
-665	Solacy Adult	MI99
-668	Sporal/viên	MI110
-676	Serc 8mg	MI88
-679	Moxiclav 625mg	MI7
-684	Triamcinolone 80mg/ inject	MI72
-698	Rolaid	MI103
-714	Eludril solution	MI38
-716	Xanax 0,25mg	MI95
-719	Retinol 50.000 iu	MI100
-727	Alvityl	MI82
-731	Tequin 400mg	MI11
-737	POLYDEXA NASAL	MI23
-740	Sedafed 30mg	MI105
-744	Zinnat 125mg	MI4
-747	Mucomyst	MI79
-754	ORAFAR	MI40
-755	Omizac 20mg	MI109
-759	Seglor	MI126
-761	Biodroxil 500mg	MI10
-762	Serazen	MI74
-772	Griseofulvine 500mg	MI111
-774	Lergitec 10mg	MI57
-775	Betadine Pommade	MI47
-776	Auriderm K2 Gel	MI130
-778	Extranase	MI73
-781	Semprex	MI132
-782	Nevramin	MI133
-784	Carbophos	MI135
-785	Dezor cream	MI136
-786	Fixx 200mg	MI137
-787	Tanakan	MI138
-789	Chlorophyl	MI140
-790	Paxeladine	MI141
-791	Peritol	MI142
-792	Ossopan	MI143
-793	Solacy	MI144
-794	Kim tiền thảo	MI145
-795	Vinaga	MI146
-796	Dogarlic	MI147
-797	Primperan	MI148
-798	Calcium Corbière	MI149
-799	Effe-Paracetamol 200mg	MI150
-800	Calcigenol	MI151
-801	Lactacyd Babybath	MI152
-802	Lactacyd feminine hygiene	MI153
-803	Phytogyno	MI154
-804	Kẹo sữa ong chúa	MI155
-805	Pectol sirop	MI156
-806	Phenergan sirop	MI157
-807	Neodex (nhỏ mắt)	MI158
-808	Cloraxin (nhỏ mắt)	MI159
-809	Dexacol (nhỏ mắt)	MI160
-810	Polydeson (nhỏ mắt tai mũi)	MI161
-811	Motilium M	MI162
-813	Alaxan	MI164
-815	Hoạt huyết dưỡng não	MI166
-816	UPSA C 1g	MI167
-817	Fugacar	MI168
-818	Phosphalugel /gói	MI169
-819	VOLTAREL Emulgel	MI170
-820	Arthrodont Gingival paste	MI171
-821	Salonpas (miếng dán)	MI172
-822	Postinor	MI173
-823	Eucalyptine	MI174
-824	Loxfen	MI175
-825	Dompil	MI176
-826	Varocomin	MI177
-827	Rosiden	MI178
-828	Dextromethorphan	MI179
-829	Mégamylase 3000 iu	MI180
-831	Artadin	MI182
-832	Zecuf sirop	MI183
-833	Biolacto	MI184
-834	NaCl 9% 10ml	MI185
-836	Contractubex 10g gel	MI187
-837	Semprex	MI55
-838	Tamik 3mg	MI189
-839	Efferalgan 80mg suppositoire	MI190
-840	Efferalgan 150mg suppositoire	MI191
-841	Efferalgan 300mg suppositoire	MI192
-842	Panadol Extra	MI193
-844	Bactrim Forte	MI195
-846	Mégamylase 	MI197
-847	Natri Clorid 0,9% 10ml	MI198
-850	Curam 312,5mg	MI201
-852	Centovit	MI203
-858	Furocap 250mg	MI209
-859	Furocap 500mg	MI210
-862	Tobicom	MI213
-865	Natri Chlorid 0,9% 500ml	MI216
-867	Clarithromycin 250mg	MI218
-868	Idarac	MI219
-869	Vitamine E 400ui	MI220
-870	Clarithromycin 500mg	MI221
-871	Vita EPA plus 	MI222
-872	Tegretol	MI223
-873	Ameflu	MI224
-875	Mobic 7,5 mg	MI226
-876	Curam 1gr	MI227
-877	Rhinathiol	MI228
-878	Aspirin 325mg	MI229
-879	Rinafed	MI230
-880	Actifed linctus sirup	MI231
-883	Scott"s	MI234
-884	Sterimar	MI235
-885	Ameflu đa triệu chứng	MI236
-886	Ameflu long đờm	MI237
-887	Ameflu ban ngày	MI238
-888	Ameflu ban đêm	MI239
-890	Bricanyl	MI241
-892	Grovit	MI243
-893	Telfast	MI244
-895	Rovas 1,5M	MI246
-896	Cerumenex	MI247
-897	Solacy  (TE)	MI248
-899	Diantalvic	MI64
-903	Trineuron	MI254
-904	Clarinase R	MI255
-905	Dantuosin	MI256
-906	Rhinex	MI257
-908	Enervon C	MI259
-909	B1B6B12	MI260
-910	Aspirin 81 mg	MI261
-911	Strepsils 	MI262
-913	Haginat 250 mg	MI264
-914	Haginat 500 mg	MI265
-915	Clarithromycin 250 mg	MI266
-919	Cetirizine	MI270
-922	Nabica 	MI273
-923	Solupred 20 mg	MI274
-924	Klacid 500 mg	MI275
-925	Kamistad- gel	MI276
-927	Mycostatine 500 mg	MI278
-928	Dalacin T	MI279
-929	Trineuron	MI280
-930	Cefaclor 250 mg	MI281
-931	Cefaclor 500 mg	MI282
-932	Opedroxil 250mg	MI283
-933	Vesim	MI284
-935	Damizen	MI286
-936	Béres Drops 30ml	MI287
-937	Béres Drops 100ml	MI288
-938	Petizen	MI289
-939	Tot'hema 	MI290
-940	Sorbitol	MI291
-941	Tonicalcium Enfant 5ml	MI292
-942	Tonicalcium Adult 10ml	MI293
-943	Opedroxil 250mg	MI294
-944	LH"s solution	MI295
-945	OpeDroxil 500mg	MI296
-947	Osla (Eye Drops)	MI298
-948	Aticef (Cefadroxil 500mg)	MI299
-951	Ciplus	MI302
-952	Euca - OPV	MI303
-953	Astelin (Azelastine HCl 137mcg)	MI304
-954	Ilclor (Cefaclor 250 mg)	MI305
-955	Dafsone 100mg	MI306
-956	Colchicin 1mg	MI307
-957	Piascledine 300mg	MI308
-958	Colchimax (paregorique)	MI309
-959	Dermal-E Abbott	MI310
-960	Dapson 100mg	MI311
-961	Rutin - C	MI312
-962	Laroxil 25mg	MI313
-963	Laroxil 50mg	MI314
-964	Neurontin 300	MI315
-965	Neurobion	MI316
-966	Neurontin 300 (Inject)	MI317
-967	Accolate 20mg	MI318
-968	Oxydermine Cream	MI319
-969	Scott''s Syrup	MI320
-970	Medrol 4mg	MI321
-971	Actifed Syrup	MI322
-973	Hapacol 250mg (gói)	MI324
-974	Centovit Silver	MI325
-975	Lidocain 10% Sprays 	MI326
-976	OpeAzitro 500mg	MI327
-978	Broncho - Vaxom	MI329
-979	Broncho - Vaxom (gói)	MI330
-980	Augmentin 500mg (gói)	MI331
-981	Augmentin 500mg	MI332
-982	Biolactyl 	MI333
-983	TobraDex Collyre	MI334
-984	Toplexil siro	MI335
-985	Atussin Siro	MI336
-986	Hirudoid Cream	MI337
-987	Augmentin 1g/lọ	MI338
-988	RH2	MI340
-989	Tavanic	MI341
-990	Sedilix - DM Linctus	MI342
-991	AZ Vit	MI343
-992	Tavanic 500mg	MI344
-993	Supradyl	MI345
-994	Lasix 20mg	MI346
-995	Curiosin Cream	MI347
-996	Neo-Sporine Solution	MI348
-997	Meloxicam 7.5mg	MI349
-998	Tramadol 50mg	MI350
-999	Lyrica 75 mg	MI351
-1000	Elavil 25 mg	MI352
-1004	Cibidazen	MI356
-1005	Acemuc	MI357
-1006	Klamentin 1g	MI285
-1007	Alphachymotrypsin	MI249
-1008	Telfast BD 60mg	MI360
-1009	Mucitux	MI78
-1010	Zantac 150mg	MI108
-1011	Eprazinone 50mg	MI363
-1012	Omega 3	MI251
-1013	Nutroplex Siroup	MI84
-1014	Tragutan	MI366
-1015	Terpine Gonnon	MI75
-1016	Cbidaizen	MI368
-1017	Flagyl 250mg	MI369
-1018	Decolgen No Drowse	MI370
-1019	Decolgen Forte	MI371
-1020	Rotunda	MI165
-1022	DOMINAKREM	MI374
-1023	Motilium-M	MI375
-1024	Magne B6	MI139
-1026	PolyBamycine Pommade	MI323
-1027	Povidine Solution	MI207
-1030	Paracetamol 500mg	MI66
-1031	Flixonase	MI19
-1033	Rhinex Gomenol	MI25
-1035	Ciplox auriculaire	MI45
-1036	Budenase	MI388
-1037	Medrol 16mg	MI69
-1039	Omeprazole 20 mg	MI272
-1040	Rovas 3M	MI245
-1041	Aciclovir 5% Cream	MI267
-1042	PolyBamycine Pommade	MI394
-1043	Actifed DM	MI41
-1044	Actifed	MI263
-1045	Omega Oseamex	MI181
-1046	Pharmaton	MI80
-1047	Polydexa auriculaire	MI199
-1048	Vastarel	MI87
-1050	Scar face	MI240
-1051	Nootropyl 800mg	MI85
-1052	Acemuc 200mg	MI404
-1053	Aerius 5mg	MI59
-1054	Zinnat 250mg	MI3
-1056	Decontractyl	MI91
-1057	Sibelium	MI94
-1058	Actisoufre	MI297
-1059	Adona	MI200
-1060	Ameflu	MI412
-1062	Toplexil	MI414
-1063	Toplexin	MI131
-1065	Terpin-Codein	MI242
-1066	Panadol children 120mg	MI194
-1068	Tyrotab	MI118
-1069	Vita C 500mg	MI83
-1070	Efferalgan 500mg	MI68
-1071	CENTRIVIT trẻ em	MI377
-1073	Xisat	MI355
-1074	Clopheniramin 4mg	MI426
-1075	Chlorpheniramin Maleate 4mg	MI215
-1076	Augmentin 1g	MI5
-1077	Alcol 90 	MI253
-1078	Eosin 1%	MI196
-1082	Loratadin 10mg	MI202
-1085	Nasonex	MI21
-1086	Rhinocort	MI20
-1089	Acticef 500mg	MI328
-1091	Metronidazole 250mg	MI18
-1092	Amoxicillin 500mg	MI277
-1093	Beta-Serc	MI353
-1097	Bactroban Cream	MI50
-1099	FRESHGUM	MI450
-1100	EFFE Paracetamol 200mg	MI452
-1103	Prednisolone 5mg	MI455
-1104	Panadol 500mg	MI1167
-1105	Silicon Sheet	MI1168
-1106	Avène Cicalfate Cream	MI1169
-1107	Heliocare	MI1218
-1108	Heliocare Cream	MI1244
-1109	Cravit 500mg	MI1248
-1110	Dermatix (Silicone gel)	MI1422
-1111	Ciprofloxacin	MI1496
-1112	Noflux 90mg	MI1508
-1113	Bisolvon	MI1531
-1114	Exomuc 200mg	MI1566
-1115	Scar fade	MI1699
-1116	Sulfarlem S25	MI1705
-1118	Parlodel 2,5mg	MI1707
-1119	Rejuvas Gel	MI1711
-1120	Lysivit	MI1726
-1121	Strase	MI1819
-1122	Celestamine	MI1820
+1	Acemuc	uống	sáng,trưa,tối	gói	gói		3	3	1	Acetylcysteine
+2	Klamentin 1g	uống	sáng,chiều	viên	viên		2	2	1	Amoxicilin: 875mg + Acid clavulanic 125mg
+3	Alphachymotrypsin	uống	sáng,chiều	viên	viên	(có thể ngậm tan trong lưỡi)	2	4	2	Alphachymotrypsin
+4	Telfast	uống	sáng,chiều	viên	viên		2	2	1	Fexofenadine hydrochloride
+5	Telfast BD 60mg	uống	sáng,chiều	viên	viên		2	2	1	Fexofenadine hydrochloride
+6	Mucitux	uống	sáng,trưa,tối	viên	viên		3	6	2	Eprazinone Dihydrochloride
+7	Zantac 150mg	uống	tối	viên	viên	Uống trước khi đi ngủ 30 phút	1	1	1	Rannitidine
+8	Eprazinone 50mg	uống	sáng,trưa,tối	viên	viên		3	3	1	Eprazinon dihydroclorid
+9	Omega 3	uống	sáng,chiều	viên	viên	Uống trong khi ăn	2	2	1	EPA, DHA, vitamin E
+10	Nutroplex Siroup	uống	sáng,tối	muỗng	muỗng	Lắc chai kỹ trước khi dùng	2	1	1	Sắt, vitamin, khoáng chất
+11	Exomuc 20mg	uống	sáng,trưa,tối	gói	gói	hòa tan trong nước trước khi uống	3	3	1	Acetylcysteine
+12	Daflon 500mg	uống	trưa,tối	viên	viên		2	2	1	Diosmin 450mg + hesperidin 50mg
+13	Tragutan	uống	sáng,trưa,tối	viên	viên		3	6	2	Eucalyptol 100mg
+14	Terpine Gonnon	uống	sáng,trưa,tối	viên	viên		3	6	2	Terpin 100mg + Codein 15mg
+15	Cbidaizen	uống	sáng,chiều	viên	viên		2	4	2	Seratiopeptidase 10mg
+16	Flagyl 250mg	uống	sáng,trưa,tối	viên	viên		3	3	1	Metronidazole
+17	Decolgen No Drowse	uống	sáng,trưa,tối	viên	viên		3	3	1	Acetaminophen: 500mg, Pseudoephedrin: 30mg
+18	Decolgen Forte	uống	sáng,trưa,tối	viên	viên		3	3	1	Acetaminophen
+19	Rotunda	uống	tối	viên	viên	uống trước khi đi ngủ 30 phút	1	1	1	L-Tetrahydropalmatin 30mg
+20	Terpin-Codein	uống	sáng,trưa,tối	viên	viên		3	6	2	Terpin hydrat 100mg - Codein phosphat 5mg
+21	DOMINAKREM	bôi	tối	ít	ít	Tránh tiếp xúc với ánh nắng mặt trời	1	1	1	Hydroquinone 40mg
+22	Motilium-M	uống	sáng,trưa,tối	viên	viên	uống trước 15 phút trước bữa ăn	3	3	1	Domperidone maleate...
+23	Magne B6	uống	sáng,trưa,tối	viên	viên		3	3	1	Magnesi lactat dihydrat 470mg + B6 5mg
+24	CENTRIVIT trẻ em	uống	sáng,trưa,tối	viên	viên		3	3	1	
+25	PolyBamycine Pommade	bôi	sáng,tối	ít	ít	bôi lên vết mổ sau 3 ngày	2	1	1	
+26	Povidine Solution	bôi	sáng,tối	ít	ít	Bôi lên vết mổ trên da đầu	2	1	1	
+27	Augmentin 1g	uống	sáng,chiều	viên	viên		2	2	1	Amoxicilin: 875mg + Acid clavulanic 125mg
+28	Loratadin 10mg	uống	sáng	viên	viên		1	1	1	Loratadine
+29	Paracetamol 500mg	uống	sáng,trưa,chiều,tối	viên	viên		4	4	1	Paracetamol
+30	Xisat	xịt	sáng,trưa,chiều,tối	cái	cái	xịt nhanh, mạnh	4	1	3	nước biển sâu
+31	Flixonase	xịt	sáng,tối	cái	cái	Xịt sau khi rửa mũi	2	1	2	Fluticasone Propionate
+32	Rhinocort	xịt	trưa,tối	cái	cái	Xịt sau khi rửa mũi	2	1	2	Budesonide: 64mcg/liều
+33	Rhinex Gomenol	xịt	sáng,trưa,tối	xịt	xịt	Xịt trước khi rửa mũi	3	1	3	Naphazoline nitrat 0,05g/100ml
+34	Nasonex	xịt	sáng,tối	cái	cái	Xịt sau khi rửa mũi	2	1	2	Mometasone furoate monohydrate
+35	Ciplox auriculaire	nhỏ tai	sáng,trưa,chiều,tối	giọt	giọt	Nhỏ thuốc vào tai bệnh	4	1	3	Ciprofloxacin HCl
+36	Budenase	xịt	sáng,tối	cái	cái	Xịt sau khi rửa mũi	2	1	2	Budesonide 100mcg
+37	Medrol 16mg	uống	sáng	viên	viên	Uống sau khi ăn	1	1	1	Methylprednisolone
+38	Omeprazole 20 mg	uống	sáng	viên	viên		1	1	1	Omeprazol
+39	Rovas 3M	uống	sáng,trưa,tối	viên	viên		3	3	1	Spiramycin
+40	Aciclovir 5% Cream	bôi	Cách nhau 4 giờ	ít	ít	Bôi liên tục 5 đến 10 ngày	5	1	1	Acyclovir
+41	Actifed DM	uống	sáng,trưa,chiều,tối	muỗng cà phê	muỗng cà phê	không uống quá 4 lần trong ngày	4	1	1	Triprolidine, Pseudoephedrine, Dextromethophan
+42	Actifed	uống	sáng	viên	viên		1	1	1	Pseudoephedrine, Triprolidine
+43	Omega Oseamex	uống	sáng,trưa	viên	viên	uống trong khi ăn	2	2	1	Omega 3 marine triglycerid
+44	Pharmaton	uống	sáng,trưa	viên	viên	Uống trước khi ăn	2	2	1	
+45	Polydexa auriculaire	nhỏ tai	sáng,trưa,tối	giọt	giọt	nhỏ vào tai bệnh	3	1	3	Neomycin sulfate; Polymycin B sulfate; Natri dexamethasone metasulphobenzoate
+46	Vastarel	uống	sáng,tối	viên	viên	uống vào đầu bữa ăn	2	2	1	Trimetazidine
+47	Toplexin	uống	sáng,trưa,tối	viên	viên		3	6	2	Acetaminophen, Guaifenesin, Oxomemazine hydrochloride
+48	Scar face	bôi	sáng,tối	ít	ít	bôi lên vết mổ	2	1	1	
+49	Nootropyl 800mg	uống	sáng,trưa,tối	viên	viên		3	3	1	Piracetam
+50	Acemuc 200mg	uống	sáng,trưa,tối	gói	gói	Hòa tan trong 1/2 ly nước	3	3	1	Acetylcystein: 200mg, Aspartam
+51	Accolate 20mg	uống	sáng,trưa,tối	gói	gói	hòa tan trong 1/2 ly nước	3	3	1	Acetylcystein: 200mg, Aspartam
+52	Acemuc 200mg	uống	sáng,trưa,tối	gói	gói	Hòa tan trong 1/2 ly nước	3	3	1	Acetylcystein: 200mg, Aspartam
+53	Clarinase R	uống	sáng,chiều	viên	viên		2	2	1	Pseudoephedrin: 120mg, Loratidine: 5mg
+54	Aerius 5mg	uống	sáng	viên	viên		1	1	1	Desloratadine: 5mg
+55	Alaxan	uống	sáng,trưa,tối	viên	viên	Uống sau khi ăn	3	3	1	Ibuprofen
+56	Alvityl	uống	sáng,trưa,tối	muỗng	muỗng		3	1	1	Vitamin
+57	Centovit	uống	sáng	viên	viên	Uống trong khi ăn	1	1	1	1
+58	Zinnat 250mg	uống	sáng,chiều	viên	viên		2	2	1	Cefuroxime
+60	Decontractyl	uống	sáng,trưa,tối	viên	viên		3	6	2	Mephenesin: 250mg
+61	Sibelium	uống	tối	viên	viên		1	2	1	Flunarizine
+62	Actisoufre	uống	sáng,tối	ống	ống	Hòa với 1 ít nước uống vào bữa ăn	2	2	1	Nomahydrated Natri Sulfide - Saccharomyces cerevisiae 
+63	Adona	uống	sáng,trưa,tối	viên	viên		3	3	1	Carbazochrome: 30mg   
+64	Ameflu	uống	sáng,trưa,tối	viên	viên		3	6	2	Paracetamol - Clopheniramin - Dextromethorphan 
+65	Bactroban Cream	bôi	sáng,trưa,tối	ít	ít	Bôi tối đa trong 10 ngày	3	1	1	Mupirocin
+66	Toplexil	uống	sáng,trưa,tối	viên	viên		3	6	2	Acetaminophen: 33.3mg Guaifenesin: 33.3mg Oxomemazine hydrochloride: 1.65mg 
+67	Panadol children 120mg	uống	sáng,tối	vieen	vieen	có thể hòa tan trong nước	2	2	1	Acetaminophen
+68	Tyrotab	uống	dùng thường xuyên	viên	viên	ngậm tan trọng miệng	10	10	1	Tyrothricin, Tetracaine hydrochloride
+69	Vita C 500mg	uống	sáng	viên	viên	không nên uống khi bụng đói	1	1	1	Vitamin C
+70	Efferalgan 500mg	uống	sáng,trưa,chiều,tối	viên	viên	Hòa tan trong nước	4	4	1	Paracetamol
+71	Clopheniramin 4mg	uống	sáng,tối	viên	viên		2	1	1/2		Chlorpheniramine
+72	Chlorpheniramin Maleate 4mg	uống	sáng,tối	viên	viên		2	1	1/2	Chlorpheniramine
+73	Alcol 90 	rửa mũi	sáng,tối	ít	ít	rửa vết thương	2	1	1	
+74	Eosin 1%	bôi	sáng,trưa,tối	ít	ít	Bôi vào tai bệnh	3	1	1	
+75	Acticef 500mg	uống	sáng,trưa,tối	viên	viên		3	3	1	Cefadroxil
+76	Metronidazole 250mg	uống	sáng,trưa,tối	viên	viên		3	3	1	Metronidazole
+77	Amoxicillin 500mg	uống	sáng,trưa,tối	viên	viên		3	3	1	
+78	Beta-Serc	uống	sáng,tối	viên	viên		2	2	1	
+80	FRESHGUM	súc họng	sáng,tối	ít	ít	ngậm trong 30 phút	2	1	1	Nước súc miệng
+81	EFFE Paracetamol 200mg	uống	sáng,tối	gói	gói	Hoà tan trong nước	2	2	1	
+82	Cravit	uống	sáng	viên	viên		1	1	1	Levofloxacin 500mg
+83	Prednisolone 5mg	uống	sáng	viên	viên	Uống sau khi ăn no	1	3	3	
+85	Panadol 500mg	uống	sáng,chiều	viên	viên		2	4	2	Paracetamol
+86	Silicon Sheet	bôi	sáng	miêng	miêng	Dán lên sẹo	1	1	1	
+87	Avène Cicalfate Cream	bôi	sáng,tối	ít	ít	Thoa lên sẹo 	2	1	1	
+88	Rolaid	uống	sáng	viên	viên	Nhai 2 viên trước khi uống Medrol	1	1	2	
+89	Heliocare	uống	sáng				1	1	1	
+90	Heliocare Cream	bôi	sáng,tối	ít	ít		2	1	1	
+91	Cravit 500mg	uống	sáng	viên	viên	Uống sau khi ăn	1	1	1	
+92	ORAFAR	súc họng		chai	chai		0	0		
+93	Zinnat 125mg	uống	sáng,chiều	viên	viên	Uống sau khi ăn	2	1	1	Cefuroxim
+94	Polaramine 2mg	-Chọn-		viên	viên		0	0		
+95	Nicobion Fort	uống		viên	viên		2	0	1	
+96	Physiomer	-Chọn-		chai	chai		0	0		
+97	Polydeson (nhỏ mắt tai mũi)	-Chọn-		chai	chai		0	0		
+98	Dermatix (Silicone gel)	bôi	sáng,tối	ít	ít	Thoa lên sẹo	2	1	1	
+99	Tamik 3mg	uống	sáng,tối	viên	viên		2	1	1	
+100	Efferalgan codein	-Chọn-		viên	viên		0	0		
+101	Zinnat 500mg	-Chọn-		viên	viên		0	0		
+102	Fixx 200mg	uống		viên	viên		0	0		
+103	Flixotide 125mg	xịt	sáng,tối	xịt	xịt		2	0	2	
+104	Ciprofloxacin	nhỏ tai	sáng,chiều	giọt	giọt		2	1	2	
+105	Tanganil 500	uống		viên	viên		0	0		
+106	Noflux 90mg	uống	sáng,chiều	viên	viên		2	1	1	
+107	Bisolvon	uống	sáng,trưa,chiều	viên	viên		3	1	1	
+108	Oscal D	uống	sáng,chiều	viên	viên		2	1	1	
+109	Exomuc 200mg	uống	sáng,trưa,chiều	gói	gói	Hòa với ít nước	3	1	1	
+110	Motilium M	uống	sáng,trưa,chiều	viên	viên		3	3	1	
+112	Scar fade	bôi	sáng,tối	ít	ít	Thoa lên sẹo	2	1	1	
+113	Sulfarlem S25	uống	sáng,trưa,chiều	viên	viên		3	3	1	
+114	Parlodel 2,5mg	uống	sáng,chiều	viên	viên		2	1	1/2 	
+115	Parlodel 2,5mg	uống	sáng,chiều	viên	viên		2	2	1/2	Bromocriptine Méylate
+116	Rejuvas Gel	bôi	sáng,chiều	ít	ít	Bôi 1 lớp mỏng lện sẹo	2	1	1	
+117	Lysivit	uống	sáng,chiều	muỗng	muỗng		2	1	1	
+118	Medrol 4mg	uống	sáng	viên	viên	Uống sau khi ăn	1	1	1	
+119	Strase	uống	sáng	viên	viên		1	1	1	
+120	Celestamine	uống	sáng	viên	viên		1	1	1	
+121	Phosphalugel /gói	-Chọn-		gói	gói		0	0		
+122	Postinor	-Chọn-		viên	viên		0	0		
+123	Dalacin C 300mg	uống		viên	viên		0	0		
+124	Methyl Cobal/viên	uống		viên	viên		0	1000		
+125	Neurobion	-Chọn-		viên	viên		0	0		
+126	Rhinex	-Chọn-		chai	chai		0	0		

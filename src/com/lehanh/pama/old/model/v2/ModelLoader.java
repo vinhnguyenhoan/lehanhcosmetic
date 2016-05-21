@@ -316,9 +316,19 @@ public class ModelLoader {
 			dsThuoc = new ArrayList<Thuoc>();
 			while (re.next()) {
 				Thuoc dr = new Thuoc(
-						re.getLong("mesISN"), 
-						re.getString("mimID"),		
-						re.getString("mesMedicineName")		
+						re.getLong("medISN"), 
+						re.getString("medName"),		
+						null,		
+						re.getInt("mexQuantityPerUnit"), 
+						re.getString("mexUsageUnit"),		
+						re.getInt("mexTakePerDay"), 
+						re.getString("mexQuantityPerDay"), 
+						re.getString("mexUsageUnit"),		
+						re.getString("mexUsagePerDay"),		
+						re.getString("mexUsage"),		
+						re.getString("mexNote"),
+						re.getString("mimMedicineOriginalName"),
+						re.getString("mexMoreDetails")
 				);
 				dsThuoc.add(dr);
 				mapThuoc.put(dr.id, dr);
@@ -390,7 +400,8 @@ public class ModelLoader {
 							re.getInt("clrRexaminationTimes"),		
 							re.getDate("clrExaminationDate"),		
 							re.getDate("clrFollowUpExaminationDate"),		
-							re.getString("clrMedicalAdvice")		
+							re.getString("clrMedicalAdvice"),
+							re.getDate("clrAppointmentDate")
 					);
 					benhNhan.addLanKhamBenh(lanKham);
 					mapLanKham.put(lanKham.id, lanKham);

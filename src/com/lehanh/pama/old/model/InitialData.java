@@ -111,7 +111,14 @@ public class InitialData {
 		
 		if (CatagoryType.DRUG == catType) {
 			Long oldId = Long.valueOf(data[0]);
-			Long newId = catDao.insert(new Catagory(catType, data[1], data[2], data[1], oldId));
+			Long newId = catDao.insert(
+					new Catagory
+					(catType, data[1], data[2], data[1], oldId)
+					//new DrugCatagory
+					//(t.id + "\t" + t.ten + "\t" + t.cachSuDung + "\t" + t.cu + "\t" + t.donVi + "\t" + t.donViSuDung + "\t" + t.luuY + "\t" + t.soLanSuDungTrenNgay
+					// + "\t" + t.soLuong + "\t" + t.soLuongSuDungTrenLan + "\t" + t.tenGoc);
+					);
+
 			updateCatCache(catType, oldId, newId);
 			return;
 		}
