@@ -22,6 +22,7 @@ public class LanKhamBenh {
 	public List<DanhMuc> danhSachChuanDoan = new ArrayList<DanhMuc>();
 	public String chuanDoanNgoaiDS;
 	public List<PhauThuat> danhSachPhauThuat = new ArrayList<PhauThuat>();
+	public Date ngayPhauThuat;
 	public String thuThuat;
 	public int lanKham = 1;
 	public int lanTaiKham = 0;
@@ -32,7 +33,7 @@ public class LanKhamBenh {
 	public List<HinhAnh> danhSachHinhAnh = new ArrayList<HinhAnh>();
 	public LanKhamBenh(long id, String tienCan, boolean caoHuyetAp, boolean tangDuongHuyet, boolean viemGan, String benhSu,
 			String dienBienBenh, String mach, String huyetAp, String nhietDo, String canNang, BacSy bacSyKham, String trieuCungNgoaiDS,
-			String chuanDoanNgoaiDS, String thuThuat, int lanKham, int lanTaiKham, Date ngayKham, Date ngayTaiKham, String loiKhuyen) {
+			String chuanDoanNgoaiDS, String thuThuat, int lanKham, int lanTaiKham, Date ngayKham, Date ngayTaiKham, String loiKhuyen,Date ngayPhauThuat) {
 		super();
 		this.id = id;
 		this.tienCan = tienCan;
@@ -54,5 +55,6 @@ public class LanKhamBenh {
 		this.ngayKham = ngayKham;
 		this.ngayTaiKham = ngayTaiKham;
 		this.loiKhuyen = loiKhuyen;
+		this.ngayPhauThuat = ngayPhauThuat;
 	}
 }

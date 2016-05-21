@@ -1,34 +1,15 @@
 package com.lehanh.pama.old.model.v3;
 
-import java.io.BufferedReader;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
-import java.util.TreeMap;
-import java.util.TreeSet;
-import java.util.function.Consumer;
 
-import org.apache.commons.lang3.StringUtils;
-
-import com.lehanh.pama.catagory.AppointmentCatagory;
-import com.lehanh.pama.catagory.Catagory;
-import com.lehanh.pama.catagory.CatagoryManager;
-import com.lehanh.pama.catagory.CatagoryType;
-import com.lehanh.pama.catagory.ServiceCatagory;
-import com.lehanh.pama.db.DatabaseManager;
-import com.lehanh.pama.db.dao.PatientDao;
 import com.lehanh.pama.old.model.BacSy;
 import com.lehanh.pama.old.model.BenhNhan;
 import com.lehanh.pama.old.model.ChiTietToaThuoc;
@@ -38,293 +19,19 @@ import com.lehanh.pama.old.model.LanKhamBenh;
 import com.lehanh.pama.old.model.PhauThuat;
 import com.lehanh.pama.old.model.Thuoc;
 import com.lehanh.pama.old.model.ToaThuocMau;
-import com.lehanh.pama.patientcase.AppointmentSchedule;
-import com.lehanh.pama.patientcase.Messages;
-import com.lehanh.pama.patientcase.Patient;
-import com.lehanh.pama.ui.util.MainApplication;
-import com.lehanh.pama.util.DateUtils;
-import com.lehanh.pama.util.PamaException;
-import com.lehanh.pama.util.PamaHome;
 
 public class ModelLoader {
-	
-	public static void main(String[] args) throws SQLException, IOException {
-		//loadToaThuocMau();
-		loadPatient();
-		//loadBS();
-		//Exception in thread "main" java.lang.IllegalArgumentException: Infinity is not a valid double value as per JSON specification. To override this behavior, use GsonBuilder.serializeSpecialFloatingPointValues() method.
-
-	}
-	
-	public static void loadBS() {
-		List<BacSy> listBS = ModelLoader.getDSBacSy();
-		listBS.stream().forEach(new Consumer<BacSy>() {
-
-			@Override
-			public void accept(BacSy t) {
-				System.out.println(t.id + "\t" + t.ten);
-			}
-		});
-		
-	}
-	
-	static String[] toathuocmau = new String[]{
-			"Căng da mặt",
-			"Căng trán thái dương",
-			"Chỉnh hình mí - Treo cung mày",
-			"Chỉnh hình mũi Fascia",
-			"Chỉnh hình mũi Silas",
-			"Chỉnh hình mũi Sili",
-			"Đặt túi ngực",
-			"Đau dây thần kinh sau mổ",
-			"Đau nhức do tổn thương thần kinh",
-			"Hậu phẫu chỉnh hình mũi, mắt",
-			"Sili môi"
-		};
-	public static void loadToaThuocMau() {
-		List<ToaThuocMau> list = ModelLoader.getDSToaThuocMau();
-		list.stream().forEach(new Consumer<ToaThuocMau>() {
-
-			@Override
-			public void accept(ToaThuocMau t) {
-				boolean showNamed = false;
-				for (String ft : toathuocmau) {
-					if (t.ten.equals(ft)) {
-						if (!showNamed) {
-							System.out.println(t.ten);
-							showNamed = true;
-						}
-						for (ChiTietToaThuoc ct : t.dsChiTiet) {
-							System.out.println(print(ct.cachSuDung, ct.cu, ct.donVi, ct.donViSuDung, /*""+ct.id,*/ ct.luuY, ct.ma
-									, ""+ct.soLanSuDungTrenNgay, ""+ct.soLuong, ""+ct.soLuongSuDungTrenLan, ct.ten));
-						}
-						System.out.println("end");
-					}
-				}
-			}
-		});
-	}
-
-	protected static String print(String... texts) {
-		String result = "";
-		int index = 0;
-		for (String text : texts) {
-			result += text;
-			if (index < texts.length - 1) {
-				result += "\t";
-			}
-			index++;
-		}
-		return result;
-	}
-	
-	public static void loadPatient() throws SQLException, IOException {
-		PamaHome.application = new MainApplication();
-		DatabaseManager.initialize();
-		CatagoryManager catM = new CatagoryManager();
-		catM.initialize();
-		
-		TreeMap<Long, Catagory> drList = catM.getCatagoryByType(CatagoryType.DR);
-		Map<Long, Long> mapDrId = new HashMap<>();
-		for (Catagory dr : drList.values()) {
-			mapDrId.put(dr.getOldId(), dr.getId());
-		}
-
-		TreeMap<Long, Catagory> surMap = catM.getCatagoryByType(CatagoryType.SURGERY);
-		TreeMap<Long, Catagory> services = catM.getCatagoryByType(CatagoryType.SERVICE);
-		TreeMap<String, ServiceCatagory> servicesBySur = new TreeMap<>();
-		Map<Long, Long> mapSgId = new HashMap<>();
-		Map<String, Catagory> mapSgName = new HashMap<>();
-		for (Catagory sg : surMap.values()) {
-			mapSgId.put(sg.getOldId(), sg.getId());
-			mapSgName.put(sg.getName(), sg);
-			
-			for (Entry<Long, Catagory> entryS : services.entrySet()) {
-				for (Number surFromSerId : entryS.getValue().getRefIds().get(CatagoryType.SURGERY.name())) {
-					if (sg.getId().longValue() == surFromSerId.longValue()) {
-						
-						if (servicesBySur.containsKey(sg.getName()) && "Tổng hợp".equals(entryS.getValue().getName())) {
-							continue;
-						}
-						servicesBySur.put(sg.getName(), (ServiceCatagory) entryS.getValue());
-					}
-				}
-			}
-		}
-		
-		List<BenhNhan> listBN = ModelLoader.getDSBenhNhan();
-		PatientDao paDao = new PatientDao();
-		
-		AppointmentCatagory appointmentCatagory = (AppointmentCatagory) ((LinkedList<Catagory>) new AppointmentCatagory().createCatagoryList()).getLast();
-		List<AppointmentSchedule> appToSave = new LinkedList<>();
-		listBN.stream().forEach(new Consumer<BenhNhan>() {
-
-			@Override
-			public void accept(BenhNhan bn) {
-				if (bn.danhSachKham == null || bn.danhSachKham.isEmpty()) {
-					return;
-				}
-				boolean isSurgery = false;
-				for (LanKhamBenh lkb : bn.danhSachKham) {
-					if (lkb.danhSachPhauThuat != null && !lkb.danhSachPhauThuat.isEmpty()) {
-						for (PhauThuat pt : lkb.danhSachPhauThuat) {
-							if (mapSgId.containsKey(pt.id)) {
-								isSurgery = true;
-								break;
-							}
-						}
-					}
-				}
-				if (!isSurgery) {
-					return;
-				}
-				
-				// for debug , TODO remove after debug
-				 if (bn.id != 16943) {
-				 return;
-				 }
-				
-				Patient pa = null;;
-				try {
-					pa = bn.convertPa(servicesBySur, mapSgName, mapDrId, appToSave, appointmentCatagory);
-				} catch (ParseException e1) {
-					e1.printStackTrace();
-					System.exit(-1);
-				}
-				try {
-					paDao.insert(pa);
-				} catch (SQLException e) {
-					throw new PamaException(Messages.PatientManager_loicapnhapdb + e.getMessage());
-				}
-			}
-		});
-		
-		System.out.println("-----------------");
-	}
-	
-	public static void printCatalog() {
-		List<DanhMuc> listBS = ModelLoader.getDSLoiKhuyen();
-		listBS.stream().forEach(new Consumer<DanhMuc>() {
-
-			@Override
-			public void accept(DanhMuc t) {
-				System.out.println(t.id + "\t" + t.ten);
-			}
-		});
-		
-	}
-	
-	public static void main2(String[] args) throws IOException {
-		//loadPerYear(1, 6, 2015);
-		
-		for (int m = 1; m < 13; m++) {
-			loadPerYear(m, 2016);
-		}
-		
-//		loadPerYear(1, 2015);
-//		loadPerYear(2, 2015);
-//		loadPerYear(3, 2015);
-//		loadPerYear(4, 2015);
-//		loadPerYear(5, 2015);
-//		loadPerYear(6, 2015);
-//		loadPerYear(7, 2015);
-//		loadPerYear(8, 2015);
-//		loadPerYear(9, 2015);
-//		loadPerYear(10, 2015);
-//		loadPerYear(11, 2015);
-//		loadPerYear(12, 2015);
-	}
-	
-	public static void loadPerYear(int m, int year) throws IOException {
-		//List<String[]> listBM = loadFile("olddata//bommo.csv");
-		
-		TreeMap<String, Integer> statictis = new TreeMap<>();
-		
-		List<BenhNhan> listBN = ModelLoader.getDSBenhNhan();
-		listBN.stream().forEach(new Consumer<BenhNhan>() {
-
-			@Override
-			public void accept(BenhNhan t) {
-				//System.out.println(t.id + "\t" + t.gioi);
-				TreeMap<Integer, TreeSet<String>> statictisPerBN = new TreeMap<>();
-				
-				for (LanKhamBenh lkb : t.danhSachKham) {
-					try {
-						java.util.Date ngayKham = DateUtils.sqlDateToutilDate(lkb.ngayKham);
-						int[] date = DateUtils.getDate(ngayKham);
-						if (/*(date[0] == 2015 && date[1] <= 6) || */(date[0] != year || date[1] != m)) {
-							continue;
-						}
-						TreeSet<String> allPT = statictisPerBN.get(lkb.lanKham);
-	
-						if (allPT == null) {
-							allPT = new TreeSet<>();
-							statictisPerBN.put(lkb.lanKham, allPT);
-						}
-						for (PhauThuat pt : lkb.danhSachPhauThuat) {
-							//System.out.println(t.id + "\t" + t.ten + "\t" + pt.ten + "\t" + pt.sym);
-							allPT.add(pt.ten);
-						}
-					} catch (ParseException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-				}
-				
-				for (Entry<Integer, TreeSet<String>> entry : statictisPerBN.entrySet()) {
-					for (String pt : entry.getValue()) {
-						Integer cPT = statictis.get(pt);
-						if (cPT == null) {
-							cPT = 0;
-						}
-						cPT += 1;
-						statictis.put(pt, cPT);
-					}
-				}
-			}
-		});
-		
-		int total = 0;
-		for (Entry<String, Integer> entry : statictis.entrySet()) {
-//			if (!entry.getKey().contains("Bơm mỡ")) {
-//				continue;
-//			}
-			//System.out.println(entry.getKey() + "\t" + entry.getValue());
-			total += entry.getValue();
-		}
-		
-		//System.out.println("-----------------");
-		System.out.println(total);
-	}
-	
-	public static List<String[]> loadFile(String dirFolder) throws IOException {
-		FileInputStream fis = new FileInputStream(dirFolder);
-		//Construct BufferedReader from InputStreamReader
-		BufferedReader br = new BufferedReader(new InputStreamReader(fis));
-		String line = null;
-		List<String[]> result = new LinkedList<>();
-		while ((line = br.readLine()) != null) {
-			if (StringUtils.isBlank(line)) {
-				break;
-			}
-			String[] data = line.split("\t");
-			result.add(data);
-		}
-		br.close();
-		return result;
-	}
-	
-	private static final String HOST = "9WZY502";
+	private static final String HOST = "NHAN-PC";
 	private static final String DB_NAME = "LHS";
 	private static final String USER = "sa";
-	private static final String PASS = "kms1895@3";
+	private static final String PASS = "123456";
 	
 	private static Connection conn;
 	public static Connection getSession() throws SQLException, ClassNotFoundException {
 		if (conn != null && !conn.isClosed()) {
 			return conn;
 		}
-		String url = String.format("jdbc:sqlserver://%s;databaseName=%s", HOST, DB_NAME);
+		String url = String.format("jdbc:sqlserver://%s\\SQLEXPRESS;databaseName=%s", HOST, DB_NAME);
 		Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
 		conn = DriverManager.getConnection(url, USER, PASS);;
 		return conn;
@@ -437,14 +144,13 @@ public class ModelLoader {
 		}
 		try {
 			Connection conn = getSession();
-			PreparedStatement ps = conn.prepareStatement("select surISN,surName,surSymbol from dbo.Surgical");
+			PreparedStatement ps = conn.prepareStatement("select surISN,surName from dbo.Surgical");
 			ResultSet re = ps.executeQuery();
 			dsPhauThuat = new ArrayList<DanhMuc>();
 			while (re.next()) {
 				DanhMuc dr = new DanhMuc(
 						re.getLong("surISN"), 
-						re.getString("surName"),
-						re.getString("surSymbol"));
+						re.getString("surName"));
 				dsPhauThuat.add(dr);
 				mapPhauThuat.put(dr.ten, dr);
 			}
@@ -517,14 +223,24 @@ public class ModelLoader {
 		}
 		try {
 			Connection conn = getSession();
-			PreparedStatement ps = conn.prepareStatement("select mesISN,mimID,mesMedicineName from dbo.MedicineStock");
+			PreparedStatement ps = conn.prepareStatement("select medISN,medName,mimMedicineOriginalName,mexUsage,mexQuantityPerUnit,mexTakePerDay,mexQuantityPerDay,mexUsagePerDay,mexUsageUnit,mexNote,mexMoreDetails from Medicine");
 			ResultSet re = ps.executeQuery();
 			dsThuoc = new ArrayList<Thuoc>();
 			while (re.next()) {
 				Thuoc dr = new Thuoc(
-						re.getLong("mesISN"), 
-						re.getString("mimID"),		
-						re.getString("mesMedicineName")		
+						re.getLong("medISN"), 
+						re.getString("medName"),		
+						null,		
+						re.getInt("mexQuantityPerUnit"), 
+						re.getString("mexUsageUnit"),		
+						re.getInt("mexTakePerDay"), 
+						re.getString("mexQuantityPerDay"), 
+						re.getString("mexUsageUnit"),		
+						re.getString("mexUsagePerDay"),		
+						re.getString("mexUsage"),		
+						re.getString("mexNote"),
+						re.getString("mimMedicineOriginalName"),
+						re.getString("mexMoreDetails")
 				);
 				dsThuoc.add(dr);
 				mapThuoc.put(dr.id, dr);
@@ -548,11 +264,11 @@ public class ModelLoader {
 		try {
 			Connection conn = getSession();
 			PreparedStatement ps = conn.prepareStatement("SELECT patID,patName,patBirthDate,patAge,patSex,patAddress,patTel,patMobile,patOccupation, "+
-				"case when isnull(patHasPic,0)=1 then 'PatientPic\\'+patID+'.jpg' else '' end patImg, "+
+				"case when isnull(patHasPic,0)=1 then 'PatientPic/'+patID+'.jpg' else '' end patImg, "+
 				"clrISN,clrMedicalHistory, clr.clrSickHistory,clr.clrSickChange,clr.clrPulse,clr.clrBloodPressure, "+
 				"clr.clrTemperature,clr.clrWeigh,clr.empISN,clr.clrSickNotInList,clr.clrPathologicalSigns, "+
 				"clr.clrSurgery,clr.clrRexamination4Surgery,clr.clrSkill,clr.clrExaminationTimes,clr.clrRexaminationTimes, "+
-				"clr.clrExaminationDate,clr.clrFollowUpExaminationDate,clrMedicalAdvice "+
+				"clr.clrExaminationDate,clr.clrFollowUpExaminationDate,clrMedicalAdvice,clrAppointmentDate "+
 				"FROM Patients pt left join ClinicalRecord clr on pt.patISN = clr.patISN "+
 				"order by patID,clrExaminationTimes,clrRexaminationTimes;");
 			ResultSet re = ps.executeQuery();
@@ -593,7 +309,8 @@ public class ModelLoader {
 							re.getInt("clrRexaminationTimes"),		
 							re.getDate("clrExaminationDate"),		
 							re.getDate("clrFollowUpExaminationDate"),		
-							re.getString("clrMedicalAdvice")		
+							re.getString("clrMedicalAdvice"),
+							re.getDate("clrAppointmentDate")
 					);
 					benhNhan.addLanKhamBenh(lanKham);
 					mapLanKham.put(lanKham.id, lanKham);
@@ -623,11 +340,9 @@ public class ModelLoader {
 							if (s != null) {
 								pt.id = s.id;
 								pt.ten = s.ten;
-								pt.sym = s.sym;
 							} else {
 								pt.id = 0;
 								pt.ten = st;
-								pt.sym = st;
 							}
 							if (surRes != null && i < surRes.length) {
 								pt.taiKham = surRes[i].trim().equals("1");
@@ -701,7 +416,7 @@ public class ModelLoader {
 					lk.danhSachChiTietToaThuoc.add(d);
 				}
 			}
-			ps = conn.prepareStatement("SELECT clrISN,clpISN,clpPicName,clpPicture,clpPicDate FROM [ClinicalPicture]");
+			ps = conn.prepareStatement("SELECT clrISN,clpISN,replace(clpPicture,'\','/') clpPicName,clpPicture,clpPicDate FROM [ClinicalPicture]");
 			re = ps.executeQuery();
 			while (re.next()) {
 				LanKhamBenh lk = mapLanKham.get(re.getLong("clrISN"));
