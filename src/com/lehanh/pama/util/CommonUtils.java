@@ -24,7 +24,7 @@ public class CommonUtils {
 
 			@Override
 			public int compare(K k1, K k2) {
-				if (reversed) {
+				if (!reversed) {
 					return k2.compareTo(k1);
 				} else {
 					return k1.compareTo(k2);

@@ -192,9 +192,9 @@ public class ModelLoader {
 				}
 				
 				// for debug , TODO remove after debug
-				// if (bn.id != 16943) {
-				// return;
-				// }
+//				 if (bn.id != 17054) { // 16943
+//				 return;
+//				 }
 				
 				Patient pa = null;;
 				try {
@@ -570,7 +570,9 @@ public class ModelLoader {
 		try {
 			Connection conn = getSession();
 			PreparedStatement ps = conn.prepareStatement("SELECT patID,patName,patBirthDate,patAge,patSex,patAddress,patTel,patMobile,patOccupation, "+
-				"case when isnull(patHasPic,0)=1 then 'PatientPic/'+patID+'.jpg' else '' end patImg, "+
+				"case when isnull(patHasPic,0)=1 then "
+				//+ "'PatientPic/'+"
+				+ "patID+'.jpg' else '' end patImg, "+
 				"clrISN,clrMedicalHistory, clr.clrSickHistory,clr.clrSickChange,clr.clrPulse,clr.clrBloodPressure, "+
 				"clr.clrTemperature,clr.clrWeigh,clr.empISN,clr.clrSickNotInList,clr.clrPathologicalSigns, "+
 				"clr.clrSurgery,clr.clrRexamination4Surgery,clr.clrSkill,clr.clrExaminationTimes,clr.clrRexaminationTimes, "+

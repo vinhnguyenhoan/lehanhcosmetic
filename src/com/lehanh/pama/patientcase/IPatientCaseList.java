@@ -1,5 +1,6 @@
 package com.lehanh.pama.patientcase;
 
+import java.text.ParseException;
 import java.util.Date;
 import java.util.List;
 
@@ -42,5 +43,7 @@ public interface IPatientCaseList {
 	ISurgeryImageList getSurgeryImageList();
 
 	IPrescription getPharmacyList(int rootId, int detalId);
+
+	int calculateDateAfterRoot(int rootId, int id) throws ParseException;
 
 }

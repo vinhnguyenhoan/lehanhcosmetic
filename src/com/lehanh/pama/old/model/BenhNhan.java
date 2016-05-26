@@ -1,21 +1,15 @@
 package com.lehanh.pama.old.model;
 
-import java.io.UnsupportedEncodingException;
-import java.nio.charset.Charset;
 import java.sql.Date;
 import java.text.ParseException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.GregorianCalendar;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TreeMap;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
-import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import com.lehanh.pama.catagory.AppointmentCatagory;
@@ -101,9 +95,13 @@ public class BenhNhan {
 			lkM.put(ltk, lkb);
 		}
 
+		// Sort by lan kham, lan tai kham
+		for (Entry<Long, TreeMap<Long, LanKhamBenh>> entry : sortedDSKham.entrySet()) {
+			sortedDSKham.put(entry.getKey(), CommonUtils.sortMapByKey(entry.getValue(), true));
+		}
 		sortedDSKham = CommonUtils.sortMapByKey(sortedDSKham, true);
 		
-		Date lastVisit = null;
+		//Date lastVisit = null;
 		int i = 1;
 		for (Entry<Long, TreeMap<Long, LanKhamBenh>> entry : sortedDSKham.entrySet()) {
 			if (entry.getValue() == null) {
@@ -130,9 +128,9 @@ public class BenhNhan {
 					mInfo.setMedicalHistory(lkb.benhSu);
 				}
 				if (StringUtils.isBlank(mInfo.getAnamnesis()) && !StringUtils.isBlank(lkb.tienCan)) {
-					mInfo.setAnamnesis(lkb.benhSu);
+					mInfo.setAnamnesis(lkb.tienCan);
 				}
-				if (StringUtils.isBlank(mInfo.getSummary()) && !StringUtils.isBlank(lkb.dienBienBenh)) {
+				if (StringUtils.isBlank(mInfo.getSummary()) || (!StringUtils.isBlank(lkb.dienBienBenh) && mInfo.getSummary().length() < lkb.dienBienBenh.length())) {
 					mInfo.setSummary(lkb.dienBienBenh);
 				}
 
@@ -170,7 +168,6 @@ public class BenhNhan {
 					detail.setDiagnoseCatagoryNames(diagnoseCatagoryNames);
 				}
 				detail.setDiagnoseOther(lkb.chuanDoanNgoaiDS);
-				
 				
 				List<String> serviceNames = null;
 				if (lkb.danhSachPhauThuat != null) {
@@ -254,66 +251,6 @@ public class BenhNhan {
 //		result.setLastSurgery();
 //		result.setNextAppointment();
 		return result;
-	}
-	
-	public static void main(String[] args) throws UnsupportedEncodingException {
-		System.out.println("\\\\" + "\315");
-		
-		
-		String a = "Nose Aug Silas\3150-4159"; // -> 24
-		Pattern p = Pattern.compile("[^A-Za-z0-9 ]");
-		for (char b : a.toCharArray()) {
-			System.out.println("ppppppppp " + b);
-			if (!" ".equals(b) && p.matcher(b + "").find()) {
-				System.out.println("bbbbbbbbbbbb " + b);
-			}
-		}
-		
-		
-		System.out.println(
-				//Charset.forName("UTF-8").encode(a)
-//				Arrays.toString(
-//						a.getBytes("UTF-8")
-//					)
-				a.getBytes("UTF-8").length
-				);
-		
-		System.out.println(
-				//Arrays.toString( splitPath(a) )
-				//Arrays.toString ( a.split("\\\\.") )
-				Arrays.toString ( a.split("") )
-				);
-		System.out.println(StringEscapeUtils.escapeHtml4(a));
-		System.out.println(a.replace("\1", "\\\\"));
-
-		Matcher m = Pattern.compile("[^A-Za-z0-9 ]").matcher(a);
-	    System.out.println(
-//	    		m.find()
-	    		Arrays.toString(
-	    			a.split("[^A-Za-z0-9\b]")
-	    		)
-	    		);
-	    System.out.println("12\b3");
-		//System.out.println(Arrays.toString(a.replace("\\", "") ));
-	}
-	
-	public static String[] splitPath (String path) {
-	    String backslash = ((char)92) + "";
-	    if (path.contains(backslash)) {
-	        ArrayList<String> parts = new ArrayList<>();
-	        int start = 0;
-	        int end = 0;
-	        for ( int c : path.toCharArray() ) {
-	            if (c == 92) {
-	                parts.add(path.substring(start, end));
-	                start = end + 1;
-	            }
-	            end++;
-	        }
-	        parts.add(path.substring(start));
-	        return parts.toArray( new String[parts.size()] );
-	    }
-	    return path.split("/");
 	}
 
 }

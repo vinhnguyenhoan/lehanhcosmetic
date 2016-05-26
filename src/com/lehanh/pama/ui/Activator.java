@@ -146,7 +146,7 @@ public class Activator implements BundleActivator, PamaApplication, IPatientView
 		if (newPa == null || StringUtils.isBlank(newPa.getName())) {
 			return;
 		}
-		PaitentNameStatusLine.label.setText(newPa.getName());
+		PaitentNameStatusLine.label.setText(newPa.getId() + " - " + newPa.getName());
 		PaitentNameStatusLine.label.getParent().layout(true);
 	}
 

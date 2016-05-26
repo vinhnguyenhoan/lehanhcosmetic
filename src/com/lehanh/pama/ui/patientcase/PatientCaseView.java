@@ -7,9 +7,8 @@ import static com.lehanh.pama.ui.util.UIControlUtils.setText;
 
 import java.security.InvalidParameterException;
 import java.text.ParseException;
+import java.util.GregorianCalendar;
 import java.util.List;
-
-import javax.annotation.PostConstruct;
 
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.e4.ui.di.Focus;
@@ -21,17 +20,25 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CCombo;
 import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.custom.ScrolledComposite;
+import org.eclipse.swt.events.ModifyEvent;
+import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.layout.RowLayout;
+import org.eclipse.swt.printing.PrinterData;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.MessageBox;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.wb.swt.SWTResourceManager;
 
@@ -55,7 +62,19 @@ import com.lehanh.pama.ui.PamaFormUI;
 import com.lehanh.pama.ui.patientcase.ExamVersionComboViewer.ISelectionDetailChangedListener;
 import com.lehanh.pama.ui.util.CatagoryToUITextByDesc;
 import com.lehanh.pama.ui.util.ObjectToUIText;
+import com.lehanh.pama.ui.util.PamaResourceManager;
+import com.lehanh.pama.ui.util.UIControlUtils;
+import com.lehanh.pama.util.DateUtils;
 import com.lehanh.pama.util.PamaHome;
+
+import net.sf.paperclips.DefaultGridLook;
+import net.sf.paperclips.GridColumn;
+import net.sf.paperclips.GridPrint;
+import net.sf.paperclips.PaperClips;
+import net.sf.paperclips.Print;
+import net.sf.paperclips.PrintJob;
+import net.sf.paperclips.TextPrint;
+import net.sf.paperclips.ui.PrintPreview;
 
 public class PatientCaseView extends PamaFormUI implements IPatientViewPartListener, IPatientView, ISelectionDetailChangedListener {
 	
@@ -70,11 +89,6 @@ public class PatientCaseView extends PamaFormUI implements IPatientViewPartListe
 	private Text appNoteText;
 	private CCombo drCombo;
 
-	private TableComboViewer serviceTComboViewer;
-	private TableComboViewer prognosticTComboViewer;
-	private TableComboViewer diagnoseTComboViewer;
-	private TableComboViewer surgeryTComboViewer;
-
 	private CDateTime surgeryDateCDate;
 	private Button complicationCheckBtn;
 	private Button beautyBut;
@@ -88,6 +102,7 @@ public class PatientCaseView extends PamaFormUI implements IPatientViewPartListe
 	private CDateTime nextAppCDate;
 	private CCombo appPurposrCombo;
 	private CCombo advCombo;
+	private Button printCodePAButton;
 	
 	private Composite composite;
 
@@ -97,9 +112,16 @@ public class PatientCaseView extends PamaFormUI implements IPatientViewPartListe
 	
 	private IPatientManager paManager;
 	
+	private TableComboViewer serviceTComboViewer;
+	private TableComboViewer prognosticTComboViewer;
+	private TableComboViewer diagnoseTComboViewer;
+	private TableComboViewer surgeryTComboViewer;
+	private CCombo surgeryToPrintCombo;
+
 	private ExamVersionComboViewer examCombo;
-	private PatientCaseCatagoryComboViewer serviceCatComboViewer;
+	//private PatientCaseCatagoryComboViewer surgeryToPrintComboViewer;
 	private PatientCaseCatagoryComboViewer surgeryCatComboViewer;
+	private PatientCaseCatagoryComboViewer serviceCatComboViewer;
 	private PatientCaseCatagoryComboViewer diagnoseCatComboViewer;
 	private PatientCaseCatagoryComboViewer prognosticCatComboViewer;
 	
@@ -320,7 +342,7 @@ public class PatientCaseView extends PamaFormUI implements IPatientViewPartListe
 		drAdviceText.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 2, 3));
 		
 		Composite composite_3 = new Composite(composite_2, SWT.NONE);
-		GridLayout gl_composite_3 = new GridLayout(3, false);
+		GridLayout gl_composite_3 = new GridLayout(4, false);
 		gl_composite_3.horizontalSpacing = 0;
 		gl_composite_3.marginWidth = 0;
 		composite_3.setLayout(gl_composite_3);
@@ -337,6 +359,7 @@ public class PatientCaseView extends PamaFormUI implements IPatientViewPartListe
 		this.beautyBut = new Button(composite_3, SWT.CHECK);
 		beautyBut.setText(Messages.PatientCaseView_hailong);
 		new Label(composite_3, SWT.NONE);
+		new Label(composite_3, SWT.NONE);
 		
 		Label lblNgyPt = new Label(composite_3, SWT.NONE);
 		lblNgyPt.setText(Messages.PatientCaseView_ngaypt);
@@ -348,8 +371,11 @@ public class PatientCaseView extends PamaFormUI implements IPatientViewPartListe
 		surgeryDateCDate.setNullText(Messages.PatientCaseView_ngaymo);
 		surgeryDateCDate.setPattern("dd/MM/yyyy"); //$NON-NLS-1$
 		
-		Button btnNewButton_2 = new Button(composite_3, SWT.NONE);
-		btnNewButton_2.setText(Messages.PatientCaseView_inphieu);
+		this.surgeryToPrintCombo = new CCombo(composite_3, SWT.BORDER | SWT.READ_ONLY);
+		surgeryToPrintCombo.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+		
+		this.printCodePAButton = new Button(composite_3, SWT.NONE);
+		printCodePAButton.setText(Messages.PatientCaseView_inphieu);
 		
 		Composite composite_4 = new Composite(composite_2, SWT.NONE);
 		composite_4.setLayoutData(new GridData(SWT.LEFT, SWT.FILL, false, false, 1, 1));
@@ -482,6 +508,29 @@ public class PatientCaseView extends PamaFormUI implements IPatientViewPartListe
 						.setEnableAllButtons(false)
 						;
 		
+		printCodePAButton.addSelectionListener(new SelectionListener() {
+			
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				try {
+					printCodePA();
+				} catch (ParseException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+			}
+			
+			@Override
+			public void widgetDefaultSelected(SelectionEvent e) {
+				try {
+					printCodePA();
+				} catch (ParseException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+			}
+		});
+		
 		// initial versions
 		examCombo.addSelectionDetailChangedListener(this);
 
@@ -503,25 +552,83 @@ public class PatientCaseView extends PamaFormUI implements IPatientViewPartListe
 			}
 		});
 		
-		this.surgeryCatComboViewer = new PatientCaseCatagoryComboViewer(catManager, grey, surgeryTComboViewer, 
-				CatagoryType.SURGERY);
-		this.diagnoseCatComboViewer = new PatientCaseCatagoryComboViewer(catManager, grey, diagnoseTComboViewer, 
-				CatagoryType.DIAGNOSE, diagnoseOtherText
-				//, surgeryCatComboViewer
-				);
-		this.prognosticCatComboViewer = new PatientCaseCatagoryComboViewer(catManager, grey, prognosticTComboViewer, 
-				CatagoryType.PROGNOSTIC, prognosticOtherText
+		//this.surgeryToPrintComboViewer = new PatientCaseCatagoryComboViewer(false, catManager, grey, surgeryToPrintCombo, CatagoryType.SURGERY);
+		this.surgeryTComboViewer.getTableCombo().getTextControl().addModifyListener(new ModifyListener() {
+			
+			@Override
+			public void modifyText(ModifyEvent e) {
+				initialCombo(surgeryToPrintCombo, surgeryCatComboViewer.getMultiSelectionCatList(), null, 0, catToDesc);
+			}
+		});
+		this.surgeryCatComboViewer = new PatientCaseCatagoryComboViewer(catManager, grey, surgeryTComboViewer, CatagoryType.SURGERY);
+		this.diagnoseCatComboViewer = new PatientCaseCatagoryComboViewer(catManager, grey, diagnoseTComboViewer, CatagoryType.DIAGNOSE, diagnoseOtherText);
+		this.prognosticCatComboViewer = new PatientCaseCatagoryComboViewer(catManager, grey, prognosticTComboViewer, CatagoryType.PROGNOSTIC
+				, prognosticOtherText
 				//, diagnoseCatComboViewer
 				//, surgeryCatComboViewer
-				);
-		this.serviceCatComboViewer = new PatientCaseCatagoryComboViewer(catManager, true, grey, serviceTComboViewer, 
-				CatagoryType.SERVICE
-				, prognosticCatComboViewer
-				, diagnoseCatComboViewer, surgeryCatComboViewer
-				);
+		);
+		this.serviceCatComboViewer = new PatientCaseCatagoryComboViewer(catManager, true, grey, serviceTComboViewer, CatagoryType.SERVICE
+				, prognosticCatComboViewer, diagnoseCatComboViewer, surgeryCatComboViewer
+		);
 		
 		// initial view
 		viewData(paManager.getCurrentPatient());
+	}
+
+	private void printCodePA() throws ParseException {
+		final Patient currPa = paManager.getCurrentPatient();
+		final SurgeryCatagory selectedSC = (SurgeryCatagory) UIControlUtils.getValueFromCombo(surgeryToPrintCombo);
+		final PatientCaseEntity detailExam = this.examCombo.getSelectedDetailEntity();
+		final int rootId = this.examCombo.getSelectedRootId();
+		
+		if (currPa == null || currPa.getId() == null || selectedSC == null || rootId < 0 || detailExam == null) {
+			return;
+		}
+		Display display = composite.getDisplay();
+		Shell shell = new Shell(display, SWT.SHELL_TRIM);
+		shell.setText("PatientCaseView.java"); //$NON-NLS-1$
+		shell.setLayout(new GridLayout());
+		shell.setSize(600, 800);
+
+		final PrintJob job = new PrintJob("PatientId", //$NON-NLS-1$
+				createPrint(currPa.getId(), selectedSC.getSymbol(), DateUtils.convertDateDataType(GregorianCalendar.getInstance()), 
+						paManager.getCurrentPatient().getMedicalPersonalInfo().getPatientCaseList().calculateDateAfterRoot(rootId, detailExam.getId())));
+
+		Composite buttonPanel = new Composite(shell, SWT.NONE);
+		buttonPanel.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
+		buttonPanel.setLayout(new RowLayout(SWT.HORIZONTAL));
+
+		final PrintPreview preview = new PrintPreview(shell, SWT.BORDER);
+
+		Button print = new Button(buttonPanel, SWT.PUSH);
+		print.setText("Print"); //$NON-NLS-1$
+		print.addListener(SWT.Selection, new Listener() {
+			public void handleEvent(Event event) {
+				PaperClips.print(job, new PrinterData());
+			}
+		});
+
+		preview.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));preview.setFitHorizontal(true);preview.setFitVertical(true);
+		preview.setPrintJob(job);
+
+		shell.open();
+	}
+
+	private Print createPrint(Long id, String symbol, String date, int calculateDateAfterRoot) {
+		GridPrint grid = new GridPrint(new DefaultGridLook(5, 5));
+		grid.addColumn(new GridColumn(SWT.LEFT, SWT.DEFAULT, 10));
+		grid.addColumn(new GridColumn(SWT.RIGHT, SWT.DEFAULT, 10));
+
+		final FontData fontData = PamaResourceManager.getFont("Arial", 20, SWT.BOLD).getFontData()[0]; //$NON-NLS-1$
+		grid.add(SWT.LEFT, new TextPrint(calculateDateAfterRoot == 0 ? "B" : "A" + calculateDateAfterRoot + "day", fontData));
+		grid.add(SWT.RIGHT, new TextPrint(date, fontData));
+
+		final FontData bFontData = PamaResourceManager.getFont("Arial", 50, SWT.BOLD).getFontData()[0]; //$NON-NLS-1$
+		grid.add(SWT.CENTER, new TextPrint(String.valueOf(id), bFontData), GridPrint.REMAINDER);
+
+		grid.add(SWT.CENTER, new TextPrint(symbol, fontData), GridPrint.REMAINDER);
+
+		return grid;
 	}
 
 	private void selectAdvice(String text) {

@@ -8,6 +8,8 @@ import static com.lehanh.pama.ui.util.UIControlUtils.selectComboOrSetTextByName;
 import static com.lehanh.pama.ui.util.UIControlUtils.setText;
 
 import java.sql.SQLException;
+import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
@@ -59,6 +61,7 @@ import com.lehanh.pama.ui.util.CatagoryToUITextByDesc;
 import com.lehanh.pama.ui.util.ObjectToUIText;
 import com.lehanh.pama.ui.util.PamaResourceManager;
 import com.lehanh.pama.ui.util.UIControlUtils;
+import com.lehanh.pama.util.DateUtils;
 import com.lehanh.pama.util.PamaException;
 import com.lehanh.pama.util.PamaHome;
 
@@ -364,6 +367,9 @@ public class PrescriptionView extends PamaFormUI implements IPatientViewPartList
 
 	@Override
 	public void organizeUIComponent() {
+		printDateSelecter.setPattern("dd/MM/yyyy"); //$NON-NLS-1$
+		printDateSelecter.setSelection(GregorianCalendar.getInstance().getTime());
+		
 		// initial data for Combos
 		initialCombo(sampleCombo, catManager.getCatagoryByType(CatagoryType.PRESCRIPTION).values(), null, -1, catToUIByDesc);
 		initialCombo(surgeryNameCombo, catManager.getCatagoryByType(CatagoryType.DRUG).values(), null, -1, catToUIByName);
@@ -473,12 +479,11 @@ public class PrescriptionView extends PamaFormUI implements IPatientViewPartList
 		shell.setLayout(new GridLayout());
 		shell.setSize(600, 800);
 
-		final PrintJob job = new PrintJob("Prescription",  //$NON-NLS-1$
+		final PrintJob job = new PrintJob("Prescription", //$NON-NLS-1$
 				createPrint(tableViewer.getInput(), 
 						String.valueOf(currPa.getId()), 
-						//"12345", //$NON-NLS-1$
-						currPa.getName(), currPa.getAge(), currPa.getFermale(), currPa.getAddress(), currPaCase.getDiagnoseCatagoryNamesAsText(", ")
-						//"Vinh VInh", 26, "Nữ", "Cao thang 123", "abc, cba, blablabla" //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+						currPa.getName(), currPa.getAge(), currPa.getFermale(), currPa.getAddress(), currPaCase.getDiagnoseCatagoryNamesAsText(", "),  //$NON-NLS-1$
+						(currPaCase.getAppoSchedule() != null ? currPaCase.getAppoSchedule().getAppointmentDate() : null)
 						));
 
 		Composite buttonPanel = new Composite(shell, SWT.NONE);
@@ -502,7 +507,7 @@ public class PrescriptionView extends PamaFormUI implements IPatientViewPartList
 	}
 
 	private Print createPrint(List<PrescriptionItem> listItem, String idPa, String paName, int age,
-			String gender, String add, String diagnose) {
+			String gender, String add, String diagnose, Date appDate) {
 		GridPrint grid = new GridPrint(new DefaultGridLook(5, 5));
 		int totalCol = 5;
 		for (int i = 0; i < totalCol; i++) {
@@ -519,11 +524,15 @@ public class PrescriptionView extends PamaFormUI implements IPatientViewPartList
 		child.add(SWT.RIGHT, new TextPrint(Messages.PrescriptionView_msbenhnhan, fontData));
 		child.add(SWT.RIGHT, new TextPrint(idPa, fontData));
 		// end MS benh nhan
+
+		printBlank(grid, 4, fontData);
 		
 		// Header toa thuoc
-		grid.add(SWT.CENTER, new TextPrint(Messages.PrescriptionView_toathuoc, PamaResourceManager.getFont("Arial", 22, SWT.BOLD).getFontData()[0]) //$NON-NLS-2$
+		grid.add(SWT.CENTER, new TextPrint(Messages.PrescriptionView_toathuoc, PamaResourceManager.getFont("Arial", 22, SWT.BOLD).getFontData()[0]) //$NON-NLS-2$ //$NON-NLS-1$
 				, GridPrint.REMAINDER);
-		
+
+		printBlank(grid, 1, fontData);
+
 		// start patient info
 		child = new GridPrint(new DefaultGridLook(10, 10));
 		child.addColumn(new GridColumn(SWT.RIGHT, SWT.DEFAULT, 0));
@@ -564,9 +573,39 @@ public class PrescriptionView extends PamaFormUI implements IPatientViewPartList
 			index++;
 		}
 		
+		printBlank(grid, 5, fontData);
+		
+		// Footer
+		GridPrint footer = new GridPrint(new DefaultGridLook(10, 10));
+		footer.addColumn(new GridColumn(SWT.LEFT, SWT.DEFAULT, 1));
+		footer.addColumn(new GridColumn(SWT.CENTER, SWT.DEFAULT, 1));
+		grid.add(SWT.CENTER, footer, GridPrint.REMAINDER);
+		
+		footer.add(SWT.LEFT, new TextPrint(StringUtils.EMPTY, fontData));
+		Date printDate = printDateSelecter.getSelection();
+		int[] dateA = DateUtils.getDate(printDate);
+		if (dateA != null) {
+			footer.add(SWT.CENTER, new TextPrint(Messages.PrescriptionView_tphcmngay + dateA[2] + Messages.PrescriptionView_thang + dateA[1] + Messages.PrescriptionView_nam + dateA[0], fontData));
+		} else {
+			footer.add(SWT.CENTER, new TextPrint(StringUtils.EMPTY, fontData));
+		}
+		footer.add(SWT.LEFT, new TextPrint(StringUtils.EMPTY, fontData));
+		footer.add(SWT.CENTER, new TextPrint(Messages.PrescriptionView_bacsy, fontData));
+		
+		printBlank(footer, 2, fontData);
+
+		footer.add(SWT.LEFT, new TextPrint(Messages.PrescriptionView_ngaytaikham + DateUtils.convertDateDataType(appDate), fontData));
+		footer.add(SWT.CENTER, new TextPrint(Messages.PrescriptionView_pgstslehanh, fontData));
+
 		return grid;
 	}
 	
+	private void printBlank(GridPrint grid, int numLine, FontData fontData) {
+		for (int i = 0; i < numLine; i++) {
+			grid.add(SWT.CENTER, new TextPrint(StringUtils.EMPTY, fontData), GridPrint.REMAINDER);
+		}
+	}
+
 	private void deleteLine() {
 		this.tableViewer.delete(this.surgeryNameCombo.getText());
 	}

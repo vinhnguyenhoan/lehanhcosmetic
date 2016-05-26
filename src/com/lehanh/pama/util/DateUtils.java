@@ -25,7 +25,7 @@ public class DateUtils {
 	public static int calculateDate(Date date, Date beforeDate) {
 		LocalDate lD = new LocalDate(date);
 		LocalDate bD = new LocalDate(beforeDate);
-		Period period = new Period(bD, lD, PeriodType.yearMonthDay());
+		Period period = new Period(bD, lD, PeriodType.days());
 		return period.getDays();
 	}
 	

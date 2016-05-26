@@ -451,18 +451,24 @@ public class PatientCaseEntity implements Serializable, IJsonDataObject {
 	}
 
 	public String getDiagnoseCatagoryNamesAsText(String separate) {
-		if (this.diagnoseCatagoryNames == null || this.diagnoseCatagoryNames.isEmpty()) {
-			return StringUtils.EMPTY;
-		}
-		String result = "";
+		String result = StringUtils.EMPTY;
 		int index = 0;
-		for (String dia : this.diagnoseCatagoryNames) {
-			result += dia;
-			if (index < this.diagnoseCatagoryNames.size() - 1) {
+		if (this.diagnoseCatagoryNames != null) {
+			for (String dia : this.diagnoseCatagoryNames) {
+				result += dia;
+				if (index < this.diagnoseCatagoryNames.size() - 1) {
+					result += separate;
+				}
+				index++;
+			}
+		}
+		if (!StringUtils.isBlank(diagnoseOther)) {
+			if (!StringUtils.EMPTY.equals(result)) {
 				result += separate;
 			}
-			index++;
+			result += diagnoseOther;
 		}
+		
 		return result;
 	}
 

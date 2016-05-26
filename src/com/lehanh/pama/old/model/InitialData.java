@@ -46,7 +46,7 @@ public class InitialData {
 		loadDanhMuc("olddata", CatagoryType.PRESCRIPTION, catDao);
 		
 //		catDao.deleteAllType(CatagoryType.DR);
-		loadDanhMuc("olddata", CatagoryType.DR, catDao);
+//		loadDanhMuc("olddata", CatagoryType.DR, catDao);
 
 	}
 	

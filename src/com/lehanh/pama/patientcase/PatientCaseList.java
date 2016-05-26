@@ -1,6 +1,7 @@
 package com.lehanh.pama.patientcase;
 
 import java.security.InvalidParameterException;
+import java.text.ParseException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
@@ -46,27 +47,28 @@ public class PatientCaseList implements IPatientCaseList {
 		@Override
 		public int compare(PatientCaseEntity p1, PatientCaseEntity p2) {
 			Integer id1 = p1.getId();
-			Integer id2 = p1.getId();
+			Integer id2 = p2.getId();
 			return id2.compareTo(id1);
 		}
 	};
 	
-	PatientCaseList(Long patientId, List<PatientCaseEntity> patientCases) {
-		this(patientId, patientCases, true);
+	PatientCaseList(Long patientId, List<PatientCaseEntity> patientCases, String summary) {
+		this(patientId, patientCases, summary, true);
 		if (patientCases.isEmpty()) {
 			createRootCase();
 		}
 	}
 	
-	private PatientCaseList(Long patientId, List<PatientCaseEntity> patientCases, boolean isRoot) {
+	private PatientCaseList(Long patientId, List<PatientCaseEntity> patientCases, String summary, boolean isRoot) {
 		this.patientId = patientId;
 		this.isListRootCase = isRoot;
 		this.patientCases = patientCases;
+		this.setSummary(summary);
 		// order list
 		Collections.sort(this.patientCases, idDescComparator);
 		detailPAList = new TreeMap<Integer, PatientCaseList>();
 		for (PatientCaseEntity pCase : this.patientCases) {
-			detailPAList.put(pCase.getId(), new PatientCaseList(this.patientId, pCase.getReExamInfo(), false));
+			detailPAList.put(pCase.getId(), new PatientCaseList(this.patientId, pCase.getReExamInfo(), null, false));
 		}
 		
 		if (isRoot) {
@@ -100,7 +102,7 @@ public class PatientCaseList implements IPatientCaseList {
 		// set id after add to list
 		newRootCase.setId(patientCases.size());
 		
-		PatientCaseList result = new PatientCaseList(this.patientId, newRootCase.getReExamInfo(), false);
+		PatientCaseList result = new PatientCaseList(this.patientId, newRootCase.getReExamInfo(), null, false);
 		this.detailPAList.put(newRootCase.getId(), result);
 		return result;
 	}
@@ -369,6 +371,36 @@ public class PatientCaseList implements IPatientCaseList {
 			}
 		}
 		return null;
+	}
+
+	@Override
+	public int calculateDateAfterRoot(int rootId, int id) throws ParseException {
+		PatientCaseList detailList = detailPAList.get(rootId);
+		if (detailList == null) {
+			return 0;
+		}
+		
+		Date beforeDate = null;
+		for (int i = detailList.patientCases.size() - 1; i > -1; i--) {
+			PatientCaseEntity pC = detailList.patientCases.get(i);
+			if (PatientCaseStatus.EXAM == pC.getStatusEnum() && pC.getSurgeryCatagoryNames() != null 
+					&& !pC.getSurgeryCatagoryNames().isEmpty()) {
+				beforeDate = pC.getDate();
+				break;
+			}
+		}
+		
+		if (beforeDate == null) {
+			return 0;
+		}
+		
+		for (PatientCaseEntity paE : detailList.patientCases) {
+			if (paE.getId() == id) {
+				return DateUtils.calculateDate(paE.getDate(), beforeDate);
+			}
+		}
+		
+		return 0;
 	}
 
 }

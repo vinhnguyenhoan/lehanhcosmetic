@@ -48,7 +48,7 @@ public class MedicalPersonalInfo implements Serializable, IJsonDataObject {
 	
 	public IPatientCaseList getPatientCaseList() {
 		if (patientCaseList == null) {
-			patientCaseList = new PatientCaseList(patientId, getPatientCases());
+			patientCaseList = new PatientCaseList(patientId, getPatientCases(), this.summary);
 		}
 		return this.patientCaseList;
 	}
