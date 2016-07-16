@@ -13,7 +13,7 @@
 	<classpathentry exported="true" kind="lib" path="lib/org.eclipse.nebula.jface.cdatetime_0.14.0.201602041833.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/org.eclipse.nebula.widgets.calendarcombo_1.0.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/org.eclipse.nebula.widgets.cdatetime_0.14.0.201602041833.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/org.eclipse.nebula.widgets.gallery_0.6.0.201602041833.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/org.eclipse.nebula.widgets.gallery_0.6.0.201602041833.jar" sourcepath="D:/eclipse-rcp/nebula-repository/plugins/org.eclipse.nebula.widgets.gallery.source_0.6.0.201602041833.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/org.eclipse.nebula.widgets.tablecombo_1.0.0.201602041833.jar"/>
 	<classpathentry kind="lib" path="lib/sqljdbc4.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8"/>

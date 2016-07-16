@@ -428,13 +428,12 @@ class SurgeryGallary {
 				String groupName = Messages.SurgeryGallary_benhanthu + groupId + Messages.SurgeryGallary_gachngang_lankham + caseDetailId + " (" + DateUtils.convertDateDataType(examDate) + ")"; //$NON-NLS-3$ //$NON-NLS-4$
 				group.setText(groupName);
 				if (afterDays == 0) {
-					group.setText(1, "Before");					 //$NON-NLS-1$
+					group.setText(1, "Before");//$NON-NLS-1$
 				} else {
 					group.setText(1, "After " + afterDays + " days"); //$NON-NLS-1$ //$NON-NLS-2$
 				}
-				group.setExpanded(indexRoot == 0);
+				//group.setExpanded(indexRoot == 0);
 				group.setData(new GalleryItemData(groupId, caseDetailId, examDate, afterDays));
-				// TODO show group description -> date range
 			}
 			
 			if (imageNamesPerSurgery != null) {
@@ -508,45 +507,49 @@ class SurgeryGallary {
 		return surgeryPath + "/" + surgery + "/" + result + "/"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	}
 	
+	private class ImageLoader implements Runnable {
+
+		private String[] callIds;
+		
+		@Override
+		public void run() {
+			// TODO not public imageList
+			if (callIds != null && Arrays.binarySearch(callIds, uid) > -1) {
+				return;
+			}
+			if (SurgeryGallary.this.imageList == null) {
+				return;
+			}
+			
+			gallery.getDisplay().asyncExec(new Runnable() {
+				
+				@Override
+				public void run() {
+					gallery.removeAll();
+					SurgeryGallary.this.imageAdd = PamaHome.application.loadImage("icons/addFolder.png"); //$NON-NLS-1$
+					SurgeryGallary.this.oldIndexDetail = -1;
+					try {
+						SurgeryGallary.this.imageList.iteratorCaseDetail(caseDetailHandler);
+					} catch (ParseException e) {
+						throw new PamaException(e);
+					}
+					GalleryItem fItem = gallery.getItem(0);
+					if (fItem != null) {
+						fItem.setExpanded(true);
+					}
+					gallery.redraw();
+				}
+			});
+		}
+		
+	}
+
+	private ImageLoader imageLoader = new ImageLoader();
+	
 	void updateGallery(ISurgeryImageList imageList, String[] callIds) {
-		// TODO not public imageList
 		this.imageList = imageList;
-		if (callIds != null && Arrays.binarySearch(callIds, uid) > -1) {
-			return;
-		}
-		if (this.imageList == null) {
-			return;
-		}
-		
-		gallery.removeAll();
-		this.imageAdd = PamaHome.application.loadImage("icons/addFolder.png"); //$NON-NLS-1$
-		this.oldIndexDetail = -1;
-		try {
-			this.imageList.iteratorCaseDetail(caseDetailHandler);
-		} catch (ParseException e) {
-			throw new PamaException(e);
-		}
-		gallery.redraw();
-		
-//		group = new GalleryItem(gallery, SWT.NONE);
-//		group.setText("Nhóm 1");
-//		group.setExpanded(true);
-//		for (int i = 0; i < 50; i++) {
-//			itemImage = PamaResourceManager.getImage(
-//					"D:\\DatabaseLHS\\20150901\\LHS\\Images\\Local\\PhauThuat\\Resize\\10563-Mai xuong go_5__A12d.JPG"
-//					/*, 120, 150*/
-//					//""
-//			); // 17176 - Copy
-//			item = new GalleryItem(group, SWT.NONE);
-//			if (itemImage != null) {
-//				item.setImage(itemImage);
-//			}
-//			item.setData(GROUP, group);
-//			item.setText("Item " + i); //$NON-NLS-1$
-//		}
-//		item = new GalleryItem(group, SWT.NONE);
-//		item.setImage(imageAdd);
-//		item.setData(IS_ADD_ITEM, true);
+		this.imageLoader.callIds = callIds;
+		new Thread(imageLoader).start();
 	}
 
 	/*private void disposeAllImages() {

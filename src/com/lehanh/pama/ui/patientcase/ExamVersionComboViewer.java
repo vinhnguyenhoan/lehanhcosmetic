@@ -103,7 +103,12 @@ class ExamVersionComboViewer extends ACommonComboViewer {
 			switch (columnIndex) {
 				case 0: return String.valueOf(model.getId());
 				case 1: return model.getDateAsText();
-				case 2: return patientCaseList.getSubList(model.getId()).getSurgerySummary();
+				case 2: {
+					IPatientCaseList subList = patientCaseList.getSubList(model.getId());
+					if (subList != null) {
+						return subList.getSurgerySummary() == null ? StringUtils.EMPTY : subList.getSurgerySummary();
+					}
+				}
 			}
 		}
 		return ""; //$NON-NLS-1$
