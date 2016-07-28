@@ -8,7 +8,12 @@ import static com.lehanh.pama.ui.util.UIControlUtils.setText;
 import java.security.InvalidParameterException;
 import java.text.ParseException;
 import java.util.GregorianCalendar;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.TreeMap;
+import java.util.function.Function;
 
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.e4.ui.di.Focus;
@@ -32,7 +37,9 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.printing.PrinterData;
 import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
@@ -57,10 +64,10 @@ import com.lehanh.pama.patientcase.MedicalPersonalInfo;
 import com.lehanh.pama.patientcase.Patient;
 import com.lehanh.pama.patientcase.PatientCaseEntity;
 import com.lehanh.pama.patientcase.PatientCaseStatus;
-import com.lehanh.pama.ui.IFormManager;
 import com.lehanh.pama.ui.PamaFormUI;
 import com.lehanh.pama.ui.patientcase.ExamVersionComboViewer.ISelectionDetailChangedListener;
 import com.lehanh.pama.ui.util.CatagoryToUITextByDesc;
+import com.lehanh.pama.ui.util.FormManager;
 import com.lehanh.pama.ui.util.ObjectToUIText;
 import com.lehanh.pama.ui.util.PamaResourceManager;
 import com.lehanh.pama.ui.util.UIControlUtils;
@@ -119,6 +126,9 @@ public class PatientCaseView extends PamaFormUI implements IPatientViewPartListe
 	private CCombo surgeryToPrintCombo;
 
 	private ExamVersionComboViewer examCombo;
+	private TableComboViewer caseVersionTComboViewer;
+	private TableComboViewer examVersionTComboViewer;
+	
 	//private PatientCaseCatagoryComboViewer surgeryToPrintComboViewer;
 	private PatientCaseCatagoryComboViewer surgeryCatComboViewer;
 	private PatientCaseCatagoryComboViewer serviceCatComboViewer;
@@ -149,6 +159,7 @@ public class PatientCaseView extends PamaFormUI implements IPatientViewPartListe
 		}
 	};
 	
+
 	public PatientCaseView() {
 		catManager = (ICatagoryManager) PamaHome.getService(ICatagoryManager.class);
 		paManager = (IPatientManager) PamaHome.getService(IPatientManager.class);
@@ -191,11 +202,11 @@ public class PatientCaseView extends PamaFormUI implements IPatientViewPartListe
 		lblBcST.setSize(78, 21);
 		lblBcST.setText(Messages.PatientCaseView_bstuvan);
 		
-		TableComboViewer caseVersionTComboViewer = new TableComboViewer(composite_1, SWT.BORDER | SWT.READ_ONLY);
+		this.caseVersionTComboViewer = new TableComboViewer(composite_1, SWT.BORDER | SWT.READ_ONLY);
 		TableCombo caseVersionTCombo = caseVersionTComboViewer.getTableCombo();
 		caseVersionTCombo.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 		
-		TableComboViewer examVersionTComboViewer = new TableComboViewer(composite_1, SWT.BORDER | SWT.READ_ONLY);
+		this.examVersionTComboViewer = new TableComboViewer(composite_1, SWT.BORDER | SWT.READ_ONLY);
 		TableCombo examVersionTCombo = examVersionTComboViewer.getTableCombo();
 		examVersionTCombo.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 		
@@ -497,16 +508,161 @@ public class PatientCaseView extends PamaFormUI implements IPatientViewPartListe
 	    sc.layout();
 	}
 
+	private static final TreeMap<Integer, RelComponentElement> allRelEle = new TreeMap<>(); 
+	private static int idGenerator = 1;
+	
+	private RelComponentElement COM_NEW_EXAM;
+	private RelComponentElement COM_NEW_CASE;
+	private RelComponentElement COM_EDIT;
+	private RelComponentElement COM_SAVE;
+	private RelComponentElement COM_CANCEL;
+	private RelComponentElement COM_SELECT_CASE;
+	private RelComponentElement COM_SELECT_DETAIL;
+	private RelComponentElement COM_FORM;
+
+	private class RelComponentElement {
+		
+		private final int id;
+		
+		private Control[] controls;
+	
+		private Map<Integer, Function<RelComponentElement, Boolean>> enbOtherRelStatus = new HashMap<>();
+		
+		private RelComponentElement(int id, Control... controls) {
+			this.id = id;
+			this.controls = controls;
+			allRelEle.put(id, this);
+		}
+		
+		private RelComponentElement enb(Integer id, Function<RelComponentElement, Boolean> func) {
+			enbOtherRelStatus.put(id, func);
+			return this;
+		}
+		
+		private void enable(boolean isEnable) {
+			if (controls == null) {
+				return;
+			}
+			for (Control control : controls) {
+				Boolean isReadOnly = (Boolean) control.getData("READ_ONLY");
+				if (control instanceof Text && !Boolean.TRUE.equals(isReadOnly)) {
+					// Ignore if read only style control
+					((Text) control).setEditable(isEnable);
+				} else if (control instanceof CCombo) {
+					CCombo ccombo = (CCombo) control;
+					ccombo.setListVisible(isEnable);
+					ccombo.setEnabled(isEnable);
+				} else if (control instanceof Combo) {
+					Combo combo = (Combo) control;
+					combo.setListVisible(isEnable);
+					combo.setEnabled(isEnable);
+				} else if (control instanceof TableCombo) {
+					TableCombo tC = (TableCombo) control;
+					tC.setEnabled(isEnable);
+					//tC.setTableVisible(editable);
+				} else {
+					control.setEnabled(isEnable);
+				}
+			}
+		}
+		
+		private void updateEnableRelView() {
+			for (Entry<Integer, Function<RelComponentElement, Boolean>> entry : enbOtherRelStatus.entrySet()) {
+				int uiId = entry.getKey();
+				RelComponentElement relCom = allRelEle.get(uiId);
+				relCom.enable(entry.getValue().apply(relCom));
+			}
+		}
+	}
+	
+	/*
+		TƯ vấn	Thăm khám	Benh án mới	Chinh sua	Luu	Huy	Chon benh an	Lan kham
+		TƯ vấn	dis	dis	enb	dis	enb	enb	---	enb
+		Thăm khám	dis	dis	enb	dis	enb	enb	---	enb
+		Benh án mới	dis	dis	dis	dis	enb	enb	---	enb
+		Chinh sua	dis	dis	dis	dis	enb if view current	enb if view current	---	enb
+		Luu	dis	dis	dis	end	dis	dis	---	dis
+		Huy	dis	dis	dis	end	dis	dis	---	dis
+		Chon benh an	dis	dis	enb	dis	enb	enb	---	enb
+		Lan kham	dis	dis	enb	dis	enb	enb	enb + upd + Lan kham	enb
+		form	enb	enb	dis	enb	dis	dis	---	dis + view
+	*/
+	//	COM_NEW_EXAM, COM_NEW_CASE, COM_EDIT, COM_SAVE, COM_CANCEL, COM_SELECT_CASE, COM_SELECT_DETAIL
+	private static final Function<RelComponentElement, Boolean> ena = f -> true;
+	private static final Function<RelComponentElement, Boolean> dis = f -> false;
+
 	@Override
 	public void organizeUIComponent() {
-		getFormManager().addAllControlFromComposite(composite, true, examCombo.getTableCombos())
+		getFormManager()
 						.addCreateButtons(newCaseBtn, adviceBtn, reExamBtn)
 							.addEditButtons(updateBtn).addSaveButtons(saveBtn).addCancelButtons(cancelBtn)
+							
+						.addAllControlFromComposite(composite, true, true, examCombo.getTableCombos())
 						.setEditableAll(false)
 						.cancel(paManager.getCurrentPatient() != null)
-						// disable all button at first
-						.setEnableAllButtons(false)
-						;
+		// TODO fix this -> disable all button at first
+		//.setEnableAllButtons(false)
+		;
+
+		COM_NEW_EXAM = new RelComponentElement(idGenerator++, this.adviceBtn, this.reExamBtn);
+		COM_NEW_CASE = new RelComponentElement(idGenerator++, this.newCaseBtn);
+		COM_EDIT = new RelComponentElement(idGenerator++, this.updateBtn);
+		COM_SAVE = new RelComponentElement(idGenerator++, this.saveBtn);
+		COM_CANCEL = new RelComponentElement(idGenerator++, this.cancelBtn);
+		COM_SELECT_CASE = new RelComponentElement(idGenerator++, caseVersionTComboViewer.getTableCombo());
+		COM_SELECT_DETAIL = new RelComponentElement(idGenerator++, examVersionTComboViewer.getTableCombo());
+		
+		List<Control> allControlForm = getFormManager().getAllControls();
+		COM_FORM = new RelComponentElement(idGenerator++, allControlForm.toArray(new Control[allControlForm.size()]));
+		
+		COM_NEW_EXAM.enb(COM_NEW_EXAM.id, dis)
+					.enb(COM_NEW_CASE.id, dis)
+					.enb(COM_EDIT.id, dis)
+					.enb(COM_SAVE.id, ena)
+					.enb(COM_CANCEL.id, ena)
+					.enb(COM_SELECT_CASE.id, dis)
+					.enb(COM_SELECT_DETAIL.id, dis)
+					.enb(COM_FORM.id, ena);
+		COM_NEW_CASE.enb(COM_NEW_EXAM.id, ena)
+					.enb(COM_NEW_CASE.id, dis)
+					.enb(COM_EDIT.id, dis)
+					.enb(COM_SAVE.id, dis)
+					.enb(COM_CANCEL.id, dis)
+					.enb(COM_SELECT_CASE.id, ena)
+					.enb(COM_SELECT_DETAIL.id, ena)
+					.enb(COM_FORM.id, dis);
+		COM_EDIT.enb(COM_NEW_EXAM.id, dis)
+					.enb(COM_NEW_CASE.id, dis)
+					.enb(COM_EDIT.id, dis)
+					.enb(COM_SAVE.id, ena)
+					.enb(COM_CANCEL.id, ena)
+					.enb(COM_SELECT_CASE.id, dis)
+					.enb(COM_SELECT_DETAIL.id, dis)
+					.enb(COM_FORM.id, ena);
+		COM_SAVE.enb(COM_NEW_EXAM.id, ena)
+					.enb(COM_NEW_CASE.id, ena)
+					.enb(COM_EDIT.id, p -> paManager.getCurrentPatient() != null)
+					.enb(COM_SAVE.id, dis)
+					.enb(COM_CANCEL.id, dis)
+					.enb(COM_SELECT_CASE.id, ena)
+					.enb(COM_SELECT_DETAIL.id, ena)
+					.enb(COM_FORM.id, dis);
+		COM_CANCEL.enb(COM_NEW_EXAM.id, ena)
+					.enb(COM_NEW_CASE.id, ena)
+					.enb(COM_EDIT.id, p -> paManager.getCurrentPatient() != null)
+					.enb(COM_SAVE.id, dis)
+					.enb(COM_CANCEL.id, dis)
+					.enb(COM_SELECT_CASE.id, ena)
+					.enb(COM_SELECT_DETAIL.id, ena)
+					.enb(COM_FORM.id, dis);
+		COM_FORM.enb(COM_NEW_EXAM.id, ena)
+					.enb(COM_NEW_CASE.id, ena)
+					.enb(COM_EDIT.id, ena)
+					.enb(COM_SAVE.id, dis)
+					.enb(COM_CANCEL.id, dis)
+					.enb(COM_SELECT_CASE.id, ena)
+					.enb(COM_SELECT_DETAIL.id, ena)
+					.enb(COM_FORM.id, dis);
 		
 		printCodePAButton.addSelectionListener(new SelectionListener() {
 			
@@ -572,7 +728,7 @@ public class PatientCaseView extends PamaFormUI implements IPatientViewPartListe
 		);
 		
 		// initial view
-		viewData(paManager.getCurrentPatient());
+		viewPatientInfo(paManager.getCurrentPatient());
 	}
 
 	private void printCodePA() throws ParseException {
@@ -646,13 +802,13 @@ public class PatientCaseView extends PamaFormUI implements IPatientViewPartListe
 	 * @see com.lehanh.pama.ui.patientcase.ExamVersionComboViewer.ISelectionDetailChangedListener#selectionChanged(com.lehanh.pama.patientcase.PatientCaseEntity)
 	 */
 	@Override
-	public void viewData(PatientCaseEntity model) {
+	public void viewDetailCase(PatientCaseEntity model) {
 		// examCombo tables are ignored so must disable when cancel
 		if (model == null/* || examCombo.getSelectedEntity() == model*/) {
-			cancelForm(false);
+			//cancelForm(false);
 		} else {
 			// after cancel then enable again to selectable versions list
-			cancelForm(true);
+			//cancelForm(true);
 			
 			//this.examCombo.selectionChanged(model);
 			selectServiceCatagory(model);
@@ -674,16 +830,18 @@ public class PatientCaseView extends PamaFormUI implements IPatientViewPartListe
 			setText(smallSurgeryText, model.getSmallSurgery());
 			setText(drAdviceText, model.getAdviceFromDr());
 			
-			viewData(model.getAppoSchedule());
+			viewAppointmentSchedule(model.getAppoSchedule());
 		}
 	
 		paManager.selectDetailPatientCase(ID, model, examCombo.getSelectedRootId());
+		
+		this.COM_FORM.updateEnableRelView();
 	}
 	
-	private void cancelForm(boolean isAllowEdit) {
+	/*private void cancelForm(boolean isAllowEdit) {
 		getFormManager().cancel(isAllowEdit)
 						.setEditable(isAllowEdit, examCombo.getTableCombos());
-	}
+	}*/
 
 	private void selectServiceCatagory(PatientCaseEntity model) {
 		// Remain order of selection
@@ -693,7 +851,7 @@ public class PatientCaseView extends PamaFormUI implements IPatientViewPartListe
 		surgeryCatComboViewer.selectionChanged(model.getSurgeryCatagoryNames());
 	}
 
-	private void viewData(AppointmentSchedule appoSchedule) {
+	private void viewAppointmentSchedule(AppointmentSchedule appoSchedule) {
 		if (appoSchedule == null) {
 			return; // sure that appointment controls cleared date before
 		}
@@ -702,7 +860,7 @@ public class PatientCaseView extends PamaFormUI implements IPatientViewPartListe
 		setText(appNoteText, appoSchedule.getNote());
 	}
 	
-	private void viewData(Patient patient) {
+	private void viewPatientInfo(Patient patient) {
 		if (patient == null) {
 			return;
 		}
@@ -714,7 +872,8 @@ public class PatientCaseView extends PamaFormUI implements IPatientViewPartListe
 	private void cancel() {
 		paManager.cancelEditingPatientCase();
 		// show again patient info as a viewing status
-		viewData(paManager.getCurrentPatient());
+		viewPatientInfo(paManager.getCurrentPatient());
+		this.COM_CANCEL.updateEnableRelView();
 	}
 
 	@SuppressWarnings("unchecked")
@@ -749,43 +908,58 @@ public class PatientCaseView extends PamaFormUI implements IPatientViewPartListe
 			return;
 		}
 		
-		getFormManager().saved(paManager.getCurrentPatient() != null);
+		//getFormManager().saved(paManager.getCurrentPatient() != null);
+		this.COM_SAVE.updateEnableRelView();
 	}
 
-	private IFormManager update() {
+	private void update() {
 		// do nothing for data
-		getFormManager().edit();
-		return getFormManager();
-	}
-
-	private void reExam() {
-		// do nothing for data
-		newAction(PatientCaseStatus.EXAM);
+		//getFormManager().edit();
+		this.COM_EDIT.updateEnableRelView();
+		//return getFormManager();
 	}
 
 	private void newCase() {
 		// do nothing for data
 		newAction(null);
+		this.COM_NEW_CASE.updateEnableRelView();;
+	}
+	
+	private void reExam() {
+		// do nothing for data
+		newAction(PatientCaseStatus.EXAM);
+		this.COM_NEW_EXAM.updateEnableRelView();
 	}
 
 	private void advice() {
 		// do nothing for data
 		newAction(PatientCaseStatus.CONSULT);
+		this.COM_NEW_EXAM.updateEnableRelView();
 	}
 
 	private void newAction(PatientCaseStatus status) {
 		if (status != null) {
+			if (this.examCombo.getDetailInput() == null) {
+				FormManager.showMessage(this.composite.getShell(), "Hướng dẩn", "Tạo bệnh án mới !");
+				return;
+			}
 			this.examCombo.getDetailInput().createDetailCase(status);
 		} else {
+			if (this.examCombo.getInput() == null) {
+				FormManager.showMessage(this.composite.getShell(), "Hướng dẩn", "Chọn bệnh nhân trước khi tạo bệnh án !");
+				return;
+			}
 			this.examCombo.getInput().createRootCase();
 		}
 		// view patient and view lasest exam is creating exam case
-		viewData(this.paManager.getCurrentPatient());
+		viewPatientInfo(this.paManager.getCurrentPatient());
 		
 		if (status != null) {
 			// switch form to editing -> enable all controls
 			// make sure disable exam combo
-			update().setEditable(false, examCombo.getTableCombos());
+			//update().setEditable(false, examCombo.getTableCombos());
+		} else {
+			//cancelForm(true);
 		}
 	}
 
@@ -796,7 +970,7 @@ public class PatientCaseView extends PamaFormUI implements IPatientViewPartListe
 
 	@Override
 	public void patientChanged(Patient oldPa, Patient newPa, String[] callIds) {
-		viewData(newPa);
+		viewPatientInfo(newPa);
 	}
 
 	@Override

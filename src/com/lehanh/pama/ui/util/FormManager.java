@@ -20,6 +20,8 @@ import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.MessageBox;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.Text;
 
@@ -47,18 +49,27 @@ public class FormManager implements IFormManager {
 	
 	@Override
 	public IFormManager addAllControlFromComposite(Composite composite, Control... ignoreControls) {
-		return addAllControlFromComposite(composite, false, ignoreControls);
+		return addAllControlFromComposite(composite, false, false, ignoreControls);
 	}
 	
 	@Override
-	public IFormManager addAllControlFromComposite(Composite composite, boolean ignoreLabel, Control... ignoreControls) {
+	public IFormManager addAllControlFromComposite(Composite composite, boolean ignoreLabel, boolean ignoreButtons, Control... ignoreControls) {
 		this.ignoreControls.addAll(Arrays.asList(ignoreControls));
-		List<Control> collectedControls = collectControls(composite, ignoreLabel); 
+		List<Control> collectedControls = collectControls(composite, ignoreLabel, ignoreButtons); 
 		formControls.put(ALL_CONTROL, collectedControls);
 		return this;
 	}
 	
-	private List<Control> collectControls(Composite composite, boolean ignoreLabel) {
+	@Override
+	public List<Control> getAllControls() {
+		LinkedList<Control> result = new LinkedList<Control>();
+		for (List<Control> listControl : formControls.values()) {
+			result.addAll(listControl);
+		}
+		return result;
+	}
+	
+	private List<Control> collectControls(Composite composite, boolean ignoreLabel, boolean ignoreButtons) {
 		List<Control> collectedControls = new LinkedList<Control>();
 		
 		for (Class<?> ignoreType : ignoreControlType) {
@@ -68,6 +79,14 @@ public class FormManager implements IFormManager {
 		}
 		if (ignoreFromList(composite, this.ignoreControls)) {
 			return collectedControls;
+		}
+		if (ignoreButtons) {
+			if (ignoreFromList(composite, this.addNewButtons)
+					|| ignoreFromList(composite, this.updateButtons)
+					|| ignoreFromList(composite, this.saveButtons)
+					|| ignoreFromList(composite, this.cancelButtons)) {
+				return collectedControls;
+			}
 		}
 		
 		// If subclass of Composite sure that is a kind of component so just handle this as a control
@@ -80,11 +99,19 @@ public class FormManager implements IFormManager {
 			if (ignoreFromList(child, this.ignoreControls)) {
 				continue;
 			}
+			if (ignoreButtons) {
+				if (ignoreFromList(child, this.addNewButtons)
+						|| ignoreFromList(child, this.updateButtons)
+						|| ignoreFromList(child, this.saveButtons)
+						|| ignoreFromList(child, this.cancelButtons)) {
+					continue;
+				}
+			}
 			if (ignoreLabel && (child instanceof CLabel || child instanceof Label)) {
 				continue;
 			}
 			if (Composite.class == child.getClass()) {
-				collectedControls.addAll(collectControls((Composite) child, ignoreLabel));
+				collectedControls.addAll(collectControls((Composite) child, ignoreLabel, ignoreButtons));
 			} else {
 				if (SWT.READ_ONLY == (child.getStyle() & SWT.READ_ONLY)) {
 					child.setData(READ_ONLY, true);
@@ -96,7 +123,7 @@ public class FormManager implements IFormManager {
 		return collectedControls;
 	}
 
-	private static final boolean ignoreFromList(Control child, List<Control> ignoreControls) {
+	private static final boolean ignoreFromList(Control child, List<? extends Control> ignoreControls) {
 		for (Control ignoreControl : ignoreControls) {
 			if (child == ignoreControl) {
 				return true;
@@ -323,4 +350,17 @@ public class FormManager implements IFormManager {
 		return null;
 	}
 
+	public static final void showMessage(Shell parent, String text, String message) {
+		MessageBox dialog = new MessageBox(parent, SWT.ICON_INFORMATION | SWT.OK);
+		dialog.setText(text);
+		dialog.setMessage(message);
+		dialog.open();
+	}
+	
+	public static final void showError(Shell parent, String text, String message) {
+		MessageBox dialog = new MessageBox(parent, SWT.ICON_ERROR | SWT.OK);
+		dialog.setText(text);
+		dialog.setMessage(message);
+		dialog.open();
+	}
 }

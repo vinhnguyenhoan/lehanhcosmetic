@@ -54,9 +54,9 @@ public class PatientCaseList implements IPatientCaseList {
 	
 	PatientCaseList(Long patientId, List<PatientCaseEntity> patientCases, String summary) {
 		this(patientId, patientCases, summary, true);
-		if (patientCases.isEmpty()) {
+		/*if (patientCases.isEmpty()) {
 			createRootCase();
-		}
+		}*/
 	}
 	
 	private PatientCaseList(Long patientId, List<PatientCaseEntity> patientCases, String summary, boolean isRoot) {

@@ -347,7 +347,7 @@ public class PatientInfoView extends PamaFormUI implements IPatientViewPartListe
 			}
 		});
 		
-		getFormManager().addAllControlFromComposite(composite, true, buttonsComposite)
+		getFormManager().addAllControlFromComposite(composite, true, false, buttonsComposite)
 						.addCreateButtons(addNewBtn).addEditButtons(editBtn).addSaveButtons(saveBtn).addCancelButtons(cancelBtn)
 						.addRadioGroup(SEX_GROUP, this.maleRadio, this.femaleRadio).defaultRadios(this.femaleRadio)
 						.setEditableAll(false)

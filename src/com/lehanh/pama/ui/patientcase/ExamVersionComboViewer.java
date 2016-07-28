@@ -33,7 +33,7 @@ class ExamVersionComboViewer extends ACommonComboViewer {
 	
 	interface ISelectionDetailChangedListener {
 		
-		void viewData(PatientCaseEntity model);
+		void viewDetailCase(PatientCaseEntity model);
 	}
 	
 	private ISelectionDetailChangedListener selectionDetailListener;
@@ -140,7 +140,7 @@ class ExamVersionComboViewer extends ACommonComboViewer {
 			}
 		}
 		if (selectionDetailListener != null) {
-			selectionDetailListener.viewData(selectedEntity);
+			selectionDetailListener.viewDetailCase(selectedEntity);
 		}
 	}
 	

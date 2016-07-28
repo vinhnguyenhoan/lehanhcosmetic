@@ -1,5 +1,7 @@
 package com.lehanh.pama.ui;
 
+import java.util.List;
+
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -8,7 +10,7 @@ public interface IFormManager {
 
 	IFormManager addAllControlFromComposite(Composite composite, Control... ignoreControls);
 
-	IFormManager addAllControlFromComposite(Composite composite, boolean ignoreLabel, Control... ignoreControls);
+	IFormManager addAllControlFromComposite(Composite composite, boolean ignoreLabel, boolean ignoreButtons, Control... ignoreControls);
 
 	IFormManager enableAll(boolean enabled);
 
@@ -41,5 +43,7 @@ public interface IFormManager {
 	IFormManager defaultRadios(Button... radioButtons);
 
 	Button getSelected(String groupId);
+
+	List<Control> getAllControls();
 
 }
