@@ -46,7 +46,7 @@ import com.lehanh.pama.util.DateUtils;
 import com.lehanh.pama.util.PamaException;
 import com.lehanh.pama.util.PamaHome;
 
-public class ModelLoader {
+public class ModelLoaderV3 {
 	
 	public static void main(String[] args) throws SQLException, IOException {
 		//loadToaThuocMau();
@@ -57,7 +57,7 @@ public class ModelLoader {
 	}
 	
 	public static void loadThuoc() {
-		List<Thuoc> list = ModelLoader.getDSThuoc();
+		List<Thuoc> list = ModelLoaderV3.getDSThuoc();
 		list.stream().forEach(new Consumer<Thuoc>() {
 
 			@Override
@@ -69,7 +69,7 @@ public class ModelLoader {
 	}
 	
 	public static void loadBS() {
-		List<BacSy> listBS = ModelLoader.getDSBacSy();
+		List<BacSy> listBS = ModelLoaderV3.getDSBacSy();
 		listBS.stream().forEach(new Consumer<BacSy>() {
 
 			@Override
@@ -94,7 +94,7 @@ public class ModelLoader {
 			"Sili môi"
 		};
 	public static void loadToaThuocMau() {
-		List<ToaThuocMau> list = ModelLoader.getDSToaThuocMau();
+		List<ToaThuocMau> list = ModelLoaderV3.getDSToaThuocMau();
 		list.stream().forEach(new Consumer<ToaThuocMau>() {
 
 			@Override
@@ -164,7 +164,7 @@ public class ModelLoader {
 			}
 		}
 		
-		List<BenhNhan> listBN = ModelLoader.getDSBenhNhan();
+		List<BenhNhan> listBN = ModelLoaderV3.getDSBenhNhan();
 		PatientDao paDao = new PatientDao();
 		
 		AppointmentCatagory appointmentCatagory = (AppointmentCatagory) ((LinkedList<Catagory>) new AppointmentCatagory().createCatagoryList()).getLast();
@@ -215,7 +215,7 @@ public class ModelLoader {
 	}
 	
 	public static void printCatalog() {
-		List<DanhMuc> listBS = ModelLoader.getDSLoiKhuyen();
+		List<DanhMuc> listBS = ModelLoaderV3.getDSLoiKhuyen();
 		listBS.stream().forEach(new Consumer<DanhMuc>() {
 
 			@Override
@@ -224,89 +224,6 @@ public class ModelLoader {
 			}
 		});
 		
-	}
-	
-	public static void main2(String[] args) throws IOException {
-		//loadPerYear(1, 6, 2015);
-		
-		for (int m = 1; m < 13; m++) {
-			loadPerYear(m, 2016);
-		}
-		
-//		loadPerYear(1, 2015);
-//		loadPerYear(2, 2015);
-//		loadPerYear(3, 2015);
-//		loadPerYear(4, 2015);
-//		loadPerYear(5, 2015);
-//		loadPerYear(6, 2015);
-//		loadPerYear(7, 2015);
-//		loadPerYear(8, 2015);
-//		loadPerYear(9, 2015);
-//		loadPerYear(10, 2015);
-//		loadPerYear(11, 2015);
-//		loadPerYear(12, 2015);
-	}
-	
-	public static void loadPerYear(int m, int year) throws IOException {
-		//List<String[]> listBM = loadFile("olddata//bommo.csv");
-		
-		TreeMap<String, Integer> statictis = new TreeMap<>();
-		
-		List<BenhNhan> listBN = ModelLoader.getDSBenhNhan();
-		listBN.stream().forEach(new Consumer<BenhNhan>() {
-
-			@Override
-			public void accept(BenhNhan t) {
-				//System.out.println(t.id + "\t" + t.gioi);
-				TreeMap<Integer, TreeSet<String>> statictisPerBN = new TreeMap<>();
-				
-				for (LanKhamBenh lkb : t.danhSachKham) {
-					try {
-						java.util.Date ngayKham = DateUtils.sqlDateToutilDate(lkb.ngayKham);
-						int[] date = DateUtils.getDate(ngayKham);
-						if (/*(date[0] == 2015 && date[1] <= 6) || */(date[0] != year || date[1] != m)) {
-							continue;
-						}
-						TreeSet<String> allPT = statictisPerBN.get(lkb.lanKham);
-	
-						if (allPT == null) {
-							allPT = new TreeSet<>();
-							statictisPerBN.put(lkb.lanKham, allPT);
-						}
-						for (PhauThuat pt : lkb.danhSachPhauThuat) {
-							//System.out.println(t.id + "\t" + t.ten + "\t" + pt.ten + "\t" + pt.sym);
-							allPT.add(pt.ten);
-						}
-					} catch (ParseException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-				}
-				
-				for (Entry<Integer, TreeSet<String>> entry : statictisPerBN.entrySet()) {
-					for (String pt : entry.getValue()) {
-						Integer cPT = statictis.get(pt);
-						if (cPT == null) {
-							cPT = 0;
-						}
-						cPT += 1;
-						statictis.put(pt, cPT);
-					}
-				}
-			}
-		});
-		
-		int total = 0;
-		for (Entry<String, Integer> entry : statictis.entrySet()) {
-//			if (!entry.getKey().contains("Bơm mỡ")) {
-//				continue;
-//			}
-			//System.out.println(entry.getKey() + "\t" + entry.getValue());
-			total += entry.getValue();
-		}
-		
-		//System.out.println("-----------------");
-		System.out.println(total);
 	}
 	
 	public static List<String[]> loadFile(String dirFolder) throws IOException {

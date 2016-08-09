@@ -34,7 +34,7 @@ import com.lehanh.pama.old.model.Thuoc;
 import com.lehanh.pama.old.model.ToaThuocMau;
 import com.lehanh.pama.util.DateUtils;
 
-public class ModelLoader {
+public class ModelLoaderV2 {
 	private static final String HOST = "9WZY502";
 	private static final String DB_NAME = "LHS";
 	private static final String USER = "sa";
@@ -45,7 +45,7 @@ public class ModelLoader {
 		
 		TreeMap<String, Integer> statictis = new TreeMap<>();
 		
-		List<BenhNhan> listBN = ModelLoader.getDSBenhNhan();
+		List<BenhNhan> listBN = ModelLoaderV2.getDSBenhNhan();
 		listBN.stream().forEach(new Consumer<BenhNhan>() {
 
 			@Override
