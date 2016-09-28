@@ -32,21 +32,28 @@ public class InitialData {
 		CatagoryDao catDao = new CatagoryDao();
 		PamaHome.application = new MainApplication();
 		DatabaseManager.initialize();
-		catDao.internalDeleteAll();
+//		catDao.internalDeleteAll();
+		
+//		catDao.deleteAllType(CatagoryType.PROGNOSTIC);
+//		catDao.deleteAllType(CatagoryType.DIAGNOSE);
+//		catDao.deleteAllType(CatagoryType.SURGERY);
 		
 		loadDanhMuc("olddata", CatagoryType.PROGNOSTIC, catDao);
 		loadDanhMuc("olddata", CatagoryType.DIAGNOSE, catDao);
 		loadDanhMuc("olddata", CatagoryType.SURGERY, catDao);
+		
 		loadDanhMuc("olddata", CatagoryType.SERVICE, catDao);
 		loadDanhMuc("olddata", CatagoryType.DR, catDao);
-		loadDanhMuc("olddata", CatagoryType.DRUG, catDao);
+//		loadDanhMuc("olddata", CatagoryType.DRUG, catDao);
 		loadDanhMuc("olddata", CatagoryType.ADVICE, catDao);
 		
+//		catDao.deleteAllType(CatagoryType.DRUG);
 //		catDao.deleteAllType(CatagoryType.PRESCRIPTION);
-		loadDanhMuc("olddata", CatagoryType.PRESCRIPTION, catDao);
+//		loadDanhMuc("olddata", CatagoryType.DRUG, catDao);
+//		loadDanhMuc("olddata", CatagoryType.PRESCRIPTION, catDao);
 		
-//		catDao.deleteAllType(CatagoryType.DR);
-//		loadDanhMuc("olddata", CatagoryType.DR, catDao);
+		//catDao.deleteAllType(CatagoryType.DR);
+		//loadDanhMuc("olddata", CatagoryType.DR, catDao);
 
 	}
 	
@@ -69,10 +76,11 @@ public class InitialData {
 	private static Map<String, DrugCatagory> allDrugCat = new TreeMap<>();
 	private static Set<String> allDrugCatInserted = new HashSet<>();
 	private static PrescriptionCatagory currPre = null;
+	private static TreeMap<String, DrugCatagory> drugInserted = new TreeMap<>();
 	private static void handleCatLine(CatagoryType catType, String[] data, CatagoryDao catDao) throws SQLException {
 		if (CatagoryType.PRESCRIPTION == catType) {
 			if (data.length == 1) {
-				if ("end".equals(data[0])) {
+				if ("end".equals(getData(data, 0))) {
 					catDao.insert(currPre);
 					for (DrugCatagory dC : allDrugCat.values()) {
 						if (allDrugCatInserted.contains(dC.getName())) {
@@ -85,23 +93,29 @@ public class InitialData {
 					return;
 				} else {
 					currPre = new PrescriptionCatagory();
-					currPre.setName(data[0]);
-					currPre.setDesc(data[0]);
+					currPre.setName(getData(data, 0));
+					currPre.setDesc(getData(data, 0));
 					currPre.setData(new LinkedList<>());
 					return;
 				}
 			}
 			//ct.cachSuDung, ct.cu, ct.donVi, ct.donViSuDung, ct.luuY, ct.ma, ""+ct.soLanSuDungTrenNgay, ""+ct.soLuong, ct.soLuongSuDungTrenLan, ct.ten
 			int index = 0;
-			PrescriptionItem item = new PrescriptionItem(data[index++], data[index++], data[index++], data[index++], data[index++], data[index++], 
-					Integer.parseInt(data[index++]), Integer.parseInt(data[index++]), data[index++], data[index]);
-			
+//			String drugName = getData(data, ]
+			PrescriptionItem item = new PrescriptionItem(getData(data, index++), getData(data, index++), getData(data, index++), getData(data, index++), getData(data, index++), 
+					// drugDesc
+					getData(data, index++),
+//					drugInserted.get
+					Integer.parseInt(getData(data, index++)), Integer.parseInt(getData(data, index++)), getData(data, index++), getData(data, index));
+			if (drugInserted.containsKey(item.getDrug())) {
+				item.setDrugDesc(drugInserted.get(item.getDrug()).getDrugDesc());
+			}
 			String drugN = item.getDrug();
 			DrugCatagory drug = allDrugCat.get(drugN);
 			if (drug == null) {
 				index = 0;
-				drug = new DrugCatagory(data[index++], data[index++], data[index++], data[index++], data[index++], data[index++], 
-						Integer.parseInt(data[index++]), Integer.parseInt(data[index++]), data[index++], data[index]);
+				drug = new DrugCatagory(getData(data, index++), getData(data, index++), getData(data, index++), getData(data, index++), getData(data, index++), getData(data, index++), 
+						Integer.parseInt(getData(data, index++)), Integer.parseInt(getData(data, index++)), getData(data, index++), getData(data, index));
 				allDrugCat.put(drugN, drug);
 			}
 			
@@ -110,53 +124,65 @@ public class InitialData {
 		}
 		
 		if (CatagoryType.DRUG == catType) {
-			Long oldId = Long.valueOf(data[0]);
+			Long oldId = Long.valueOf(getData(data, 0));
+			DrugCatagory drug = new DrugCatagory(catType, getData(data, 1), getData(data, 2), getData(data, 1), oldId);
+			if (data.length >= 11) {
+				drug.setDrugDesc(getData(data, 10));
+			}
+			//new DrugCatagory
+			//(t.id + "\t" + t.ten + "\t" + t.cachSuDung + "\t" + t.cu + "\t" + t.donVi + "\t" + t.donViSuDung + "\t" + t.luuY + "\t" + t.soLanSuDungTrenNgay
+			// + "\t" + t.soLuong + "\t" + t.soLuongSuDungTrenLan + "\t" + t.tenGoc);
+			
 			Long newId = catDao.insert(
-					new Catagory
-					(catType, data[1], data[2], data[1], oldId)
-					//new DrugCatagory
-					//(t.id + "\t" + t.ten + "\t" + t.cachSuDung + "\t" + t.cu + "\t" + t.donVi + "\t" + t.donViSuDung + "\t" + t.luuY + "\t" + t.soLanSuDungTrenNgay
-					// + "\t" + t.soLuong + "\t" + t.soLuongSuDungTrenLan + "\t" + t.tenGoc);
+					drug
 					);
-
+			drugInserted.put(drug.getName(), drug);
 			updateCatCache(catType, oldId, newId);
 			return;
 		}
 		
 		if (CatagoryType.SURGERY == catType) {
-			Long oldId = Long.valueOf(data[0]);
-			Long newId = catDao.insert(new Catagory(catType, data[1], data[2], data[1], oldId));
+			Long oldId = Long.valueOf(getData(data, 0));
+			Long newId = catDao.insert(new Catagory(catType, getData(data, 1), getData(data, 2), getData(data, 1), oldId));
 			updateCatCache(catType, oldId, newId);
 			return;
 		}
 		
 		if (CatagoryType.SERVICE == catType) {
 			Long[] proList = null;
-			if (!StringUtils.isBlank(data[1])) {
-				String[] oldIds = data[1].split("\\|");
+			if (!StringUtils.isBlank(getData(data, 1))) {
+				String[] oldIds = getData(data, 1).split("\\|");
 				proList = getListNewIds(CatagoryType.PROGNOSTIC, oldIds);
 			}
 			Long[] diaList = null;
-			if (!StringUtils.isBlank(data[2])) {
-				String[] oldIds = data[2].split("\\|");
+			if (!StringUtils.isBlank(getData(data, 2))) {
+				String[] oldIds = getData(data, 2).split("\\|");
 				diaList = getListNewIds(CatagoryType.DIAGNOSE, oldIds);
 			}
 			Long[] surList = null;
-			if (!StringUtils.isBlank(data[3])) {
-				String[] oldIds = data[3].split("\\|");
+			if (!StringUtils.isBlank(getData(data, 3))) {
+				String[] oldIds = getData(data, 3).split("\\|");
 				surList = getListNewIds(CatagoryType.SURGERY, oldIds);
 			}
 
-			catDao.insert(new Catagory(catType, data[0], data[0])
+			catDao.insert(new Catagory(catType, getData(data, 0), getData(data, 0))
 												.addRef(CatagoryType.PROGNOSTIC, proList)
 												.addRef(CatagoryType.DIAGNOSE, diaList)
 												.addRef(CatagoryType.SURGERY, surList));
 			return;
 		}
 		
-		Long oldId = Long.valueOf(data[0]);
-		Long newId = catDao.insert(new Catagory(catType, data[1], data[1], oldId));
+		Long oldId = Long.valueOf(getData(data, 0));
+		Long newId = catDao.insert(new Catagory(catType, getData(data, 1), getData(data, 1), oldId));
 		updateCatCache(catType, oldId, newId);
+	}
+	
+	private static String getData(String[] data, int index) {
+		String result = data[index];
+		if (result == null) {
+			return result;
+		}
+		return result.trim();
 	}
 
 	private static Long[] getListNewIds(CatagoryType prognostic, String[] oldIds) {

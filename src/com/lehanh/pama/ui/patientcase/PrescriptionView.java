@@ -8,9 +8,13 @@ import static com.lehanh.pama.ui.util.UIControlUtils.selectComboOrSetTextByName;
 import static com.lehanh.pama.ui.util.UIControlUtils.setText;
 
 import java.sql.SQLException;
+import java.text.DecimalFormat;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.LinkedList;
 import java.util.List;
+
+import javax.annotation.PostConstruct;
 
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.e4.ui.di.Focus;
@@ -30,6 +34,9 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.FontData;
+import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.ImageData;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.RowLayout;
@@ -68,12 +75,15 @@ import com.lehanh.pama.util.PamaHome;
 import net.sf.paperclips.DefaultGridLook;
 import net.sf.paperclips.GridColumn;
 import net.sf.paperclips.GridPrint;
-import net.sf.paperclips.LinePrint;
+import net.sf.paperclips.ImagePrint;
 import net.sf.paperclips.PaperClips;
 import net.sf.paperclips.Print;
 import net.sf.paperclips.PrintJob;
+import net.sf.paperclips.StyledTextPrint;
 import net.sf.paperclips.TextPrint;
+import net.sf.paperclips.examples.StyledTextPrintExample;
 import net.sf.paperclips.ui.PrintPreview;
+import org.eclipse.wb.swt.ResourceManager;
 
 public class PrescriptionView extends PamaFormUI implements IPatientViewPartListener, IPatientView, ISelectionChangedListener {
 	
@@ -81,7 +91,7 @@ public class PrescriptionView extends PamaFormUI implements IPatientViewPartList
 	private Button saveAsTemplateBtn;
 	//private Button deleteTemplateBtn;
 	private PrescriptionTable tableViewer;
-	private CCombo surgeryNameCombo;
+	private CCombo drugNameCombo;
 	private Text otherDrugText;
 	private Text numberDayText;
 	private Label unitLabel;
@@ -126,7 +136,17 @@ public class PrescriptionView extends PamaFormUI implements IPatientViewPartList
 		}
 	};
 	
+	private Image imageUp;
+	private Image imageDown;
+	private Button btnUpButton;
+	private Button btnDown;
+	
+	static final DecimalFormat DF = new DecimalFormat("#####.##");
+	
 	public PrescriptionView() {
+		this.imageUp = PamaHome.application.loadImage("icons/Up-icon.png"); //$NON-NLS-1$
+		this.imageDown = PamaHome.application.loadImage("icons/Down-icon.png"); //$NON-NLS-1$
+		
 		catManager = (ICatagoryManager) PamaHome.getService(ICatagoryManager.class);
 		paManager = (IPatientManager) PamaHome.getService(IPatientManager.class);
 		paManager.addPaListener(this, ID);
@@ -135,6 +155,7 @@ public class PrescriptionView extends PamaFormUI implements IPatientViewPartList
 	public static final String ID = "com.lehanh.pama.prescriptionView"; //$NON-NLS-1$
 	
 	@Override
+	//@PostConstruct
 	public void createFormUI(Composite parent) {
 		this.composite = new Composite(parent, SWT.NONE);
 		composite.setLayout(new GridLayout(1, false));
@@ -196,8 +217,8 @@ public class PrescriptionView extends PamaFormUI implements IPatientViewPartList
 		Label lblTnThuc = new Label(composite_5, SWT.NONE);
 		lblTnThuc.setText(Messages.PrescriptionView_tenthuoc);
 		
-		this.surgeryNameCombo = new CCombo(composite_5, SWT.BORDER);
-		surgeryNameCombo.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+		this.drugNameCombo = new CCombo(composite_5, SWT.BORDER);
+		drugNameCombo.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 		
 		Label lblThucKhc = new Label(composite_5, SWT.NONE);
 		lblThucKhc.setText(Messages.PrescriptionView_thuockhac);
@@ -274,11 +295,29 @@ public class PrescriptionView extends PamaFormUI implements IPatientViewPartList
 		drugOriginalText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 		
 		Composite composite_6 = new Composite(composite_4, SWT.NONE);
-		composite_6.setLayout(new GridLayout(1, false));
-		composite_6.setLayoutData(new GridData(SWT.RIGHT, SWT.BOTTOM, false, false, 1, 1));
+		composite_6.setLayout(new GridLayout(2, false));
+		composite_6.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false, 1, 1));
+		
+		this.btnUpButton = new Button(composite_6, SWT.NONE);
+		btnUpButton.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				upLine();
+			}
+		});
+		btnUpButton.setImage(ResourceManager.getPluginImage("lehanhcosmetic", "icons/Up-icon.png"));
+		
+		this.btnDown = new Button(composite_6, SWT.NONE);
+		btnDown.setImage(ResourceManager.getPluginImage("lehanhcosmetic", "icons/Down-icon.png"));
+		btnDown.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				downLine();
+			}
+		});
 		
 		this.updateLineBtn = new Button(composite_6, SWT.NONE);
-		updateLineBtn.setLayoutData(new GridData(SWT.RIGHT, SWT.BOTTOM, false, false, 1, 1));
+		updateLineBtn.setLayoutData(new GridData(SWT.FILL, SWT.BOTTOM, false, true, 2, 1));
 		updateLineBtn.setText(Messages.PrescriptionView_luudong);
 		updateLineBtn.addSelectionListener(new SelectionAdapter() {
 			@Override
@@ -288,7 +327,7 @@ public class PrescriptionView extends PamaFormUI implements IPatientViewPartList
 		});
 		
 		this.deleteLineBtn = new Button(composite_6, SWT.NONE);
-		deleteLineBtn.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
+		deleteLineBtn.setLayoutData(new GridData(SWT.FILL, SWT.BOTTOM, false, false, 2, 1));
 		deleteLineBtn.setText(Messages.PrescriptionView_xoadong);
 		deleteLineBtn.addSelectionListener(new SelectionAdapter() {
 			@Override
@@ -372,7 +411,7 @@ public class PrescriptionView extends PamaFormUI implements IPatientViewPartList
 		
 		// initial data for Combos
 		initialCombo(sampleCombo, catManager.getCatagoryByType(CatagoryType.PRESCRIPTION).values(), null, -1, catToUIByDesc);
-		initialCombo(surgeryNameCombo, catManager.getCatagoryByType(CatagoryType.DRUG).values(), null, -1, catToUIByName);
+		initialCombo(drugNameCombo, catManager.getCatagoryByType(CatagoryType.DRUG).values(), null, -1, catToUIByName);
 		initialCombo(useCombo, catManager.getCatagoryByType(CatagoryType.DRUG_USE).values(), null, -1, catToUIByDesc);
 		//initialCombo(sessionCombo, catManager.getCatagoryByType(CatagoryType.DRUG_SESSION_PER_DAY).values(), "---", 0, catToUI);
 		initialCombo(noteCombo, catManager.getCatagoryByType(CatagoryType.DRUG_NOTICE).values(), null, -1, catToUIByDesc);
@@ -393,16 +432,16 @@ public class PrescriptionView extends PamaFormUI implements IPatientViewPartList
 			}
 		});
 		
-		this.surgeryNameCombo.addSelectionListener(new SelectionListener() {
+		this.drugNameCombo.addSelectionListener(new SelectionListener() {
 			
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				viewPrescriptionItem((DrugCatagory) getValueFromCombo(surgeryNameCombo));
+				viewPrescriptionItem((DrugCatagory) getValueFromCombo(drugNameCombo));
 			}
 			
 			@Override
 			public void widgetDefaultSelected(SelectionEvent e) {
-				viewPrescriptionItem((DrugCatagory) getValueFromCombo(surgeryNameCombo));
+				viewPrescriptionItem((DrugCatagory) getValueFromCombo(drugNameCombo));
 			}
 		});
 		
@@ -427,12 +466,20 @@ public class PrescriptionView extends PamaFormUI implements IPatientViewPartList
 		patientCaseChanged(null, paManager.getCurrCase(), 0, new String[]{ID});
 	}
 
+	private void downLine() {
+		this.tableViewer.downLine(this.drugNameCombo.getText());
+	}
+
+	private void upLine() {
+		this.tableViewer.upLine(this.drugNameCombo.getText());
+	}
+
 	private void viewPrescriptionItem(DrugCatagory modelObj) {
 		if (modelObj == null) {
 			clearDetailForm();
 			return;
 		}
-		setText(this.drugOriginalText, modelObj.getDesc());
+		setText(this.drugOriginalText, modelObj.getDrugDesc());
 		
 		setText(this.numberDayText, String.valueOf(modelObj.getNumDay()));
 		setText(this.unitLabel, modelObj.getUnit());
@@ -482,10 +529,15 @@ public class PrescriptionView extends PamaFormUI implements IPatientViewPartList
 		final PrintJob job = new PrintJob("Prescription", //$NON-NLS-1$
 				createPrint(tableViewer.getInput(), 
 						String.valueOf(currPa.getId()), 
-						currPa.getName(), currPa.getAge(), currPa.getFermale(), currPa.getAddress(), currPaCase.getDiagnoseCatagoryNamesAsText(", "),  //$NON-NLS-1$
+						currPa.getName(), currPa.getAge(), currPa.getFermale(), currPa.getAddress(), 
+						//currPaCase.getDiagnoseCatagoryNamesAsText(", "),  //$NON-NLS-1$
+						currPaCase.getDiagnoseCatagoryNames(),
+						//currPaCase.getDiagnoseCatagoryNamesInAllCase(),
+						currPaCase.getAdviceFromDr(),
 						(currPaCase.getAppoSchedule() != null ? currPaCase.getAppoSchedule().getAppointmentDate() : null)
 						));
-
+		job.setMargins(10);
+		
 		Composite buttonPanel = new Composite(shell, SWT.NONE);
 		buttonPanel.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
 		buttonPanel.setLayout(new RowLayout(SWT.HORIZONTAL));
@@ -507,12 +559,14 @@ public class PrescriptionView extends PamaFormUI implements IPatientViewPartList
 	}
 
 	private Print createPrint(List<PrescriptionItem> listItem, String idPa, String paName, int age,
-			String gender, String add, String diagnose, Date appDate) {
+			String gender, String add, List<String> diagnoses, String adviceFromDr, Date appDate) {
 		GridPrint grid = new GridPrint(new DefaultGridLook(5, 5));
-		int totalCol = 5;
-		for (int i = 0; i < totalCol; i++) {
-			grid.addColumn(new GridColumn(SWT.CENTER, SWT.DEFAULT, 20));
-		}
+		
+		grid.addColumn(new GridColumn(SWT.CENTER, SWT.DEFAULT, 5));
+		grid.addColumn(new GridColumn(SWT.CENTER, SWT.DEFAULT, 20));
+		grid.addColumn(new GridColumn(SWT.CENTER, SWT.DEFAULT, 20));
+		grid.addColumn(new GridColumn(SWT.CENTER, SWT.DEFAULT, 20));
+		grid.addColumn(new GridColumn(SWT.CENTER, SWT.DEFAULT, 35));
 		
 		// start MS benh nhan
 		GridPrint child = new GridPrint(new DefaultGridLook(10, 10));
@@ -520,15 +574,19 @@ public class PrescriptionView extends PamaFormUI implements IPatientViewPartList
 		child.addColumn(new GridColumn(SWT.RIGHT, SWT.DEFAULT, 0));
 		grid.add(SWT.RIGHT, child, GridPrint.REMAINDER);
 		
-		final FontData fontData = PamaResourceManager.getFont("Arial", 10, SWT.BOLD).getFontData()[0]; //$NON-NLS-1$
-		child.add(SWT.RIGHT, new TextPrint(Messages.PrescriptionView_msbenhnhan, fontData));
+		final int fontSize = 14;
+		final FontData boldFontData = PamaResourceManager.getFont("Arial", fontSize, SWT.BOLD).getFontData()[0]; //$NON-NLS-1$
+		final FontData fontData = PamaResourceManager.getFont("Arial", fontSize, SWT.NORMAL).getFontData()[0]; //$NON-NLS-1$
+		
+		child.add(SWT.RIGHT, new TextPrint(Messages.PrescriptionView_msbenhnhan, fontData));//MS Bệnh nhân:
 		child.add(SWT.RIGHT, new TextPrint(idPa, fontData));
 		// end MS benh nhan
 
-		printBlank(grid, 4, fontData);
+		printBlank(grid, 6, fontData);
 		
 		// Header toa thuoc
-		grid.add(SWT.CENTER, new TextPrint(Messages.PrescriptionView_toathuoc, PamaResourceManager.getFont("Arial", 22, SWT.BOLD).getFontData()[0]) //$NON-NLS-2$ //$NON-NLS-1$
+		grid.add(SWT.CENTER, new TextPrint(Messages.PrescriptionView_toathuoc, //Toa Thuốc
+				PamaResourceManager.getFont("Arial", fontSize * 2, SWT.BOLD).getFontData()[0]) //$NON-NLS-2$ //$NON-NLS-1$
 				, GridPrint.REMAINDER);
 
 		printBlank(grid, 1, fontData);
@@ -541,9 +599,9 @@ public class PrescriptionView extends PamaFormUI implements IPatientViewPartList
 		child.addColumn(new GridColumn(SWT.LEFT, SWT.DEFAULT, 0));
 		grid.add(SWT.LEFT, child, GridPrint.REMAINDER);
 		
-		child.add(SWT.LEFT, new TextPrint(Messages.PrescriptionView_benhnhan, fontData));
-		child.add(SWT.LEFT, new TextPrint(paName, fontData));
-		child.add(SWT.RIGHT, new TextPrint(Messages.PrescriptionView_tuoi + age, fontData));
+		child.add(SWT.LEFT, new TextPrint(Messages.PrescriptionView_benhnhan, fontData)); //Bệnh nhân:
+		child.add(SWT.LEFT, new TextPrint(paName, boldFontData));
+		child.add(SWT.RIGHT, new TextPrint(Messages.PrescriptionView_tuoi + age, fontData));//Tuổi:
 		child.add(SWT.RIGHT, new TextPrint(Messages.PrescriptionView_gioitinh + gender.toUpperCase(), fontData));
 		
 		child.add(SWT.LEFT, new TextPrint(Messages.PrescriptionView_diachi, fontData));
@@ -551,29 +609,45 @@ public class PrescriptionView extends PamaFormUI implements IPatientViewPartList
 		child.add(SWT.RIGHT, new TextPrint(StringUtils.EMPTY, fontData));
 		child.add(SWT.RIGHT, new TextPrint(StringUtils.EMPTY, fontData));
 		
-		child.add(SWT.LEFT, new TextPrint(Messages.PrescriptionView_chandoan, fontData));
-		child.add(SWT.LEFT, new TextPrint(diagnose, fontData));
-		child.add(SWT.RIGHT, new TextPrint(StringUtils.EMPTY, fontData));
-		child.add(SWT.RIGHT, new TextPrint(StringUtils.EMPTY, fontData));
+		if (diagnoses == null) {
+			diagnoses = new LinkedList<>();
+		}
+		boolean firstDiagnose = true;
+		for (String diagnose : diagnoses) {
+			if (firstDiagnose) {
+				child.add(SWT.LEFT, new TextPrint(Messages.PrescriptionView_chandoan, fontData)); // Chẩn đoán:
+				firstDiagnose = false;
+			} else {
+				child.add(SWT.LEFT, new TextPrint(StringUtils.EMPTY, fontData));
+			}
+			child.add(SWT.LEFT, new TextPrint("- " + diagnose, boldFontData));
+			child.add(SWT.RIGHT, new TextPrint(StringUtils.EMPTY, fontData));
+			child.add(SWT.RIGHT, new TextPrint(StringUtils.EMPTY, fontData));
+		}
+		
 
-		grid.add(new LinePrint(), GridPrint.REMAINDER);
+		//grid.add(new LinePrint(), GridPrint.REMAINDER);
+		printBlank(grid, 1, fontData);
 
 		int index = 1;
 		for (PrescriptionItem item : listItem) {
-			grid.add(SWT.LEFT, new TextPrint(index + Messages.PrescriptionView_17, fontData));
-			grid.add(SWT.LEFT, new TextPrint(item.getDrug(), fontData, GridPrint.REMAINDER), 3);
-			grid.add(SWT.LEFT, new TextPrint(Messages.PrescriptionView_18 + String.valueOf(item.getTotal()) + Messages.PrescriptionView_19 + item.getUnit(), fontData));
+			grid.add(SWT.LEFT, new TextPrint(index + Messages.PrescriptionView_17, boldFontData));
+			grid.add(SWT.LEFT, new TextPrint(item.getDrug() + (StringUtils.isBlank(item.getDrugDesc()) ? StringUtils.EMPTY : " " + item.getDrugDesc())
+					, boldFontData, GridPrint.REMAINDER), 3);
+			grid.add(SWT.LEFT, new TextPrint(Messages.PrescriptionView_18 + DF.format(item.getTotal()) + Messages.PrescriptionView_19 + item.getUnit(), boldFontData));
 
 			grid.add(SWT.LEFT, new TextPrint(StringUtils.EMPTY, fontData));
 			grid.add(SWT.LEFT, new TextPrint(Messages.PrescriptionView_ngay + item.getUse(), fontData));
 			grid.add(SWT.LEFT, new TextPrint(String.valueOf(item.getNumSs()) + Messages.PrescriptionView_lanmoilan, fontData));
-			grid.add(SWT.LEFT, new TextPrint(String.valueOf(item.getPerSs()) + "    " + item.getUnitPer(), fontData)); //$NON-NLS-1$
+			grid.add(SWT.LEFT, new TextPrint(DF.format(item.getPerSs()) + "    " + item.getUnitPer(), fontData)); //$NON-NLS-1$
 			grid.add(SWT.LEFT, new TextPrint(Messages.PrescriptionView_23 + item.getSs() + Messages.PrescriptionView_24 + item.getNote(), fontData));
 
 			index++;
 		}
 		
-		printBlank(grid, 5, fontData);
+		final int listItemS = listItem.size();
+		final int totalLine = 8;
+		printBlank(grid, listItemS > totalLine ? 0 : (totalLine - listItemS), fontData);
 		
 		// Footer
 		GridPrint footer = new GridPrint(new DefaultGridLook(10, 10));
@@ -592,8 +666,13 @@ public class PrescriptionView extends PamaFormUI implements IPatientViewPartList
 		footer.add(SWT.LEFT, new TextPrint(StringUtils.EMPTY, fontData));
 		footer.add(SWT.CENTER, new TextPrint(Messages.PrescriptionView_bacsy, fontData));
 		
-		printBlank(footer, 2, fontData);
-
+		//printBlank(footer, 2, fontData);
+		footer.add(SWT.LEFT, new TextPrint(adviceFromDr, fontData));
+		StyledTextPrint doc = new StyledTextPrint();
+		footer.add(SWT.CENTER, doc, GridPrint.REMAINDER);
+		doc.append(new ImagePrint(new ImageData(StyledTextPrintExample.class
+				.getResourceAsStream("chuki.jpg")), new Point(726, 221)));
+		
 		footer.add(SWT.LEFT, new TextPrint(Messages.PrescriptionView_ngaytaikham + DateUtils.convertDateDataType(appDate), fontData));
 		footer.add(SWT.CENTER, new TextPrint(Messages.PrescriptionView_pgstslehanh, fontData));
 
@@ -607,7 +686,7 @@ public class PrescriptionView extends PamaFormUI implements IPatientViewPartList
 	}
 
 	private void deleteLine() {
-		this.tableViewer.delete(this.surgeryNameCombo.getText());
+		this.tableViewer.delete(this.drugNameCombo.getText());
 	}
 
 	private void updateLine() {
@@ -616,7 +695,7 @@ public class PrescriptionView extends PamaFormUI implements IPatientViewPartList
 
 	private PrescriptionItem getCurrentItem() {
 		PrescriptionItem result = new PrescriptionItem();
-		result.setDrug(surgeryNameCombo.getText());
+		result.setDrug(drugNameCombo.getText());
 		result.setDrugDesc(drugOriginalText.getText());
 		result.setUnit(unitLabel.getText());
 		result.setUnitPer(unitPerText.getText());
@@ -706,16 +785,16 @@ public class PrescriptionView extends PamaFormUI implements IPatientViewPartList
 	}
 
 	private void viewPrescriptionItem(PrescriptionItem modelObj) {
-		selectComboOrSetTextByName(this.surgeryNameCombo, modelObj.getDrug());
+		selectComboOrSetTextByName(this.drugNameCombo, modelObj.getDrug());
 		setText(this.otherDrugText, modelObj.getOtherDrug());
 		setText(this.drugOriginalText, modelObj.getDrugDesc());
 		
-		setText(this.numberDayText, String.valueOf(modelObj.getNumDay()));
+		setText(this.numberDayText, DF.format(modelObj.getNumDay()));
 		setText(this.unitLabel, modelObj.getUnit());
 		setText(this.unitPerText, modelObj.getUnitPer());
-		setText(this.useNumSSPerDayText, String.valueOf(modelObj.getNumSs()));
-		setText(this.numberPerUseText, String.valueOf(modelObj.getPerSs()));
-		setText(this.totalNoteLabel, modelObj.getTotalNote());
+		setText(this.useNumSSPerDayText, DF.format(modelObj.getNumSs()));
+		setText(this.numberPerUseText, DF.format(modelObj.getPerSs()));
+		setText(this.totalNoteLabel, modelObj.getTotalNote(DF));
 		selectComboOrSetTextByName(this.useCombo, modelObj.getUse());
 		selectComboOrSetTextByName(this.sessionCombo, modelObj.getSs());
 		selectComboOrSetTextByName(this.noteCombo, modelObj.getNote());
@@ -738,7 +817,7 @@ public class PrescriptionView extends PamaFormUI implements IPatientViewPartList
 	}
 
 	private void clearDetailForm() {
-		revert(this.surgeryNameCombo);
+		revert(this.drugNameCombo);
 		final String empty = StringUtils.EMPTY;
 		this.otherDrugText.setText(empty);
 		this.drugOriginalText.setText(empty);

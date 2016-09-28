@@ -37,6 +37,8 @@ public class DrugCatagory extends Catagory implements IContainJsonDataCatagory, 
 	private String ss;
 	@Expose
 	private String note;
+	@Expose
+	private String drugDesc;
 	
 	public DrugCatagory() {
 		super(CatagoryType.DRUG);
@@ -76,7 +78,7 @@ public class DrugCatagory extends Catagory implements IContainJsonDataCatagory, 
 		this.unitPer = donViSuDung;
 		this.note = luuY;
 		this.setName(ten);
-		//TODO this.drugDesc = ma;
+		this.drugDesc = ma;
 
 		this.numSs = soLanSuDungTrenNgay;
 		this.total = soLuong;
@@ -93,6 +95,10 @@ public class DrugCatagory extends Catagory implements IContainJsonDataCatagory, 
 		this.numDay = this.total / this.perDay;
 	}
 	
+	public DrugCatagory(CatagoryType catagoryType, String name, String symbol, String desc, Long oldId) {
+		super(catagoryType, name, symbol, desc, oldId);
+	}
+
 	public String getUse() {
 		return use;
 	}
@@ -173,6 +179,14 @@ public class DrugCatagory extends Catagory implements IContainJsonDataCatagory, 
 		this.note = note;
 	}
 
+	public String getDrugDesc() {
+		return drugDesc;
+	}
+
+	public void setDrugDesc(String drugDesc) {
+		this.drugDesc = drugDesc;
+	}
+
 	@Override
 	public void updateFromText() {
 		DrugCatagory otherData = JsonMapper.fromJson(getOtherDataText(), DrugCatagory.class);
@@ -181,6 +195,7 @@ public class DrugCatagory extends Catagory implements IContainJsonDataCatagory, 
 		}
 		updateData(otherData.use, otherData.total, otherData.unit, otherData.unitPer, otherData.numDay, otherData.perDay, 
 				otherData.numSs, otherData.perSs, otherData.ss, otherData.note);
+		this.drugDesc = otherData.drugDesc;
 	}
 
 	@Override

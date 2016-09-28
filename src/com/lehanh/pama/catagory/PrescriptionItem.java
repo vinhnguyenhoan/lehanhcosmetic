@@ -1,6 +1,7 @@
 package com.lehanh.pama.catagory;
 
 import java.io.Serializable;
+import java.text.DecimalFormat;
 
 import com.google.gson.annotations.Expose;
 import com.lehanh.pama.IJsonDataObject;
@@ -12,6 +13,8 @@ public class PrescriptionItem implements IJsonDataObject, Serializable {
 	 */
 	private static final long serialVersionUID = -3576622959257845837L;
 
+	@Expose
+	private int index = -1;
 	@Expose
 	private String use;
 	@Expose
@@ -68,6 +71,14 @@ public class PrescriptionItem implements IJsonDataObject, Serializable {
 			this.perDay = numSs * perSs;
 		}
 		this.numDay = this.total / this.perDay;
+	}
+
+	public int getIndex() {
+		return index;
+	}
+
+	public void setIndex(int index) {
+		this.index = index;
 	}
 
 	public String getUse() {
@@ -174,9 +185,9 @@ public class PrescriptionItem implements IJsonDataObject, Serializable {
 		this.otherDrug = otherDrug;
 	}
 
-	public String getTotalNote() {
+	public String getTotalNote(DecimalFormat df) {
 		float totalUnit = this.numDay * this.numSs * this.perSs;
-		return String.valueOf(totalUnit) + " " + unit; //$NON-NLS-1$
+		return df.format(totalUnit) + " " + unit; //$NON-NLS-1$
 	}
 
 }

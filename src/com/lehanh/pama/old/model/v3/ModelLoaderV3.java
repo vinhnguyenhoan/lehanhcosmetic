@@ -17,7 +17,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TreeMap;
-import java.util.TreeSet;
 import java.util.function.Consumer;
 
 import org.apache.commons.lang3.StringUtils;
@@ -26,6 +25,7 @@ import com.lehanh.pama.catagory.AppointmentCatagory;
 import com.lehanh.pama.catagory.Catagory;
 import com.lehanh.pama.catagory.CatagoryManager;
 import com.lehanh.pama.catagory.CatagoryType;
+import com.lehanh.pama.catagory.DrugCatagory;
 import com.lehanh.pama.catagory.ServiceCatagory;
 import com.lehanh.pama.db.DatabaseManager;
 import com.lehanh.pama.db.dao.PatientDao;
@@ -39,10 +39,8 @@ import com.lehanh.pama.old.model.PhauThuat;
 import com.lehanh.pama.old.model.Thuoc;
 import com.lehanh.pama.old.model.ToaThuocMau;
 import com.lehanh.pama.patientcase.AppointmentSchedule;
-import com.lehanh.pama.patientcase.Messages;
 import com.lehanh.pama.patientcase.Patient;
 import com.lehanh.pama.ui.util.MainApplication;
-import com.lehanh.pama.util.DateUtils;
 import com.lehanh.pama.util.PamaException;
 import com.lehanh.pama.util.PamaHome;
 
@@ -144,6 +142,7 @@ public class ModelLoaderV3 {
 
 		TreeMap<Long, Catagory> surMap = catM.getCatagoryByType(CatagoryType.SURGERY);
 		TreeMap<Long, Catagory> services = catM.getCatagoryByType(CatagoryType.SERVICE);
+		
 		TreeMap<String, ServiceCatagory> servicesBySur = new TreeMap<>();
 		Map<Long, Long> mapSgId = new HashMap<>();
 		Map<String, Catagory> mapSgName = new HashMap<>();
@@ -164,6 +163,12 @@ public class ModelLoaderV3 {
 			}
 		}
 		
+		TreeMap<Long, Catagory> drugs = catM.getCatagoryByType(CatagoryType.DRUG);
+		TreeMap<String, DrugCatagory> drugsByName = new TreeMap<>();
+		for (Catagory cat : drugs.values()) {
+			drugsByName.put(cat.getName(), (DrugCatagory) cat);
+		}
+		
 		List<BenhNhan> listBN = ModelLoaderV3.getDSBenhNhan();
 		PatientDao paDao = new PatientDao();
 		
@@ -176,6 +181,15 @@ public class ModelLoaderV3 {
 				if (bn.danhSachKham == null || bn.danhSachKham.isEmpty()) {
 					return;
 				}
+				
+				if (bn.ten.equals("Trương Nguyệt Bình")) {
+					System.out.println("Trương Nguyệt Bình");
+				}
+				
+				if (bn.id == 17250) {
+					System.out.println("Nguyễn Thị Nghĩa");
+				}
+				
 				boolean isSurgery = false;
 				for (LanKhamBenh lkb : bn.danhSachKham) {
 					if (lkb.danhSachPhauThuat != null && !lkb.danhSachPhauThuat.isEmpty()) {
@@ -198,7 +212,7 @@ public class ModelLoaderV3 {
 				
 				Patient pa = null;;
 				try {
-					pa = bn.convertPa(servicesBySur, mapSgName, mapDrId, appToSave, appointmentCatagory);
+					pa = bn.convertPa(servicesBySur, /*mapSgName,*/ mapDrId, appToSave, appointmentCatagory, drugsByName);
 				} catch (ParseException e1) {
 					e1.printStackTrace();
 					System.exit(-1);
@@ -206,7 +220,7 @@ public class ModelLoaderV3 {
 				try {
 					paDao.insert(pa);
 				} catch (SQLException e) {
-					throw new PamaException(Messages.PatientManager_loicapnhapdb + e.getMessage());
+					throw new PamaException(/*Messages.PatientManager_loicapnhapdb + */e.getMessage());
 				}
 			}
 		});

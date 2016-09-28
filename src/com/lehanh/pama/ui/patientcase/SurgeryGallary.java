@@ -32,6 +32,7 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
@@ -416,15 +417,32 @@ class SurgeryGallary {
 	}
 
 	private int oldIndexDetail = -1;
+
+	private GroupListener groupListener = new GroupListener() {
+
+		@Override
+		public void beforeExpanded(boolean expanded, boolean redraw, GalleryCustomGroupItem galleryCustomGroupItem) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void afterExpanded(boolean expanded, boolean redraw, GalleryCustomGroupItem galleryCustomGroupItem) {
+			// TODO Auto-generated method stub
+			
+		}
+	};
+	
 	private ICaseDetailHandler caseDetailHandler = new ICaseDetailHandler() {
 		
-		private GalleryItem group;
+		private GalleryCustomGroupItem group;
 		@Override
 		public void handleCaseDetail(ISurgeryImageList imageList, int indexRoot, int indexDetail, int groupId, int caseDetailId, 
 				Date examDate, int afterDays, List<Catagory> allSurCat, Map<String, Map<String, IImageInfo>> imageNamesPerSurgery) {
 			if (indexDetail != oldIndexDetail) {
 				oldIndexDetail = indexDetail;
-				group = new GalleryItem(gallery, SWT.NONE);
+				group = new GalleryCustomGroupItem(gallery, SWT.NONE, SurgeryGallary.this.groupListener);
+				
 				String groupName = Messages.SurgeryGallary_benhanthu + groupId + Messages.SurgeryGallary_gachngang_lankham + caseDetailId + " (" + DateUtils.convertDateDataType(examDate) + ")"; //$NON-NLS-3$ //$NON-NLS-4$
 				group.setText(groupName);
 				if (afterDays == 0) {
@@ -581,6 +599,10 @@ class SurgeryGallary {
 			}
 		}
 		this.gallery.redraw();
+	}
+
+	void updateFolderEmpty(boolean isShow) {
+		// TODO Auto-generated method stub
 	}
 
 }

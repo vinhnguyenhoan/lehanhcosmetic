@@ -420,7 +420,7 @@ public class PatientCaseView extends PamaFormUI implements IPatientViewPartListe
 		label_5.setText(Messages.PatientCaseView_de);
 		
 		this.appPurposrCombo = new CCombo(composite_6, SWT.BORDER | SWT.DROP_DOWN | SWT.READ_ONLY);
-		appPurposrCombo.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
+		appPurposrCombo.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 		
 		Label lblGhiCh_1 = new Label(composite_6, SWT.NONE);
 		lblGhiCh_1.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
@@ -506,6 +506,8 @@ public class PatientCaseView extends PamaFormUI implements IPatientViewPartListe
 	    sc.setExpandHorizontal(true);
 	    sc.setExpandVertical(true);
 	    sc.layout();
+	    
+	    sc.setMinSize(composite.computeSize(SWT.DEFAULT, SWT.DEFAULT));
 	}
 
 	private static final TreeMap<Integer, RelComponentElement> allRelEle = new TreeMap<>(); 

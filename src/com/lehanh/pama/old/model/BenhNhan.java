@@ -14,6 +14,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import com.lehanh.pama.catagory.AppointmentCatagory;
 import com.lehanh.pama.catagory.Catagory;
+import com.lehanh.pama.catagory.DrugCatagory;
 import com.lehanh.pama.catagory.PrescriptionItem;
 import com.lehanh.pama.catagory.ServiceCatagory;
 import com.lehanh.pama.patientcase.AppointmentSchedule;
@@ -57,7 +58,9 @@ public class BenhNhan {
 	int startBA = 1;
 	int startTK = 0;
 	
-	public Patient convertPa(TreeMap<String, ServiceCatagory> servicesBySur, Map<String, Catagory> mapSgName, Map<Long, Long> mapIdDr, List<AppointmentSchedule> scheToSave, AppointmentCatagory appointmentCatagory) throws ParseException {
+	public Patient convertPa(TreeMap<String, ServiceCatagory> servicesBySur, /*Map<String, Catagory> mapSgName,*/ 
+			Map<Long, Long> mapIdDr, List<AppointmentSchedule> scheToSave, AppointmentCatagory appointmentCatagory,
+			TreeMap<String, DrugCatagory> drugs) throws ParseException {
 		Patient result = new Patient();
 		
 		result.setId(id);
@@ -241,6 +244,9 @@ public class BenhNhan {
 					for (ChiTietToaThuoc cttt : lkb.danhSachChiTietToaThuoc) {
 						PrescriptionItem item = new PrescriptionItem(cttt.cachSuDung, cttt.cu, cttt.donVi, cttt.donViSuDung, cttt.luuY, "",// TODO ten goc 
 								cttt.soLanSuDungTrenNgay, cttt.soLuong, cttt.soLuongSuDungTrenLan, cttt.ten);
+						if (drugs.containsKey(item.getDrug())) {
+							item.setDrugDesc(drugs.get(item.getDrug()).getDrugDesc());
+						}
 						pL.add(item);
 					}
 					detail.setPrescription(pL);

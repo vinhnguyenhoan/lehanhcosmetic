@@ -2,6 +2,8 @@ package com.lehanh.pama.ui.patientcase;
 
 import java.util.Arrays;
 
+import javax.annotation.PostConstruct;
+
 import org.eclipse.e4.ui.di.Focus;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
@@ -18,10 +20,13 @@ import com.lehanh.pama.patientcase.PatientCaseEntity;
 import com.lehanh.pama.ui.PamaFormUI;
 import com.lehanh.pama.ui.util.PamaResourceManager;
 import com.lehanh.pama.util.PamaHome;
+import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 
 public class DetailImageView extends PamaFormUI implements IPatientViewPartListener, IPatientView {
 	
-	public static final String ID = "com.lehanh.pama.detailImageView";
+	public static final String ID = "com.lehanh.pama.detailImageView"; //$NON-NLS-1$
 	
 	private SurgeryGallary gallery;
 
@@ -37,6 +42,7 @@ public class DetailImageView extends PamaFormUI implements IPatientViewPartListe
 	}
 
 	@Override
+	//@PostConstruct
 	public void createFormUI(Composite parent) {
 		Composite composite = new Composite(parent, SWT.NONE);
 		composite.setLayout(new GridLayout(1, false));
@@ -71,6 +77,20 @@ public class DetailImageView extends PamaFormUI implements IPatientViewPartListe
 		
 		this.gallery = new SurgeryGallary(ID, galleryCom, SWT.V_SCROLL | SWT.MULTI, new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
 
+//		Composite galleryControlCom = new Composite(galleryCom, SWT.NONE);
+//		galleryControlCom.setLayout(new GridLayout(1, false));
+//		galleryControlCom.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+//		
+//		Button btnShowEmptyCasesButton = new Button(galleryControlCom, SWT.CHECK);
+//		btnShowEmptyCasesButton.addSelectionListener(new SelectionAdapter() {
+//			@Override
+//			public void widgetSelected(SelectionEvent e) {
+//				showEmptyCasesButton(btnShowEmptyCasesButton.getSelection());
+//			}
+//		});
+//		btnShowEmptyCasesButton.setBounds(0, 0, 93, 16);
+//		btnShowEmptyCasesButton.setText(Messages.DetailImageView_hienlankhamtrong);
+		
 		Composite composite_1 = new Composite(sashForm, SWT.NONE);
 		GridLayout gl_composite_1 = new GridLayout(1, false);
 		gl_composite_1.verticalSpacing = 0;
@@ -105,6 +125,11 @@ public class DetailImageView extends PamaFormUI implements IPatientViewPartListe
 		return false;
 	}
 
+	private void showEmptyCasesButton(boolean isShow) {
+		gallery.updateFolderEmpty(isShow);
+		canvasPainter.clearImages();
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * @see com.lehanh.pama.patientcase.IPatientViewPartListener#patientChanged(com.lehanh.pama.patientcase.Patient, com.lehanh.pama.patientcase.Patient)
@@ -134,5 +159,4 @@ public class DetailImageView extends PamaFormUI implements IPatientViewPartListe
 		}
 		gallery.showCase(newCase.getId(), rootCase);
 	}
-	
 }

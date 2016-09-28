@@ -4,6 +4,7 @@ import org.eclipse.osgi.util.NLS;
 
 public class Messages extends NLS {
 	private static final String BUNDLE_NAME = "com.lehanh.pama.ui.patientcase.messages"; //$NON-NLS-1$
+	public static String DetailImageView_hienlankhamtrong;
 	public static String ExamVersionComboViewer_dangthuchien;
 	public static String ExamVersionComboViewer_langannhat;
 	public static String ExamVersionComboViewer_ngayden;
