@@ -186,8 +186,13 @@ public class FormManager implements IFormManager {
 
 	@Override
 	public IFormManager clearFormData() {
-		for (Control control : formControls.get(ALL_CONTROL)) {
-			if (ignoreFromList(control, this.ignoreControls)) {
+		FormManager.clearFormData(this.formControls.get(ALL_CONTROL), ignoreControls, defaultRadios);
+		return this;
+	}
+	
+	public static final void clearFormData(List<Control> controls, List<Control> ignoreControls, List<Button> defaultRadios) {
+		for (Control control : controls) {
+			if (ignoreFromList(control, ignoreControls)) {
 				continue;
 			}
 			if (control instanceof Text) {
@@ -202,15 +207,13 @@ public class FormManager implements IFormManager {
 				((CDateTime) control).setSelection((Date) null);
 			} else if (control instanceof Button) {
 				((Button) control).setSelection(false);
-				for (Button dB : this.defaultRadios) {
+				for (Button dB : defaultRadios) {
 					if (control == dB) {
 						((Button) control).setSelection(true);
 					}
 				}
 			}
 		}
-		
-		return this;
 	}
 
 	@Override

@@ -40,6 +40,7 @@ public class PatientManager implements IPatientManager, IPatientSearcher, IAppoi
 	
 	private Map<String, IPatientViewPartListener> paListeners = new HashMap<String, IPatientViewPartListener>();
 
+	private final NotifyPaRunnable notifyPaRunnable = new NotifyPaRunnable();
 	private class NotifyPaRunnable implements Runnable {
 		
 		private Patient oldPa;
@@ -66,8 +67,6 @@ public class PatientManager implements IPatientManager, IPatientSearcher, IAppoi
 			}
 		}
 	}
-	
-	private final NotifyPaRunnable notifyPaRunnable = new NotifyPaRunnable();
 	
 	/* (non-Javadoc)
 	 * @see com.lehanh.pama.IService#initialize()
@@ -108,8 +107,17 @@ public class PatientManager implements IPatientManager, IPatientSearcher, IAppoi
 	 * @see com.lehanh.pama.patientcase.IPatientSearcher#searchPatient(java.util.Date, java.util.Date, java.lang.String)
 	 */
 	@Override
-	public List<Patient> searchPatient(Date lastUpdate, String name, String phone) throws SQLException, ParseException {
-		List<Patient> result = new PatientDao().searchPatient(null, lastUpdate, name, phone);
+	public List<Patient> searchPatient(String idText, Date lastUpdate, String name, String phone) throws SQLException, ParseException {
+		Long id = null;
+		if (idText != null) {
+			idText = idText.trim();
+		}
+		try {
+			id = Long.valueOf(idText);
+		} catch (NumberFormatException e) {
+			// TODO validate fields
+		}
+		List<Patient> result = new PatientDao().searchPatient(id, lastUpdate, name, phone);
 		return result;
 	}
 
@@ -284,11 +292,6 @@ public class PatientManager implements IPatientManager, IPatientSearcher, IAppoi
 		}
 		getCurrentPatient().reloadMedicalInfo();
 		notifyPaListener(patientSelected, patientSelected, uiId);
-	}
-
-	@Override
-	public void cancelEditingPatientCase() {
-		getCurrentPatient().reloadMedicalInfo();
 	}
 
 	@Override

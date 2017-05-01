@@ -864,6 +864,10 @@ public class PatientCaseView extends PamaFormUI implements IPatientViewPartListe
 	
 	private void viewPatientInfo(Patient patient) {
 		if (patient == null) {
+			//TODO clear examCombo 
+			examCombo.setInput(null);
+			this.COM_CANCEL.updateEnableRelView();
+			getFormManager().clearFormData();
 			return;
 		}
 		
@@ -872,7 +876,13 @@ public class PatientCaseView extends PamaFormUI implements IPatientViewPartListe
 	}
 	
 	private void cancel() {
-		paManager.cancelEditingPatientCase();
+		Patient patient = paManager.getCurrentPatient();
+		if (patient == null) {
+			viewPatientInfo(null);
+			return;
+		}
+		
+		patient.reloadMedicalInfo();
 		// show again patient info as a viewing status
 		viewPatientInfo(paManager.getCurrentPatient());
 		this.COM_CANCEL.updateEnableRelView();
@@ -955,14 +965,6 @@ public class PatientCaseView extends PamaFormUI implements IPatientViewPartListe
 		}
 		// view patient and view lasest exam is creating exam case
 		viewPatientInfo(this.paManager.getCurrentPatient());
-		
-		if (status != null) {
-			// switch form to editing -> enable all controls
-			// make sure disable exam combo
-			//update().setEditable(false, examCombo.getTableCombos());
-		} else {
-			//cancelForm(true);
-		}
 	}
 
 	@Focus
@@ -972,6 +974,11 @@ public class PatientCaseView extends PamaFormUI implements IPatientViewPartListe
 
 	@Override
 	public void patientChanged(Patient oldPa, Patient newPa, String[] callIds) {
+//		if (newPa == null) {
+//			this.COM_CANCEL.updateEnableRelView();
+//			getFormManager().clearFormData();
+//			return;
+//		}
 		viewPatientInfo(newPa);
 	}
 

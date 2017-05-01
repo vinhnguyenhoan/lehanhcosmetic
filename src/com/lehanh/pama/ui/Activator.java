@@ -23,6 +23,7 @@ import com.lehanh.pama.patientcase.IPatientManager;
 import com.lehanh.pama.patientcase.IPatientViewPartListener;
 import com.lehanh.pama.patientcase.Patient;
 import com.lehanh.pama.patientcase.PatientCaseEntity;
+import com.lehanh.pama.ui.handlers.Messages;
 import com.lehanh.pama.ui.handlers.PaitentNameStatusLine;
 import com.lehanh.pama.util.PamaHome;
 
@@ -144,6 +145,8 @@ public class Activator implements BundleActivator, PamaApplication, IPatientView
 	@Override
 	public void patientChanged(Patient oldPa, Patient newPa, String[] callIds) {
 		if (newPa == null || StringUtils.isBlank(newPa.getName())) {
+			PaitentNameStatusLine.label.setText(Messages.PaitentNameStatusLine_benhan);
+			PaitentNameStatusLine.label.getParent().layout(true);
 			return;
 		}
 		PaitentNameStatusLine.label.setText(newPa.getId() + " - " + newPa.getName());

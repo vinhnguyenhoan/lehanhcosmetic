@@ -24,6 +24,7 @@ public class Messages extends NLS {
 	public static String UserSearchView_sodt;
 	public static String UserSearchView_timkiem;
 	public static String UserSearchView_xoaboloc;
+	public static String UserSearchView_lblId_text;
 	static {
 		// initialize resource bundle
 		NLS.initializeMessages(BUNDLE_NAME, Messages.class);

@@ -5,6 +5,30 @@ import com.lehanh.pama.ui.patientcase.PrescriptionView;
 
 public class Note {
 	
+	// từ 2009 -> danh muc phau thuat cũ
+	/* ?????
+	 1. a:b:c ->b
+	 if (st.contains(":")) {
+								String[] ss = st.split(":");
+								if (ss.length > 1) {
+									st = ss[1].trim();
+								} else {
+									st = ss[0].trim();
+								}
+							}
+							
+	2.- a - b
+	for (int i = 0; i < surs.length - 1; i++) { 
+
+	 */
+	
+	
+	
+	// từ 2009 -> benh án ngoài thẩm mỹ
+	
+	//30/09/2016
+	//Nguyen thi anh - 17163 -> chon benh an 1 -> 2 -> 1 -> error 
+	
 	// Klamentin 1g -> check ten gốc
 	
 	// 08/07/2016

@@ -9,6 +9,6 @@ public interface IPatientSearcher {
 
 	Patient getPatientDetailById(Long id) throws SQLException, ParseException;
 	
-	List<Patient> searchPatient(Date lastUpdate, String name, String phone) throws SQLException, ParseException;
+	List<Patient> searchPatient(String idText, Date lastUpdate, String name, String phone) throws SQLException, ParseException;
 
 }

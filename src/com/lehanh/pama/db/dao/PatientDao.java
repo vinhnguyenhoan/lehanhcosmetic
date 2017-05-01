@@ -210,7 +210,7 @@ public class PatientDao implements IDao {
 		}
 	}
 
-	private Patient populate(ResultSet rs) throws SQLException, ParseException {
+	public static final Patient populate(ResultSet rs) throws SQLException, ParseException {
 		//image_name, name, address, birth_day, is_fermale, cell_phone, phone, email, career, last_visit, last_surgery, " +
 		//"next_appointment, patient_level, note, medical_personal_info
 		

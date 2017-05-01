@@ -11,12 +11,14 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TreeMap;
+import java.util.TreeSet;
 import java.util.function.Consumer;
 
 import org.apache.commons.lang3.StringUtils;
@@ -45,6 +47,13 @@ import com.lehanh.pama.util.PamaException;
 import com.lehanh.pama.util.PamaHome;
 
 public class ModelLoaderV3 {
+	
+	protected static final boolean DEBUG_ISNOT_SURGERY = false;
+	private static final boolean DEBUG_LASTST_LIST = false;
+
+	public static void main2(String[] args) throws ClassNotFoundException, SQLException {
+		getSession();
+	}
 	
 	public static void main(String[] args) throws SQLException, IOException {
 		//loadToaThuocMau();
@@ -174,6 +183,8 @@ public class ModelLoaderV3 {
 		
 		AppointmentCatagory appointmentCatagory = (AppointmentCatagory) ((LinkedList<Catagory>) new AppointmentCatagory().createCatagoryList()).getLast();
 		List<AppointmentSchedule> appToSave = new LinkedList<>();
+		
+		TreeSet<String> allOldSurgery = new TreeSet<>();
 		listBN.stream().forEach(new Consumer<BenhNhan>() {
 
 			@Override
@@ -181,6 +192,10 @@ public class ModelLoaderV3 {
 				if (bn.danhSachKham == null || bn.danhSachKham.isEmpty()) {
 					return;
 				}
+				
+//				if (bn.id == 11551) {
+//					System.out.println("DEBUG");
+//				}
 				
 				if (bn.ten.equals("Trương Nguyệt Bình")) {
 					System.out.println("Trương Nguyệt Bình");
@@ -202,6 +217,12 @@ public class ModelLoaderV3 {
 					}
 				}
 				if (!isSurgery) {
+					
+					// TODO check data before 2008
+					if (DEBUG_ISNOT_SURGERY) {
+						debugIsNotSur(bn, allOldSurgery);
+					}
+					
 					return;
 				}
 				
@@ -225,9 +246,22 @@ public class ModelLoaderV3 {
 			}
 		});
 		
+		
+		System.out.println("all surgery non exists: " + Arrays.toString(allOldSurgery.toArray()));
+		
 		System.out.println("-----------------");
 	}
 	
+	protected static void debugIsNotSur(BenhNhan bn, TreeSet<String> allOldSurgery) {
+		for (LanKhamBenh lkb : bn.danhSachKham) {
+			if (lkb.danhSachPhauThuat != null && !lkb.danhSachPhauThuat.isEmpty()) {
+				for (PhauThuat pt : lkb.danhSachPhauThuat) {
+					allOldSurgery.add(pt.ten);
+				}
+			}
+		}
+	}
+
 	public static void printCatalog() {
 		List<DanhMuc> listBS = ModelLoaderV3.getDSLoiKhuyen();
 		listBS.stream().forEach(new Consumer<DanhMuc>() {
@@ -257,17 +291,21 @@ public class ModelLoaderV3 {
 		return result;
 	}
 	
-	private static final String HOST = "9WZY502";
+	private static final String HOST = "FBYGRC2\\SQLEXPRESS";
 	private static final String DB_NAME = "LHS";
-	private static final String USER = "sa";
-	private static final String PASS = "kms1895@3";
+	private static final String USER = 
+//			"KMS\\vinhhnguyen";
+			"sa";
+	private static final String PASS = "kms18955@";
 	
 	private static Connection conn;
 	public static Connection getSession() throws SQLException, ClassNotFoundException {
 		if (conn != null && !conn.isClosed()) {
 			return conn;
 		}
-		String url = String.format("jdbc:sqlserver://%s;databaseName=%s", HOST, DB_NAME);
+		String url = String.format("jdbc:sqlserver://%s;databaseName=%s;"
+//				+ "integratedSecurity=true"
+				, HOST, DB_NAME);
 		Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
 		conn = DriverManager.getConnection(url, USER, PASS);;
 		return conn;
@@ -553,6 +591,13 @@ public class ModelLoaderV3 {
 					);
 					benhNhan.addLanKhamBenh(lanKham);
 					mapLanKham.put(lanKham.id, lanKham);
+					
+					
+//					if (benhNhan.id == 11551 && lanKham.lanTaiKham == 0) {
+//						System.out.println("DEBUG");
+//					}
+					
+					
 					String sur = re.getString("clrSurgery");
 					String surRe = re.getString("clrRexamination4Surgery");
 					if (sur != null) {
@@ -561,16 +606,29 @@ public class ModelLoaderV3 {
 						if (surRe != null) {
 							surRes = surRe.split(";");
 						}
-						for (int i = 0; i < surs.length - 1; i++) {
+						for (int i = 0; i <= surs.length - 1; i++) {
 							String st = surs[i].trim();
-							if (st.contains(":")) {
-								String[] ss = st.split(":");
-								if (ss.length > 1) {
-									st = ss[1].trim();
-								} else {
-									st = ss[0].trim();
-								}
+							
+							
+							if (DEBUG_LASTST_LIST && (i == surs.length - 1 && st != null && !st.trim().isEmpty())) {
+								System.out.println("DEBUG last st list: " + st);
+								System.out.println("     " + benhNhan.id);
 							}
+							
+							
+//							if (st.contains(":")) {
+//								
+//								System.out.println("DEBUG st.contains(:)" + st);
+//								
+//								String[] ss = st.split(":");
+//								if (ss.length > 1) {
+//									st = ss[1].trim();
+//								} else {
+//									st = ss[0].trim();
+//								}
+//							}
+							
+							
 							if (st.isEmpty()) {
 								continue;
 							}

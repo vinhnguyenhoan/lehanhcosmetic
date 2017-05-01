@@ -58,7 +58,7 @@ public class Report {
 						java.util.Date ngayKham = DateUtils.sqlDateToutilDate(lkb.ngayKham);
 						int[] date = DateUtils.getDate(ngayKham);
 						//if (/*(date[0] == 2015 && date[1] <= 6) || */(date[0] != year || date[1] != m)) {
-						if (date[0] < 2013) {
+						if (date[0] < 2014) {
 							continue;
 						}
 						
@@ -148,7 +148,7 @@ public class Report {
 						}
 					}
 					
-					System.out.println(t.bn.ten + " : " + nk);
+					System.out.println(t.bn.id + " : " + t.bn.ten + " : " + nk);
 				}
 			});
 			System.out.println();

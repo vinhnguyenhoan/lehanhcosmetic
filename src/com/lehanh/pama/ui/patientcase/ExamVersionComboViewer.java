@@ -18,7 +18,9 @@ import com.lehanh.pama.ui.util.ACommonComboViewer;
 
 class ExamVersionComboViewer extends ACommonComboViewer {
 
+	private final boolean isRoot;
 	private final TableComboViewer tableComboViewer;
+	
 	private PatientCaseEntity selectedEntity;
 	private IPatientCaseList patientCaseList;
 	
@@ -29,8 +31,6 @@ class ExamVersionComboViewer extends ACommonComboViewer {
 	
 	private final Color backgroundSelected;
 
-	private final boolean isRoot;
-	
 	interface ISelectionDetailChangedListener {
 		
 		void viewDetailCase(PatientCaseEntity model);
@@ -120,25 +120,25 @@ class ExamVersionComboViewer extends ACommonComboViewer {
 	@Override
 	public void selectionChanged(SelectionChangedEvent event) {
 		PatientCaseEntity model = (PatientCaseEntity) ((IStructuredSelection) event.getSelection()).getFirstElement();
-		if (model == null) {
-			return;
-		}
-		
-		selectionChanged(model);
+		selectionChanged(model, true);
 	}
 
-	private void selectionChanged(PatientCaseEntity model) {
+	private void selectionChanged(PatientCaseEntity model, boolean refreshView) {
 		this.selectedEntity = model;
 		String selectionText = getSelectionText(selectedEntity);
 		this.tableComboViewer.getTableCombo().setText(selectionText);
 
 		if (selectedEntity != null) {
-			this.tableComboViewer.refresh();
 			// notify detail viewer
 			if (detailViewer != null) {
 				this.detailViewer.setInput(patientCaseList.getSubList(selectedEntity.getId()));
 			}
 		}
+		
+		if (refreshView) {
+			this.tableComboViewer.refresh();
+		}
+		
 		if (selectionDetailListener != null) {
 			selectionDetailListener.viewDetailCase(selectedEntity);
 		}
@@ -168,13 +168,20 @@ class ExamVersionComboViewer extends ACommonComboViewer {
 	 */
 	@Override
 	public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
-		if (newInput instanceof IPatientCaseList) {
-        	this.patientCaseList = (IPatientCaseList) newInput;
-        	
-    		// Default select last one and notify sub list combo
-    		PatientCaseEntity lastRoot = patientCaseList.getLastExamHaveStatus();
-    		this.selectionChanged(lastRoot);
-        }
+    	this.patientCaseList = (IPatientCaseList) newInput;
+    	if (patientCaseList == null) {
+    		//this.selectionChanged((PatientCaseEntity) null, false);
+    		this.selectedEntity = null;
+			// notify detail viewer
+			if (detailViewer != null) {
+				this.detailViewer.setInput((IPatientCaseList) null);
+			}
+			this.tableComboViewer.getTableCombo().setText(StringUtils.EMPTY);
+    		return;
+    	}
+		// Default select last one and notify sub list combo
+		PatientCaseEntity lastRoot = patientCaseList.getLastExamHaveStatus();
+		this.selectionChanged(lastRoot, true);
 	}
 
 	/*
@@ -241,10 +248,10 @@ class ExamVersionComboViewer extends ACommonComboViewer {
 	@Override
 	public void modifyText(ModifyEvent e) {
 		String text = tableComboViewer.getTableCombo().getText();
-		if (StringUtils.isBlank(text)) {
-			tableComboViewer.refresh();
-			selectedEntity = null;
-		}
+//		if (StringUtils.isBlank(text)) {
+//			tableComboViewer.refresh();
+//			selectedEntity = null;
+//		}
 	}
 
 }

@@ -97,10 +97,18 @@ class PatientCaseCatagoryComboViewer extends ACommonComboViewer {
 		if (model == null) {
 			return;
 		}
-		selectionChanged(Arrays.asList(model.getName()));
+		selectionChanged(Arrays.asList(model.getName()), false);
 	}
 	
 	void selectionChanged(List<String> catNameList) {
+		selectionChanged(catNameList, true);
+	}
+	
+	private void selectionChanged(List<String> catNameList, boolean firstSelection) {
+		if (firstSelection) {
+			multiSelectionCatList.clear();
+			tableComboViewer.refresh();
+		}
 		if (catNameList == null || input == null || input.isEmpty()) {
 			return;
 		}

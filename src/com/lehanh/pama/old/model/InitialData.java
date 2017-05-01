@@ -44,13 +44,12 @@ public class InitialData {
 		
 		loadDanhMuc("olddata", CatagoryType.SERVICE, catDao);
 		loadDanhMuc("olddata", CatagoryType.DR, catDao);
-//		loadDanhMuc("olddata", CatagoryType.DRUG, catDao);
 		loadDanhMuc("olddata", CatagoryType.ADVICE, catDao);
 		
 //		catDao.deleteAllType(CatagoryType.DRUG);
 //		catDao.deleteAllType(CatagoryType.PRESCRIPTION);
-//		loadDanhMuc("olddata", CatagoryType.DRUG, catDao);
-//		loadDanhMuc("olddata", CatagoryType.PRESCRIPTION, catDao);
+		loadDanhMuc("olddata", CatagoryType.DRUG, catDao);
+		loadDanhMuc("olddata", CatagoryType.PRESCRIPTION, catDao);
 		
 		//catDao.deleteAllType(CatagoryType.DR);
 		//loadDanhMuc("olddata", CatagoryType.DR, catDao);

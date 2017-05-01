@@ -197,7 +197,7 @@ public class Patient {
 		}
 	}
 
-	void reloadMedicalInfo() {	
+	public void reloadMedicalInfo() {	
 		String json = JsonMapper.toJson(getMedicalPersonalInfo());
 		this.medicalPersonalInfo = JsonMapper.fromJson(json, MedicalPersonalInfo.class);
 		this.medicalPersonalInfo.setPatientId(id);

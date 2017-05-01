@@ -46,8 +46,6 @@ public interface IPatientManager extends IService {
 			String smallSurgery, String drAdvice, Date nextApp,
 			AppointmentCatagory appPurpose, String appNot, ObjectToUIText<Patient, Long> toPatientInfo);
 	
-	void cancelEditingPatientCase();
-
 	PatientCaseEntity getCurrCase();
 
 }

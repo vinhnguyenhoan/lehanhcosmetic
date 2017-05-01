@@ -7,6 +7,12 @@ public class CatagoryToUITextByDesc implements ObjectToUIText {
 
 	@Override
 	public String showUI(Object object) {
+		
+		if (object == null) {
+			
+			System.out.println("DEBUG");
+		}
+		
 		return ((Catagory) object).getDesc();
 	}
 

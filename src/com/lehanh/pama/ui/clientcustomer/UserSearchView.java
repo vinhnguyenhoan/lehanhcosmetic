@@ -38,6 +38,7 @@ public class UserSearchView implements IPatientViewPartListener /*extends ViewPa
 	//private CCombo date_filter_combo;
 	
 	private IPatientManager paManager;
+	private Text id_text;
 	
 	public UserSearchView() {
 		paManager = (IPatientManager) PamaHome.getService(IPatientManager.class);
@@ -52,7 +53,16 @@ public class UserSearchView implements IPatientViewPartListener /*extends ViewPa
 		
 		Composite filter_composite = new Composite(content_com, SWT.BORDER);
 		filter_composite.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
-		filter_composite.setLayout(new GridLayout(8, false));
+		filter_composite.setLayout(new GridLayout(10, false));
+		
+		Label lblId = new Label(filter_composite, SWT.NONE);
+		lblId.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
+		lblId.setText(Messages.UserSearchView_lblId_text);
+		
+		id_text = new Text(filter_composite, SWT.BORDER);
+		GridData gd_text = new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1);
+		gd_text.widthHint = 70;
+		id_text.setLayoutData(gd_text);
 		
 		Label lblHTn = new Label(filter_composite, SWT.NONE);
 		lblHTn.setText(Messages.UserSearchView_hoten);
@@ -98,6 +108,7 @@ public class UserSearchView implements IPatientViewPartListener /*extends ViewPa
 
 		};
 		btnTm.addSelectionListener(searchSelect);
+		id_text.addSelectionListener(searchSelect);
 		name_text.addSelectionListener(searchSelect);
 		phone_text.addSelectionListener(searchSelect);
 		calendarCombo.addSelectionListener(new SelectionAdapter() {
@@ -124,6 +135,7 @@ public class UserSearchView implements IPatientViewPartListener /*extends ViewPa
 	}
 
 	private void clearFilter() {
+		id_text.setText(StringUtils.EMPTY);
 		calendarCombo.setSelection(null);
 		name_text.setText(StringUtils.EMPTY);
 		phone_text.setText(StringUtils.EMPTY);
@@ -132,7 +144,7 @@ public class UserSearchView implements IPatientViewPartListener /*extends ViewPa
 	private void search() {
 		List<Patient> paList;
 		try {
-			paList = paManager.getPatientSearcher().searchPatient(calendarCombo.getSelection(), name_text.getText(), phone_text.getText());
+			paList = paManager.getPatientSearcher().searchPatient(id_text.getText(), calendarCombo.getSelection(), name_text.getText(), phone_text.getText());
 			this.tableViewer.setInput(paList);
 		} catch (SQLException e) {
 			e.printStackTrace();
