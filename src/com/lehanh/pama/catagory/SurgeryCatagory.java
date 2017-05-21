@@ -15,8 +15,16 @@ public class SurgeryCatagory extends Catagory implements IContainJsonDataCatagor
 		super(CatagoryType.SURGERY);
 	}
 
-	SurgeryCatagory(Long id, CatagoryType catagoryType) {
+	protected SurgeryCatagory(Long id, CatagoryType catagoryType) {
 		super(id, CatagoryType.SURGERY);
+	}
+
+	protected SurgeryCatagory(CatagoryType type) {
+		super(type);
+	}
+
+	protected SurgeryCatagory(CatagoryType type, String catName, String catDesc) {
+		super(type, catName, catDesc);
 	}
 
 	@Override

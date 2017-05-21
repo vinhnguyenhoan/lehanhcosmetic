@@ -21,9 +21,10 @@ import org.eclipse.swt.widgets.Text;
 import com.lehanh.pama.ICatagoryManager;
 import com.lehanh.pama.catagory.Catagory;
 import com.lehanh.pama.catagory.CatagoryType;
-import com.lehanh.pama.ui.util.ACommonComboViewer;
+import com.lehanh.pama.catagory.NonIdentifiedSurgeryCatalog;
+import com.lehanh.pama.ui.util.ACommonCombositeDataProvider;
 
-class PatientCaseCatagoryComboViewer extends ACommonComboViewer {
+class PatientCaseCatagoryDataProvider extends ACommonCombositeDataProvider {
 
 	private final CatagoryType type;
 	private TableComboViewer tableComboViewer;
@@ -32,7 +33,7 @@ class PatientCaseCatagoryComboViewer extends ACommonComboViewer {
 	private TreeMap<String, Catagory> multiSelectionCatList = new TreeMap<String, Catagory>();
 	private TreeMap<String, Catagory> input = new TreeMap<String, Catagory>();
 	
-	private List<PatientCaseCatagoryComboViewer> dependViewers;
+	private List<PatientCaseCatagoryDataProvider> dependViewers;
 	private Color backgroundSelected;
 	private Text otherText;
 	private Comparator<Catagory> catagoryComparator = new Comparator<Catagory>() {
@@ -46,24 +47,24 @@ class PatientCaseCatagoryComboViewer extends ACommonComboViewer {
 		}
 	};
 	
-	PatientCaseCatagoryComboViewer(ICatagoryManager catManager, Color backgroundSelected, final TableComboViewer tableComboViewer, CatagoryType type, 
-			PatientCaseCatagoryComboViewer... dependViewers) {
+	PatientCaseCatagoryDataProvider(ICatagoryManager catManager, Color backgroundSelected, final TableComboViewer tableComboViewer, CatagoryType type, 
+			PatientCaseCatagoryDataProvider... dependViewers) {
 		this(catManager, false, backgroundSelected, tableComboViewer, type, dependViewers);
 	}
 	
-	PatientCaseCatagoryComboViewer(ICatagoryManager catManager, boolean showDataAtFirst, Color backgroundSelected, final TableComboViewer tableComboViewer, CatagoryType type, 
-			PatientCaseCatagoryComboViewer... dependViewers) {
+	PatientCaseCatagoryDataProvider(ICatagoryManager catManager, boolean showDataAtFirst, Color backgroundSelected, final TableComboViewer tableComboViewer, CatagoryType type, 
+			PatientCaseCatagoryDataProvider... dependViewers) {
 		this(catManager, showDataAtFirst, backgroundSelected, tableComboViewer, type, 
 				null, dependViewers);
 	}
 
-	PatientCaseCatagoryComboViewer(ICatagoryManager catManager, Color backgroundSelected, final TableComboViewer tableComboViewer, CatagoryType type, 
-			Text otherText, PatientCaseCatagoryComboViewer... dependViewers) {
+	PatientCaseCatagoryDataProvider(ICatagoryManager catManager, Color backgroundSelected, final TableComboViewer tableComboViewer, CatagoryType type, 
+			Text otherText, PatientCaseCatagoryDataProvider... dependViewers) {
 		this(catManager, false, backgroundSelected, tableComboViewer, type, otherText, dependViewers);
 	}
 	
-	private PatientCaseCatagoryComboViewer(ICatagoryManager catManager, boolean showDataAtFirst, Color backgroundSelected, final TableComboViewer tableComboViewer, CatagoryType type, 
-			Text otherText, PatientCaseCatagoryComboViewer... dependViewers) {
+	private PatientCaseCatagoryDataProvider(ICatagoryManager catManager, boolean showDataAtFirst, Color backgroundSelected, final TableComboViewer tableComboViewer, CatagoryType type, 
+			Text otherText, PatientCaseCatagoryDataProvider... dependViewers) {
 		this.catManager = catManager;
 		this.backgroundSelected = backgroundSelected;
 		this.tableComboViewer = tableComboViewer;
@@ -112,8 +113,13 @@ class PatientCaseCatagoryComboViewer extends ACommonComboViewer {
 		if (catNameList == null || input == null || input.isEmpty()) {
 			return;
 		}
+		long nonIdentifiedCatId = -1;
 		for (String catName : catNameList) {
 			Catagory cat = input.get(catName);// getCatByName(multiSelectionCatList, catName);
+			if (cat == null) {
+				// Allow to show a non-identified catalog
+				cat = new NonIdentifiedSurgeryCatalog(nonIdentifiedCatId--, catName);
+			}
 			if (multiSelectionCatList.containsKey(catName)) {
 				multiSelectionCatList.remove(catName);
 			} else {
@@ -146,11 +152,11 @@ class PatientCaseCatagoryComboViewer extends ACommonComboViewer {
 		return selectionText;
 	}
 	
-	private void notifyDependViewers(List<PatientCaseCatagoryComboViewer> dependViewers, TreeMap<String, Catagory> multiSelectionCatList, boolean containOtherText) {
+	private void notifyDependViewers(List<PatientCaseCatagoryDataProvider> dependViewers, TreeMap<String, Catagory> multiSelectionCatList, boolean containOtherText) {
 		if (dependViewers == null) {
 			return;
 		}
-		for (PatientCaseCatagoryComboViewer dependViewer : dependViewers) {
+		for (PatientCaseCatagoryDataProvider dependViewer : dependViewers) {
 			dependViewer.changedByParent(this.type, multiSelectionCatList == null ? null : multiSelectionCatList.values(), containOtherText);
 		}
 	}

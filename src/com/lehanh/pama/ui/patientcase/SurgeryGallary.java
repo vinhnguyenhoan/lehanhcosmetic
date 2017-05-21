@@ -3,8 +3,6 @@ package com.lehanh.pama.ui.patientcase;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.StandardCopyOption;
 import java.text.ParseException;
 import java.util.Arrays;
 import java.util.Date;
@@ -32,7 +30,6 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
@@ -65,7 +62,7 @@ class SurgeryGallary {
 
 	private Image imageAdd;
 	
-	private final String surgeryPath;
+	//private final String surgeryPath;
 	private ISurgeryImageList imageList;
 	
 	private IPatientManager paManager;
@@ -79,7 +76,7 @@ class SurgeryGallary {
 	SurgeryGallary(String uid, Composite galleryCom, int style, GridData gridData) {
 		this.uid = uid;
 		this.paManager = (IPatientManager) PamaHome.getService(IPatientManager.class);
-		this.surgeryPath = PamaHome.application.getProperty(PamaHome.SURGERY_IMAGE_PATH, PamaHome.DEFAULT_SURGERY_IMAGE_PATH);
+		//this.surgeryPath = PamaHome.application.getProperty(PamaHome.SURGERY_IMAGE_PATH, PamaHome.DEFAULT_SURGERY_IMAGE_PATH);
 		this.imageAdd = PamaHome.application.loadImage("icons/addFolder.png"); //$NON-NLS-1$
 		
 		this.gallery = new Gallery(galleryCom, style);
@@ -361,10 +358,10 @@ class SurgeryGallary {
 			if (index == item.getParentItem().getItemCount()) {
 				index -= 1; 
 			}
-			String folderName = folderNameFromSurgeryAndPatientId(imageList.getPatientId(), uD.symbol);
+			//String folderName = folderNameFromSurgeryAndPatientId(imageList.getPatientId(), uD.symbol);
 			try {
-				Image itemImage = PamaResourceManager.getImage(folderName, uD.iI.getImageName(), MAX_W, MAX_H);
-				createItem(index, item.getParentItem(), uD.toFolder, itemImage, orderAtSur + 1, uD.symbol, uD.iI.getImageName(), allSurgeryCat, 
+				Image itemImage = PamaResourceManager.getImage(uD.iI.getFolderName(), uD.iI.getImageName(), MAX_W, MAX_H);
+				createGallaryItem(index, item.getParentItem(), uD.toFolder, itemImage, orderAtSur + 1, uD.symbol, uD.iI.getImageName(), allSurgeryCat, 
 						itemData.groupId, itemData.caseDetailId, uD.iI.getDate(), itemData.examDate, itemData.afterDays);
 			} catch (FileNotFoundException e) {
 				throw new PamaException(e);
@@ -396,23 +393,23 @@ class SurgeryGallary {
 		String extension = FilenameUtils.getExtension(filePath);
 		String name = surgery.getName();
 		String symbol = surgery.getSymbol();
-		IImageInfo iI = this.imageList.addImage(itemData.groupId, itemData.caseDetailId, name, extension);
+		IImageInfo iI = this.imageList.addImage(filePath, itemData.groupId, itemData.caseDetailId, name, extension);
 		
-		final long patientId = imageList.getPatientId();
-		String toFolder = folderNameFromSurgeryAndPatientId(patientId, symbol);
-		try {
-			File toFolderFile = new File(toFolder);
-			if (!toFolderFile.exists()) {
-				if (!toFolderFile.mkdirs()) {
-					throw new PamaException("Can not create folder " + toFolder); //$NON-NLS-1$
-				}
-			}
-			Files.copy(new File(filePath).toPath(), new File(toFolder + iI.getImageName()).toPath(), StandardCopyOption.REPLACE_EXISTING);
-		} catch (IOException e) {
-			throw new PamaException(e);
-		}
+//		final long patientId = imageList.getPatientId();
+//		String toFolder = folderNameFromSurgeryAndPatientId(patientId, symbol);
+//		try {
+//			File toFolderFile = new File(toFolder);
+//			if (!toFolderFile.exists()) {
+//				if (!toFolderFile.mkdirs()) {
+//					throw new PamaException("Can not create folder " + toFolder); //$NON-NLS-1$
+//				}
+//			}
+//			Files.copy(new File(filePath).toPath(), new File(toFolder + iI.getImageName()).toPath(), StandardCopyOption.REPLACE_EXISTING);
+//		} catch (IOException e) {
+//			throw new PamaException(e);
+//		}
 		
-		UpdatedImageData uD = new UpdatedImageData(symbol, toFolder, iI);
+		UpdatedImageData uD = new UpdatedImageData(symbol, iI.getFolderName(), iI);
 		return uD;
 	}
 
@@ -437,7 +434,7 @@ class SurgeryGallary {
 		
 		private GalleryCustomGroupItem group;
 		@Override
-		public void handleCaseDetail(ISurgeryImageList imageList, int indexRoot, int indexDetail, int groupId, int caseDetailId, 
+		public void caseDetailLoaded(ISurgeryImageList imageList, int indexRoot, int indexDetail, int groupId, int caseDetailId, 
 				Date examDate, int afterDays, List<Catagory> allSurCat, Map<String, Map<String, IImageInfo>> imageNamesPerSurgery) {
 			if (indexDetail != oldIndexDetail) {
 				oldIndexDetail = indexDetail;
@@ -462,9 +459,10 @@ class SurgeryGallary {
 						String fileName = aImage.getKey();
 						Image itemImage;
 						try {
-							String folderName = folderNameFromSurgeryAndPatientId(imageList.getPatientId(), surSym);
+							//String folderName = folderNameFromSurgeryAndPatientId(imageList.getPatientId(), surSym);
+							String folderName = aImage.getValue().getFolderName();
 							itemImage = PamaResourceManager.getImage(folderName, fileName, MAX_W, MAX_H);
-							createItem(-1, group, folderName, itemImage, indexImagePerSymbol++, surSym, fileName, allSurCat, groupId, caseDetailId
+							createGallaryItem(-1, group, folderName, itemImage, indexImagePerSymbol++, surSym, fileName, allSurCat, groupId, caseDetailId
 									, aImage.getValue().getDate(), examDate, afterDays);
 						} catch (FileNotFoundException e) {
 							e.printStackTrace();
@@ -474,12 +472,12 @@ class SurgeryGallary {
 					}
 				}
 			}
-			createItem(-1, group, null, imageAdd, -1, null/*"Thêm ảnh"*/, null, allSurCat, groupId, caseDetailId, null, examDate, afterDays)
+			createGallaryItem(-1, group, null, imageAdd, -1, null/*"Thêm ảnh"*/, null, allSurCat, groupId, caseDetailId, null, examDate, afterDays)
 					.setData(IS_ADD_ITEM, true);
 		}
 	};
 
-	private static final GalleryItem createItem(int orderIndex, GalleryItem group, String folder, Image itemImage, int indexImagePerSymbol, String surSym, String imageName, 
+	private static final GalleryItem createGallaryItem(int orderIndex, GalleryItem group, String folder, Image itemImage, int indexImagePerSymbol, String surSym, String imageName, 
 			List<Catagory> allSurCat, int groupId, int caseDetailId, String date, Date examDate, int afterDays) {
 		GalleryItem item = null;
 		if (orderIndex < 0) {
@@ -514,7 +512,7 @@ class SurgeryGallary {
 		}
 	};
 	
-	private String folderNameFromSurgeryAndPatientId(long pId, String surgery) {
+	/*private String folderNameFromSurgeryAndPatientId(long pId, String surgery) {
 		String pIdPrefix = String.valueOf(pId);
 		if (pIdPrefix.length() > 1) {
 			pIdPrefix = pIdPrefix.substring(0, pIdPrefix.length() - 1);
@@ -523,7 +521,7 @@ class SurgeryGallary {
 		}
 		String result = pIdPrefix + "0-" + pIdPrefix + "9"; // example 16945 -> 16940-16949 //$NON-NLS-1$ //$NON-NLS-2$
 		return surgeryPath + "/" + surgery + "/" + result + "/"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-	}
+	}*/
 	
 	private class ImageLoader implements Runnable {
 
@@ -531,7 +529,6 @@ class SurgeryGallary {
 		
 		@Override
 		public void run() {
-			// TODO not public imageList
 			if (callIds != null && Arrays.binarySearch(callIds, uid) > -1) {
 				return;
 			}

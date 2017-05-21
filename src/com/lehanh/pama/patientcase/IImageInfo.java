@@ -6,8 +6,9 @@ public interface IImageInfo {
 
 	Number getId();
 
-	String generateImageName(long patientId, int rootId, int detailId, String surgerySymbol);
-
+	//String generateImageName(long patientId, int rootId, int detailId, String surgerySymbol);
+	String getFolderName();
+	
 	String getImageName();
 
 }

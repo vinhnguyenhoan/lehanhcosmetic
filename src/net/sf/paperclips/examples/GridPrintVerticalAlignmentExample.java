@@ -10,6 +10,16 @@
  */
 package net.sf.paperclips.examples;
 
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.ImageData;
+import org.eclipse.swt.layout.FillLayout;
+import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.RowLayout;
+import org.eclipse.swt.printing.PrinterData;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Shell;
+
 import net.sf.paperclips.DefaultGridLook;
 import net.sf.paperclips.GridPrint;
 import net.sf.paperclips.ImagePrint;
@@ -18,20 +28,7 @@ import net.sf.paperclips.PaperClips;
 import net.sf.paperclips.Print;
 import net.sf.paperclips.PrintJob;
 import net.sf.paperclips.TextPrint;
-import net.sf.paperclips.ui.PrintPreview;
-
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.graphics.ImageData;
-import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.layout.RowLayout;
-import org.eclipse.swt.printing.PrinterData;
-import org.eclipse.swt.widgets.Button;
-import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Event;
-import org.eclipse.swt.widgets.Listener;
-import org.eclipse.swt.widgets.Shell;
+import net.sf.paperclips.ui.PrintViewer;
 
 /**
  * Example for the GridPrint class.
@@ -49,21 +46,19 @@ public class GridPrintVerticalAlignmentExample {
 		final Display display = new Display();
 
 		Shell shell = new Shell(display, SWT.SHELL_TRIM);
-		shell.setText("GridPrintVerticalAlignmentExample.java");
-		shell.setLayout(new GridLayout());
-		shell.setSize(600, 800);
+		//shell.setText("GridPrintVerticalAlignmentExample.java");
+		//shell.setLayout(new GridLayout());
+		shell.setLayout(new FillLayout());
+		shell.setSize(600, 600);
 
-		final PrintJob job = new PrintJob(
-				"GridPrintVerticalAlignmentExample.java", createPrint());
+//		Composite buttonPanel = new Composite(shell, SWT.NONE);
+//		buttonPanel
+//				.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
+//		buttonPanel.setLayout(new RowLayout(SWT.HORIZONTAL));
 
-		Composite buttonPanel = new Composite(shell, SWT.NONE);
-		buttonPanel
-				.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
-		buttonPanel.setLayout(new RowLayout(SWT.HORIZONTAL));
+		final PrintViewer preview = new PrintViewer(shell, SWT.BORDER);
 
-		final PrintPreview preview = new PrintPreview(shell, SWT.BORDER);
-
-		Button prev = new Button(buttonPanel, SWT.PUSH);
+		/*Button prev = new Button(buttonPanel, SWT.PUSH);
 		prev.setText("<< Prev");
 		prev.addListener(SWT.Selection, new Listener() {
 			public void handleEvent(Event event) {
@@ -86,25 +81,34 @@ public class GridPrintVerticalAlignmentExample {
 			public void handleEvent(Event event) {
 				PaperClips.print(job, new PrinterData());
 			}
-		});
+		});*/
 
-		preview.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
-		preview.setFitHorizontal(true);
-		preview.setFitVertical(true);
-		preview.setPrintJob(job);
+//		preview.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+//		preview.setFitHorizontal(true);
+//		preview.setFitVertical(true);
+		
+//		final PrintJob job = new PrintJob(
+//				"GridPrintVerticalAlignmentExample.java", createPrint());
+//		preview.setPrintJob(job);
 
+		preview.setPrint(createPrint());
+		
 		shell.open();
 
 		while (!shell.isDisposed())
 			if (!display.readAndDispatch())
 				display.sleep();
 
+		PaperClips.print(new PrintJob("GridPrintVerticalAlignmentExample", createPrint()),
+				new PrinterData());
+		
 		display.dispose();
+		
 	}
 
 	public static Print createPrint() {
 		DefaultGridLook look = new DefaultGridLook(5, 5);
-		look.setHeaderGap(5);
+		//look.setHeaderGap(5);
 		GridPrint grid = new GridPrint("d:g, d, d:g, d, d:g, d, d:g", look);
 
 		ImageData imageData = new ImageData(

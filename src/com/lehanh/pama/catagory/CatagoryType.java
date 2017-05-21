@@ -2,6 +2,11 @@ package com.lehanh.pama.catagory;
 
 public enum CatagoryType {
 
+	NON_IDENTIFIED() {
+		public Catagory createCatalog(Long id) {
+			return new NonIdentifiedSurgeryCatalog(NON_IDENTIFIED);
+		}
+	},
 	SERVICE(){
 		public Catagory createCatalog(Long id) {
 			return new ServiceCatagory(id, this);

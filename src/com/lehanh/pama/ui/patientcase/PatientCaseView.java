@@ -119,21 +119,20 @@ public class PatientCaseView extends PamaFormUI implements IPatientViewPartListe
 	
 	private IPatientManager paManager;
 	
-	private TableComboViewer serviceTComboViewer;
-	private TableComboViewer prognosticTComboViewer;
-	private TableComboViewer diagnoseTComboViewer;
-	private TableComboViewer surgeryTComboViewer;
+	private TableComboViewer serviceTableComboViewer;
+	private TableComboViewer prognosticTableComboViewer;
+	private TableComboViewer diagnoseTableComboViewer;
+	private TableComboViewer surgeryTableComboViewer;
 	private CCombo surgeryToPrintCombo;
 
 	private ExamVersionComboViewer examCombo;
 	private TableComboViewer caseVersionTComboViewer;
 	private TableComboViewer examVersionTComboViewer;
 	
-	//private PatientCaseCatagoryComboViewer surgeryToPrintComboViewer;
-	private PatientCaseCatagoryComboViewer surgeryCatComboViewer;
-	private PatientCaseCatagoryComboViewer serviceCatComboViewer;
-	private PatientCaseCatagoryComboViewer diagnoseCatComboViewer;
-	private PatientCaseCatagoryComboViewer prognosticCatComboViewer;
+	private PatientCaseCatagoryDataProvider surgeryCatDataProvider;
+	private PatientCaseCatagoryDataProvider serviceCatDataProvider;
+	private PatientCaseCatagoryDataProvider diagnoseCatDataProvider;
+	private PatientCaseCatagoryDataProvider prognosticCatDataProvider;
 	
 	private ObjectToUIText<Patient, Long> patientInfo = new ObjectToUIText<Patient, Long>() {
 		
@@ -242,8 +241,8 @@ public class PatientCaseView extends PamaFormUI implements IPatientViewPartListe
 		new Label(composite_2, SWT.NONE);
 		new Label(composite_2, SWT.NONE);
 		
-		this.serviceTComboViewer = new TableComboViewer(composite_2, SWT.BORDER | SWT.READ_ONLY);
-		TableCombo serviceTCombo = serviceTComboViewer.getTableCombo();
+		this.serviceTableComboViewer = new TableComboViewer(composite_2, SWT.BORDER | SWT.READ_ONLY);
+		TableCombo serviceTCombo = serviceTableComboViewer.getTableCombo();
 		GridData gd_serviceTCombo = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
 		gd_serviceTCombo.widthHint = 400;
 		serviceTCombo.setLayoutData(gd_serviceTCombo);
@@ -267,8 +266,8 @@ public class PatientCaseView extends PamaFormUI implements IPatientViewPartListe
 		lblGhiChT.setText(Messages.PatientCaseView_ghichutubacsi);
 		new Label(composite_2, SWT.NONE);
 		
-		this.prognosticTComboViewer = new TableComboViewer(composite_2, SWT.BORDER | SWT.READ_ONLY);
-		TableCombo prognosticTCombo = prognosticTComboViewer.getTableCombo();
+		this.prognosticTableComboViewer = new TableComboViewer(composite_2, SWT.BORDER | SWT.READ_ONLY);
+		TableCombo prognosticTCombo = prognosticTableComboViewer.getTableCombo();
 		GridData gd_prognosticTCombo = new GridData(SWT.LEFT, SWT.TOP, false, false, 1, 1);
 		gd_prognosticTCombo.widthHint = 400;
 		prognosticTCombo.setLayoutData(gd_prognosticTCombo);
@@ -291,10 +290,10 @@ public class PatientCaseView extends PamaFormUI implements IPatientViewPartListe
 		
 		CLabel label_4 = new CLabel(composite_2, SWT.NONE);
 		label_4.setText(Messages.PatientCaseView_ngoaids);
-		label_4.setFont(SWTResourceManager.getFont("Segoe UI", 10, SWT.NORMAL));
+		label_4.setFont(SWTResourceManager.getFont("Segoe UI", 10, SWT.NORMAL)); //$NON-NLS-1$
 		
-		this.diagnoseTComboViewer = new TableComboViewer(composite_2, SWT.BORDER | SWT.READ_ONLY);
-		TableCombo diagnoseTCombo = diagnoseTComboViewer.getTableCombo();
+		this.diagnoseTableComboViewer = new TableComboViewer(composite_2, SWT.BORDER | SWT.READ_ONLY);
+		TableCombo diagnoseTCombo = diagnoseTableComboViewer.getTableCombo();
 		GridData gd_diagnoseTCombo = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
 		gd_diagnoseTCombo.widthHint = 400;
 		diagnoseTCombo.setLayoutData(gd_diagnoseTCombo);
@@ -333,8 +332,8 @@ public class PatientCaseView extends PamaFormUI implements IPatientViewPartListe
 		this.advCombo = new CCombo(composite_2, SWT.BORDER | SWT.READ_ONLY);
 		advCombo.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 		
-		this.surgeryTComboViewer = new TableComboViewer(composite_2, SWT.BORDER | SWT.READ_ONLY);
-		TableCombo surgeryTCombo = surgeryTComboViewer.getTableCombo();
+		this.surgeryTableComboViewer = new TableComboViewer(composite_2, SWT.BORDER | SWT.READ_ONLY);
+		TableCombo surgeryTCombo = surgeryTableComboViewer.getTableCombo();
 		GridData gd_surgeryTCombo = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
 		gd_surgeryTCombo.widthHint = 400;
 		surgeryTCombo.setLayoutData(gd_surgeryTCombo);
@@ -449,7 +448,7 @@ public class PatientCaseView extends PamaFormUI implements IPatientViewPartListe
 		});
 		reExamBtn.setLayoutData(new GridData(SWT.LEFT, SWT.BOTTOM, false, false, 1, 1));
 		reExamBtn.setFont(SWTResourceManager.getFont("Arial", 10, SWT.NORMAL)); //$NON-NLS-1$
-		reExamBtn.setText(Messages.PatientCaseView_thamkham);
+		reExamBtn.setText(Messages.PatientCaseView_but_phauthuat);
 		
 		this.newCaseBtn = new Button(composite_6, SWT.NONE);
 		newCaseBtn.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 2, 1));
@@ -546,7 +545,7 @@ public class PatientCaseView extends PamaFormUI implements IPatientViewPartListe
 				return;
 			}
 			for (Control control : controls) {
-				Boolean isReadOnly = (Boolean) control.getData("READ_ONLY");
+				Boolean isReadOnly = (Boolean) control.getData("READ_ONLY"); //$NON-NLS-1$
 				if (control instanceof Text && !Boolean.TRUE.equals(isReadOnly)) {
 					// Ignore if read only style control
 					((Text) control).setEditable(isEnable);
@@ -710,23 +709,22 @@ public class PatientCaseView extends PamaFormUI implements IPatientViewPartListe
 			}
 		});
 		
-		//this.surgeryToPrintComboViewer = new PatientCaseCatagoryComboViewer(false, catManager, grey, surgeryToPrintCombo, CatagoryType.SURGERY);
-		this.surgeryTComboViewer.getTableCombo().getTextControl().addModifyListener(new ModifyListener() {
+		this.surgeryTableComboViewer.getTableCombo().getTextControl().addModifyListener(new ModifyListener() {
 			
 			@Override
 			public void modifyText(ModifyEvent e) {
-				initialCombo(surgeryToPrintCombo, surgeryCatComboViewer.getMultiSelectionCatList(), null, 0, catToDesc);
+				initialCombo(surgeryToPrintCombo, surgeryCatDataProvider.getMultiSelectionCatList(), null, 0, catToDesc);
 			}
 		});
-		this.surgeryCatComboViewer = new PatientCaseCatagoryComboViewer(catManager, grey, surgeryTComboViewer, CatagoryType.SURGERY);
-		this.diagnoseCatComboViewer = new PatientCaseCatagoryComboViewer(catManager, grey, diagnoseTComboViewer, CatagoryType.DIAGNOSE, diagnoseOtherText);
-		this.prognosticCatComboViewer = new PatientCaseCatagoryComboViewer(catManager, grey, prognosticTComboViewer, CatagoryType.PROGNOSTIC
-				, prognosticOtherText
+		this.surgeryCatDataProvider = new PatientCaseCatagoryDataProvider(catManager, grey, surgeryTableComboViewer, CatagoryType.SURGERY);
+		this.diagnoseCatDataProvider = new PatientCaseCatagoryDataProvider(catManager, grey, diagnoseTableComboViewer, CatagoryType.DIAGNOSE, diagnoseOtherText);
+		this.prognosticCatDataProvider = new PatientCaseCatagoryDataProvider(catManager, grey, prognosticTableComboViewer, CatagoryType.PROGNOSTIC, 
+				prognosticOtherText
 				//, diagnoseCatComboViewer
 				//, surgeryCatComboViewer
 		);
-		this.serviceCatComboViewer = new PatientCaseCatagoryComboViewer(catManager, true, grey, serviceTComboViewer, CatagoryType.SERVICE
-				, prognosticCatComboViewer, diagnoseCatComboViewer, surgeryCatComboViewer
+		this.serviceCatDataProvider = new PatientCaseCatagoryDataProvider(catManager, true, grey, serviceTableComboViewer, CatagoryType.SERVICE,
+				prognosticCatDataProvider, diagnoseCatDataProvider, surgeryCatDataProvider
 		);
 		
 		// initial view
@@ -778,7 +776,7 @@ public class PatientCaseView extends PamaFormUI implements IPatientViewPartListe
 		grid.addColumn(new GridColumn(SWT.RIGHT, SWT.DEFAULT, 10));
 
 		final FontData fontData = PamaResourceManager.getFont("Arial", 20, SWT.BOLD).getFontData()[0]; //$NON-NLS-1$
-		grid.add(SWT.LEFT, new TextPrint(calculateDateAfterRoot == 0 ? "B" : "A" + calculateDateAfterRoot + "day", fontData));
+		grid.add(SWT.LEFT, new TextPrint(calculateDateAfterRoot == 0 ? "B" : "A" + calculateDateAfterRoot + "day", fontData)); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		grid.add(SWT.RIGHT, new TextPrint(date, fontData));
 
 		final FontData bFontData = PamaResourceManager.getFont("Arial", 50, SWT.BOLD).getFontData()[0]; //$NON-NLS-1$
@@ -790,7 +788,7 @@ public class PatientCaseView extends PamaFormUI implements IPatientViewPartListe
 	}
 
 	private void selectAdvice(String text) {
-		text = "- " + text;
+		text = "- " + text; //$NON-NLS-1$
 		String currText = this.drAdviceText.getText();
 		if (StringUtils.isBlank(currText)) {
 			currText = text;
@@ -847,10 +845,10 @@ public class PatientCaseView extends PamaFormUI implements IPatientViewPartListe
 
 	private void selectServiceCatagory(PatientCaseEntity model) {
 		// Remain order of selection
-		serviceCatComboViewer.selectionChanged(model.getServiceNames());
-		prognosticCatComboViewer.selectionChanged(model.getPrognosticCatagoryNames());
-		diagnoseCatComboViewer.selectionChanged(model.getDiagnoseCatagoryNames());
-		surgeryCatComboViewer.selectionChanged(model.getSurgeryCatagoryNames());
+		serviceCatDataProvider.selectionChanged(model.getServiceNames());
+		prognosticCatDataProvider.selectionChanged(model.getPrognosticCatagoryNames());
+		diagnoseCatDataProvider.selectionChanged(model.getDiagnoseCatagoryNames());
+		surgeryCatDataProvider.selectionChanged(model.getSurgeryCatagoryNames());
 	}
 
 	private void viewAppointmentSchedule(AppointmentSchedule appoSchedule) {
@@ -893,14 +891,14 @@ public class PatientCaseView extends PamaFormUI implements IPatientViewPartListe
 		try {
 			paManager.updatePatientCase(ID, this.examCombo.getSelectedRootId(), this.examCombo.getSelectedDetailEntity(),
 										(DrCatagory) getValueFromCombo(this.drCombo),
-										(List<ServiceCatagory>) this.serviceCatComboViewer.getMultiSelectionCatList(),
-										(List<PrognosticCatagory>) this.prognosticCatComboViewer.getMultiSelectionCatList(),
+										(List<ServiceCatagory>) this.serviceCatDataProvider.getMultiSelectionCatList(),
+										(List<PrognosticCatagory>) this.prognosticCatDataProvider.getMultiSelectionCatList(),
 										this.prognosticOtherText.getText(),
-										(List<DiagnoseCatagory>) this.diagnoseCatComboViewer.getMultiSelectionCatList(),
+										(List<DiagnoseCatagory>) this.diagnoseCatDataProvider.getMultiSelectionCatList(),
 										this.diagnoseOtherText.getText(),
 										this.noteFromPaText.getText(),
 										this.noteFromDrText.getText(),
-										(List<SurgeryCatagory>) this.surgeryCatComboViewer.getMultiSelectionCatList(),
+										(List<SurgeryCatagory>) this.surgeryCatDataProvider.getMultiSelectionCatList(),
 										this.surgeryNoteText.getText(),
 										this.surgeryDateCDate.getSelection(),
 										this.complicationCheckBtn.getSelection(),
@@ -933,38 +931,46 @@ public class PatientCaseView extends PamaFormUI implements IPatientViewPartListe
 
 	private void newCase() {
 		// do nothing for data
-		newAction(null);
+		if (!newAction(null)) {
+			return;
+		}
 		this.COM_NEW_CASE.updateEnableRelView();;
 	}
 	
 	private void reExam() {
 		// do nothing for data
-		newAction(PatientCaseStatus.EXAM);
+		if (!newAction(PatientCaseStatus.EXAM)) {
+			return;
+		}
 		this.COM_NEW_EXAM.updateEnableRelView();
 	}
 
 	private void advice() {
 		// do nothing for data
-		newAction(PatientCaseStatus.CONSULT);
+		if (!newAction(PatientCaseStatus.CONSULT)) {
+			return;
+		}
 		this.COM_NEW_EXAM.updateEnableRelView();
 	}
 
-	private void newAction(PatientCaseStatus status) {
+	private boolean newAction(PatientCaseStatus status) {
 		if (status != null) {
 			if (this.examCombo.getDetailInput() == null) {
-				FormManager.showMessage(this.composite.getShell(), "Hướng dẩn", "Tạo bệnh án mới !");
-				return;
+				FormManager.showMessage(this.composite.getShell(), Messages.PatientCaseView_huongdan, Messages.PatientCaseView_cantaomotbenhantruoc);
+				return false;
 			}
 			this.examCombo.getDetailInput().createDetailCase(status);
 		} else {
 			if (this.examCombo.getInput() == null) {
-				FormManager.showMessage(this.composite.getShell(), "Hướng dẩn", "Chọn bệnh nhân trước khi tạo bệnh án !");
-				return;
+				FormManager.showMessage(this.composite.getShell(), Messages.PatientCaseView_huongdan, Messages.PatientCaseView_chonhoactaobenhnhantruoc);
+				return false;
 			}
 			this.examCombo.getInput().createRootCase();
 		}
-		// view patient and view lasest exam is creating exam case
+		// view patient and view latest exam is creating exam case
 		viewPatientInfo(this.paManager.getCurrentPatient());
+		
+		return true;
 	}
 
 	@Focus

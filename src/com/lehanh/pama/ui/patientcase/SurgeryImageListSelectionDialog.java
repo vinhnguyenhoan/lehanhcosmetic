@@ -1,8 +1,8 @@
 package com.lehanh.pama.ui.patientcase;
 
-import java.util.Arrays;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CCombo;
@@ -28,7 +28,7 @@ import com.lehanh.pama.ui.util.UIControlUtils;
 
 public class SurgeryImageListSelectionDialog extends Dialog {
 
-	protected String[] dir;
+	private String[] dir;
 	private CCombo surgerCombo;
 	private List<Catagory> allSurgeryCat;
 	private Object result;
@@ -45,13 +45,13 @@ public class SurgeryImageListSelectionDialog extends Dialog {
 		gridLayout.numColumns = 2;
 
 		Label lblNewLabel = new Label(container, SWT.NONE);
-		lblNewLabel.setText("New Label"); //$NON-NLS-1$
+		lblNewLabel.setText(Messages.SurgeryImageListSelectionDialog_lblNewLabel_text);
 
 		this.surgerCombo = new CCombo(container, SWT.BORDER);
 		surgerCombo.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 
-		Label label = new Label(container, SWT.NONE);
-		label.setText("File: "); //$NON-NLS-1$
+		Label lblFilenh = new Label(container, SWT.NONE);
+		lblFilenh.setText(Messages.SurgeryImageListSelectionDialog_lblFilenh_text);
 
 		final Composite fileCom = new Composite(container, SWT.NONE);
 		fileCom.setLayout(new GridLayout(5, true));
@@ -100,7 +100,8 @@ public class SurgeryImageListSelectionDialog extends Dialog {
 					String path = dlg.getFilterPath();
 					String[] dirs = dlg.getFileNames();
 					if (dirs != null) {
-						imagePathText.setText(Arrays.toString(dirs));
+						imagePathText.setText(StringUtils.join(dirs, ", "));
+						imagePathText.getParent().layout();
 						SurgeryImageListSelectionDialog.this.dir = new String[dirs.length];
 						for (int i = 0; i < dirs.length; i++) {
 							String aDir = path + "/" + dirs[i];

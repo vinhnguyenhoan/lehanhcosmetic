@@ -14,12 +14,9 @@ import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Table;
-import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.ToolItem;
 
 import com.lehanh.pama.catagory.Catagory;
@@ -27,34 +24,22 @@ import com.lehanh.pama.patientcase.AppointmentSchedule;
 import com.lehanh.pama.patientcase.IPatientManager;
 import com.lehanh.pama.ui.E4LifeCycle;
 import com.lehanh.pama.ui.patientcase.PatientPerspectiveHandler;
-import com.lehanh.pama.ui.util.ACommonComboViewer;
+import com.lehanh.pama.ui.util.TableDataProvider;
 import com.lehanh.pama.util.PamaHome;
 
-class AppointmentTable extends ACommonComboViewer {
-
-	private TableViewer tableViewer;
+class AppointmentTable extends TableDataProvider {
 
 	AppointmentTable(final String uid, Composite composite_1) {
-		this.tableViewer = new TableViewer(composite_1, SWT.H_SCROLL
-		        | SWT.V_SCROLL | SWT.FULL_SELECTION | SWT.BORDER);
-		Table table = tableViewer.getTable();
-		table.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
-		table.setHeaderVisible(true);
-		table.setLinesVisible(true);
+		super(composite_1);
+
+		newColDef(SWT.LEFT, Messages.AppointmentTable_thongtinkhach, 40);
+		newColDef(SWT.LEFT, Messages.AppointmentTable_hen, 20);
+		newColDef(SWT.LEFT, Messages.AppointmentTable_ghichu, 40);
 		
-		newColDef(SWT.LEFT, Messages.AppointmentTable_thongtinkhach);
-		newColDef(SWT.LEFT, Messages.AppointmentTable_hen);
-		newColDef(SWT.LEFT, Messages.AppointmentTable_ghichu);
-		
-		this.tableViewer.setContentProvider(this);
-		// set the label providers
-		this.tableViewer.setLabelProvider(this);
-		pack();
 		
 		final IPatientManager paManager = (IPatientManager) PamaHome.getService(IPatientManager.class);
-
 		// initial actions
-		this.tableViewer.addDoubleClickListener(new IDoubleClickListener() {
+		this.getTableViewer().addDoubleClickListener(new IDoubleClickListener() {
 			
 			@Override
 			public void doubleClick(DoubleClickEvent event) {
@@ -116,24 +101,13 @@ class AppointmentTable extends ACommonComboViewer {
 		});*/
 	}
 	
-	private void pack() {
-		for (TableColumn col : this.tableViewer.getTable().getColumns()) {
-			col.pack();
-		}
-	}
-
-	private void newColDef(int style, String text) {
-		TableColumn sttCol = new TableColumn(tableViewer.getTable(), SWT.CENTER);
-		sttCol.setText(text);
-	}
-
 	Table getTable() {
-		return this.tableViewer.getTable();
+		return this.getTableViewer().getTable();
 	}
 
 	@SuppressWarnings("unchecked")
 	List<AppointmentSchedule> getInput() {
-		return (List<AppointmentSchedule>) this.tableViewer.getInput();
+		return (List<AppointmentSchedule>) this.getTableViewer().getInput();
 	}
 	
 //	@Override
@@ -171,11 +145,11 @@ class AppointmentTable extends ACommonComboViewer {
 	}
 
 	void addSelectionChangedListener(ISelectionChangedListener listener) {
-		this.tableViewer.addSelectionChangedListener(listener);
+		this.getTableViewer().addSelectionChangedListener(listener);
 	}
 
 	void setInput(List<AppointmentSchedule> data) {
-		this.tableViewer.setInput(data);
+		this.getTableViewer().setInput(data);
 	}
 
 }

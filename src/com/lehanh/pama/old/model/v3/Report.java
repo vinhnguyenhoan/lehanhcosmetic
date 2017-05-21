@@ -13,6 +13,8 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.function.Consumer;
 
+import org.apache.commons.lang3.StringUtils;
+
 import com.lehanh.pama.old.model.BenhNhan;
 import com.lehanh.pama.old.model.LanKhamBenh;
 import com.lehanh.pama.old.model.PhauThuat;
@@ -38,6 +40,8 @@ public class Report {
 //		loadPerYear(11, 2015);
 //		loadPerYear(12, 2015);
 	}
+	
+	private static final String filterBySurName = "mũi"; //example "Bơm mỡ"
 	
 	public static void loadPerYear(/*int m, int year*/) throws IOException {
 		//List<String[]> listBM = loadFile("olddata//bommo.csv");
@@ -81,7 +85,7 @@ public class Report {
 				
 				for (Entry<Integer, TreeSet<String>> entry : statictisPerBN.entrySet()) {
 					for (String pt : entry.getValue()) {
-						if (!pt.contains("Bơm mỡ")) {
+						if (!StringUtils.containsIgnoreCase(pt, filterBySurName)) {
 							continue;
 						}
 						//Integer cPT = statictis.get(pt);
@@ -100,14 +104,14 @@ public class Report {
 			}
 		});
 		
-		printContain("Bơm mỡ", statictis);
+		printContain(filterBySurName, statictis);
 	}
 
 	private static void printContain(String pt, TreeMap<String, List<StatictisBN>> statictis) {
 		int total = 0;
 		//int indexPT = 0;
 		for (Entry<String, List<StatictisBN>> entry : statictis.entrySet()) {
-			if (!entry.getKey().contains(pt)) {
+			if (!StringUtils.containsIgnoreCase(entry.getKey(), pt)) {
 				continue;
 			}
 			

@@ -70,7 +70,7 @@ public class BenhNhan {
 		result.setBirthDay(ngaySinh);
 		result.setFermale(!"Nam".equals(gioi));
 		if (StringUtils.isBlank(dienThoaiDiDong)) {
-			dienThoaiDiDong = "090...";
+			dienThoaiDiDong = "+84...";
 		}
 		result.setCellPhone(dienThoaiDiDong);
 		result.setPhone(dienThoai);

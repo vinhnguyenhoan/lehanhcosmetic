@@ -6,63 +6,38 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.eclipse.jface.viewers.ISelectionChangedListener;
-import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Table;
-import org.eclipse.swt.widgets.TableColumn;
 
 import com.lehanh.pama.catagory.PrescriptionItem;
-import com.lehanh.pama.ui.util.ACommonComboViewer;
+import com.lehanh.pama.ui.util.TableDataProvider;
 
-class PrescriptionTable extends ACommonComboViewer {
-
-	private TableViewer tableViewer;
+class PrescriptionTable extends TableDataProvider {
 
 	PrescriptionTable(Composite composite_1) {
-		this.tableViewer = new TableViewer(composite_1, SWT.H_SCROLL
-		        | SWT.V_SCROLL | SWT.FULL_SELECTION | SWT.BORDER);
-		Table table = tableViewer.getTable();
-		table.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 4, 1));
-		table.setHeaderVisible(true);
-		table.setLinesVisible(true);
-		
+		super(composite_1, new GridData(SWT.FILL, SWT.FILL, true, true, 4, 1));
+
 		//newColDef(SWT.CENTER, "STT");
-		newColDef(SWT.LEFT, Messages.PrescriptionTable_tenthuoc);
-		newColDef(SWT.LEFT, Messages.PrescriptionTable_tengoc);
-		newColDef(SWT.RIGHT, Messages.PrescriptionTable_songay);
-		newColDef(SWT.LEFT, Messages.PrescriptionTable_donvi);
-		newColDef(SWT.RIGHT, Messages.PrescriptionTable_ngaydung);
-		newColDef(SWT.RIGHT, Messages.PrescriptionTable_landung);
-		newColDef(SWT.LEFT, Messages.PrescriptionTable_cachdung);
-		newColDef(SWT.LEFT, Messages.PrescriptionTable_cuuong);
-		newColDef(SWT.LEFT, Messages.PrescriptionTable_luuy);
-		
-		this.tableViewer.setContentProvider(this);
-		// set the label providers
-		this.tableViewer.setLabelProvider(this);
-		pack();
+		newColDef(SWT.LEFT, Messages.PrescriptionTable_tenthuoc, 50);
+		newColDef(SWT.LEFT, Messages.PrescriptionTable_tengoc, 30);
+		newColDef(SWT.RIGHT, Messages.PrescriptionTable_songay, 20);
+		newColDef(SWT.LEFT, Messages.PrescriptionTable_donvi, 20);
+		newColDef(SWT.RIGHT, Messages.PrescriptionTable_ngaydung, 20);
+		newColDef(SWT.RIGHT, Messages.PrescriptionTable_landung, 20);
+		newColDef(SWT.LEFT, Messages.PrescriptionTable_cachdung, 35);
+		newColDef(SWT.LEFT, Messages.PrescriptionTable_cuuong, 20);
+		newColDef(SWT.LEFT, Messages.PrescriptionTable_luuy, 40);
 	}
 	
-	private void pack() {
-		for (TableColumn col : this.tableViewer.getTable().getColumns()) {
-			col.pack();
-		}
-	}
-
-	private void newColDef(int style, String text) {
-		TableColumn sttCol = new TableColumn(tableViewer.getTable(), SWT.CENTER);
-		sttCol.setText(text);
-	}
-
 	Table getTable() {
-		return this.tableViewer.getTable();
+		return this.getTableViewer().getTable();
 	}
 
 	@SuppressWarnings("unchecked")
 	List<PrescriptionItem> getInput() {
-		return (List<PrescriptionItem>) this.tableViewer.getInput();
+		return (List<PrescriptionItem>) this.getTableViewer().getInput();
 	}
 	
 //	@Override
@@ -111,7 +86,7 @@ class PrescriptionTable extends ACommonComboViewer {
 	}
 
 	void addSelectionChangedListener(ISelectionChangedListener listener) {
-		this.tableViewer.addSelectionChangedListener(listener);
+		this.getTableViewer().addSelectionChangedListener(listener);
 	}
 
 	private static final Comparator<PrescriptionItem> sortByIndex = new Comparator<PrescriptionItem>() {
@@ -136,12 +111,12 @@ class PrescriptionTable extends ACommonComboViewer {
 		if (data != null) {
 			Collections.sort(data, sortByIndex);
 		}
-		this.tableViewer.setInput(data);
+		this.getTableViewer().setInput(data);
 	}
 
 	void updateLine(PrescriptionItem currentItem) {
 		@SuppressWarnings("unchecked")
-		List<PrescriptionItem> data = (List<PrescriptionItem>) this.tableViewer.getInput();
+		List<PrescriptionItem> data = (List<PrescriptionItem>) this.getTableViewer().getInput();
 		if (data == null) {
 			data = new LinkedList<PrescriptionItem>();
 			data.add(currentItem);
@@ -167,7 +142,7 @@ class PrescriptionTable extends ACommonComboViewer {
 
 	void delete(String drug) {
 		@SuppressWarnings("unchecked")
-		List<PrescriptionItem> data = (List<PrescriptionItem>) this.tableViewer.getInput();
+		List<PrescriptionItem> data = (List<PrescriptionItem>) this.getTableViewer().getInput();
 		if (data == null || data.isEmpty()) {
 			return;
 		}
@@ -195,7 +170,7 @@ class PrescriptionTable extends ACommonComboViewer {
 
 	@SuppressWarnings("unchecked")
 	private void upLine(String drugName, boolean isUp) {
-		List<PrescriptionItem> data = (List<PrescriptionItem>) this.tableViewer.getInput();
+		List<PrescriptionItem> data = (List<PrescriptionItem>) this.getTableViewer().getInput();
 		if (data == null || data.isEmpty()) {
 			return;
 		}

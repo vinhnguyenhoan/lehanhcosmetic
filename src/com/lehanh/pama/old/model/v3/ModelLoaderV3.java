@@ -51,10 +51,6 @@ public class ModelLoaderV3 {
 	protected static final boolean DEBUG_ISNOT_SURGERY = false;
 	private static final boolean DEBUG_LASTST_LIST = false;
 
-	public static void main2(String[] args) throws ClassNotFoundException, SQLException {
-		getSession();
-	}
-	
 	public static void main(String[] args) throws SQLException, IOException {
 		//loadToaThuocMau();
 		loadPatient();
@@ -100,7 +96,7 @@ public class ModelLoaderV3 {
 			"Hậu phẫu chỉnh hình mũi, mắt",
 			"Sili môi"
 		};
-	public static void loadToaThuocMau() {
+	private static void loadToaThuocMau() {
 		List<ToaThuocMau> list = ModelLoaderV3.getDSToaThuocMau();
 		list.stream().forEach(new Consumer<ToaThuocMau>() {
 
@@ -124,7 +120,7 @@ public class ModelLoaderV3 {
 		});
 	}
 
-	protected static String print(String... texts) {
+	private static String print(String... texts) {
 		String result = "";
 		int index = 0;
 		for (String text : texts) {
@@ -137,7 +133,7 @@ public class ModelLoaderV3 {
 		return result;
 	}
 	
-	public static void loadPatient() throws SQLException, IOException {
+	private static void loadPatient() throws SQLException, IOException {
 		PamaHome.application = new MainApplication();
 		DatabaseManager.initialize();
 		CatagoryManager catM = new CatagoryManager();
@@ -185,14 +181,17 @@ public class ModelLoaderV3 {
 		List<AppointmentSchedule> appToSave = new LinkedList<>();
 		
 		TreeSet<String> allOldSurgery = new TreeSet<>();
-		listBN.stream().forEach(new Consumer<BenhNhan>() {
+		listBN.stream()
+			.forEach(new Consumer<BenhNhan>() {
 
 			@Override
 			public void accept(BenhNhan bn) {
 				if (bn.danhSachKham == null || bn.danhSachKham.isEmpty()) {
 					return;
 				}
-				
+				if (bn.id == 26) {
+					System.out.println("DEBUG");
+				}
 //				if (bn.id == 11551) {
 //					System.out.println("DEBUG");
 //				}
@@ -205,18 +204,18 @@ public class ModelLoaderV3 {
 					System.out.println("Nguyễn Thị Nghĩa");
 				}
 				
-				boolean isSurgery = false;
+				boolean isCosmeticSurgery = false;
 				for (LanKhamBenh lkb : bn.danhSachKham) {
 					if (lkb.danhSachPhauThuat != null && !lkb.danhSachPhauThuat.isEmpty()) {
 						for (PhauThuat pt : lkb.danhSachPhauThuat) {
 							if (mapSgId.containsKey(pt.id)) {
-								isSurgery = true;
+								isCosmeticSurgery = true;
 								break;
 							}
 						}
 					}
 				}
-				if (!isSurgery) {
+				if (!isCosmeticSurgery) {
 					
 					// TODO check data before 2008
 					if (DEBUG_ISNOT_SURGERY) {
@@ -252,7 +251,7 @@ public class ModelLoaderV3 {
 		System.out.println("-----------------");
 	}
 	
-	protected static void debugIsNotSur(BenhNhan bn, TreeSet<String> allOldSurgery) {
+	private static void debugIsNotSur(BenhNhan bn, TreeSet<String> allOldSurgery) {
 		for (LanKhamBenh lkb : bn.danhSachKham) {
 			if (lkb.danhSachPhauThuat != null && !lkb.danhSachPhauThuat.isEmpty()) {
 				for (PhauThuat pt : lkb.danhSachPhauThuat) {
@@ -262,7 +261,7 @@ public class ModelLoaderV3 {
 		}
 	}
 
-	public static void printCatalog() {
+	private static void printCatalog() {
 		List<DanhMuc> listBS = ModelLoaderV3.getDSLoiKhuyen();
 		listBS.stream().forEach(new Consumer<DanhMuc>() {
 
@@ -274,7 +273,7 @@ public class ModelLoaderV3 {
 		
 	}
 	
-	public static List<String[]> loadFile(String dirFolder) throws IOException {
+	private static List<String[]> loadFile(String dirFolder) throws IOException {
 		FileInputStream fis = new FileInputStream(dirFolder);
 		//Construct BufferedReader from InputStreamReader
 		BufferedReader br = new BufferedReader(new InputStreamReader(fis));
@@ -299,7 +298,7 @@ public class ModelLoaderV3 {
 	private static final String PASS = "kms18955@";
 	
 	private static Connection conn;
-	public static Connection getSession() throws SQLException, ClassNotFoundException {
+	private static Connection getSession() throws SQLException, ClassNotFoundException {
 		if (conn != null && !conn.isClosed()) {
 			return conn;
 		}
@@ -311,7 +310,7 @@ public class ModelLoaderV3 {
 		return conn;
 	}
 	
-	public static void close() throws SQLException {
+	private static void close() throws SQLException {
 		if (conn != null && !conn.isClosed()) {
 			conn.close();
 		}
@@ -319,7 +318,7 @@ public class ModelLoaderV3 {
 
 	private static List<BacSy> drList = null;
 	private static Map<Long, BacSy> drMap = new HashMap<Long, BacSy>();
-	public static List<BacSy> getDSBacSy() {
+	private static List<BacSy> getDSBacSy() {
 		if (drList != null) {
 			return drList;
 		}
@@ -341,7 +340,7 @@ public class ModelLoaderV3 {
 		return drList;
 	}
 	
-	public static BacSy getBacSy(Long id) {
+	private static BacSy getBacSy(Long id) {
 		if (drList == null) {
 			getDSBacSy();
 		}
@@ -350,7 +349,7 @@ public class ModelLoaderV3 {
 
 	private static List<DanhMuc> dsTrieuChung = null;
 	private static Map<Long, DanhMuc> trieuChungMap = new HashMap<Long, DanhMuc>();
-	public static List<DanhMuc> getDSTrieuChung() {
+	private static List<DanhMuc> getDSTrieuChung() {
 		if (dsTrieuChung != null) {
 			return dsTrieuChung;
 		}

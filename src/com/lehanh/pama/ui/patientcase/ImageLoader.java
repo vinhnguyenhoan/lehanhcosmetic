@@ -35,7 +35,7 @@ class ImageLoader implements Runnable {
 	private ICaseDetailHandler caseDetailHandler = new ICaseDetailHandler() {
 		
 		@Override
-		public void handleCaseDetail(ISurgeryImageList imageList, int indexRoot, int indexDetail, int groupId, int caseDetailId, 
+		public void caseDetailLoaded(ISurgeryImageList imageList, int indexRoot, int indexDetail, int groupId, int caseDetailId, 
 			Date examDate, int afterDays, List<Catagory> allSurCat, Map<String, Map<String, IImageInfo>> imageNamesPerSurgery) {
 //			if (indexDetail != oldIndexDetail) {
 //				oldIndexDetail = indexDetail;

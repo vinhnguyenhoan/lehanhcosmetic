@@ -161,7 +161,7 @@ public class UserSearchView implements IPatientViewPartListener /*extends ViewPa
 
 	@Override
 	public void patientChanged(Patient oldPa, Patient newPa, String[] callIds) {
-		tableViewer.setInput(null);
+		//tableViewer.setInput(null);
 	}
 
 	@Override

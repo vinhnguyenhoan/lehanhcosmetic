@@ -67,7 +67,7 @@ public class GridPrintExample {
 		ImageData imageData = new ImageData(GridPrintExample.class
 				.getResourceAsStream("logo.png"));
 		ImagePrint image = new ImagePrint(imageData);
-		image.setDPI(300, 300);
+		image.setDPI(100, 700);
 
 		grid.add(SWT.CENTER, image, GridPrint.REMAINDER);
 

@@ -10,7 +10,7 @@ public class CatagoryToUITextByDesc implements ObjectToUIText {
 		
 		if (object == null) {
 			
-			System.out.println("DEBUG");
+			System.out.println("DEBUG showUI null");
 		}
 		
 		return ((Catagory) object).getDesc();

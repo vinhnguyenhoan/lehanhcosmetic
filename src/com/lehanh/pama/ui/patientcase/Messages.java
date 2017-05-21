@@ -14,11 +14,14 @@ public class Messages extends NLS {
 	public static String PatientCaseView_benhanmoi;
 	public static String PatientCaseView_bienchung;
 	public static String PatientCaseView_bstuvan;
+	public static String PatientCaseView_but_phauthuat;
+	public static String PatientCaseView_cantaomotbenhantruoc;
 	public static String PatientCaseView_chandoan;
 	public static String PatientCaseView_chinhsua;
 	public static String PatientCaseView_chonbenhan;
 	public static String PatientCaseView_chon;
 	public static String PatientCaseView_chonbs;
+	public static String PatientCaseView_chonhoactaobenhnhantruoc;
 	public static String PatientCaseView_chonlankham;
 	public static String PatientCaseView_de;
 	public static String PatientCaseView_dichvu;
@@ -26,6 +29,7 @@ public class Messages extends NLS {
 	public static String PatientCaseView_ghichutubacsi;
 	public static String PatientCaseView_ghichutukhach;
 	public static String PatientCaseView_hailong;
+	public static String PatientCaseView_huongdan;
 	public static String PatientCaseView_huy;
 	public static String PatientCaseView_inphieu;
 	public static String PatientCaseView_loikhuyencuabs;
@@ -36,7 +40,6 @@ public class Messages extends NLS {
 	public static String PatientCaseView_ngaypt;
 	public static String PatientCaseView_ngoaids;
 	public static String PatientCaseView_phauthuat;
-	public static String PatientCaseView_thamkham;
 	public static String PatientCaseView_thongtinphauthuat;
 	public static String PatientCaseView_thongtintuvanthamkham;
 	public static String PatientCaseView_thuthuat;
@@ -130,6 +133,8 @@ public class Messages extends NLS {
 	public static String SurgeryImageListSelectionDialog_anhphauthuat;
 	public static String SurgeryImageListSelectionDialog_chon;
 	public static String SurgeryImageListSelectionDialog_chonanhchophauthuat;
+	public static String SurgeryImageListSelectionDialog_lblNewLabel_text;
+	public static String SurgeryImageListSelectionDialog_lblFilenh_text;
 	static {
 		// initialize resource bundle
 		NLS.initializeMessages(BUNDLE_NAME, Messages.class);

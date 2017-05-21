@@ -14,7 +14,7 @@ import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.Image;
 
-public abstract class ACommonComboViewer extends LabelProvider 
+public abstract class ACommonCombositeDataProvider extends LabelProvider 
 	implements ITableLabelProvider, ITableColorProvider, ITableFontProvider,
 					ISelectionChangedListener, IStructuredContentProvider, ModifyListener {
 

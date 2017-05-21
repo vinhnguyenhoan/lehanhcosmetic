@@ -14,8 +14,6 @@ import java.util.GregorianCalendar;
 import java.util.LinkedList;
 import java.util.List;
 
-import javax.annotation.PostConstruct;
-
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.e4.ui.di.Focus;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
@@ -578,14 +576,14 @@ public class PrescriptionView extends PamaFormUI implements IPatientViewPartList
 		final FontData boldFontData = PamaResourceManager.getFont("Arial", fontSize, SWT.BOLD).getFontData()[0]; //$NON-NLS-1$
 		final FontData fontData = PamaResourceManager.getFont("Arial", fontSize, SWT.NORMAL).getFontData()[0]; //$NON-NLS-1$
 		
-		child.add(SWT.RIGHT, new TextPrint(Messages.PrescriptionView_msbenhnhan, fontData));//MS Bệnh nhân:
-		child.add(SWT.RIGHT, new TextPrint(idPa, fontData));
+		child.add(SWT.RIGHT, newTextPrint(Messages.PrescriptionView_msbenhnhan, fontData));//MS Bệnh nhân:
+		child.add(SWT.RIGHT, newTextPrint(idPa, fontData));
 		// end MS benh nhan
 
 		printBlank(grid, 6, fontData);
 		
 		// Header toa thuoc
-		grid.add(SWT.CENTER, new TextPrint(Messages.PrescriptionView_toathuoc, //Toa Thuốc
+		grid.add(SWT.CENTER, newTextPrint(Messages.PrescriptionView_toathuoc, //Toa Thuốc
 				PamaResourceManager.getFont("Arial", fontSize * 2, SWT.BOLD).getFontData()[0]) //$NON-NLS-2$ //$NON-NLS-1$
 				, GridPrint.REMAINDER);
 
@@ -599,15 +597,15 @@ public class PrescriptionView extends PamaFormUI implements IPatientViewPartList
 		child.addColumn(new GridColumn(SWT.LEFT, SWT.DEFAULT, 0));
 		grid.add(SWT.LEFT, child, GridPrint.REMAINDER);
 		
-		child.add(SWT.LEFT, new TextPrint(Messages.PrescriptionView_benhnhan, fontData)); //Bệnh nhân:
-		child.add(SWT.LEFT, new TextPrint(paName, boldFontData));
-		child.add(SWT.RIGHT, new TextPrint(Messages.PrescriptionView_tuoi + age, fontData));//Tuổi:
-		child.add(SWT.RIGHT, new TextPrint(Messages.PrescriptionView_gioitinh + gender.toUpperCase(), fontData));
+		child.add(SWT.LEFT, newTextPrint(Messages.PrescriptionView_benhnhan, fontData)); //Bệnh nhân:
+		child.add(SWT.LEFT, newTextPrint(paName, boldFontData));
+		child.add(SWT.RIGHT, newTextPrint(Messages.PrescriptionView_tuoi + age, fontData));//Tuổi:
+		child.add(SWT.RIGHT, newTextPrint(Messages.PrescriptionView_gioitinh + gender.toUpperCase(), fontData));
 		
-		child.add(SWT.LEFT, new TextPrint(Messages.PrescriptionView_diachi, fontData));
-		child.add(SWT.LEFT, new TextPrint(add, fontData));
-		child.add(SWT.RIGHT, new TextPrint(StringUtils.EMPTY, fontData));
-		child.add(SWT.RIGHT, new TextPrint(StringUtils.EMPTY, fontData));
+		child.add(SWT.LEFT, newTextPrint(Messages.PrescriptionView_diachi, fontData));
+		child.add(SWT.LEFT, newTextPrint(add, fontData));
+		child.add(SWT.RIGHT, newTextPrint(StringUtils.EMPTY, fontData));
+		child.add(SWT.RIGHT, newTextPrint(StringUtils.EMPTY, fontData));
 		
 		if (diagnoses == null) {
 			diagnoses = new LinkedList<>();
@@ -615,14 +613,14 @@ public class PrescriptionView extends PamaFormUI implements IPatientViewPartList
 		boolean firstDiagnose = true;
 		for (String diagnose : diagnoses) {
 			if (firstDiagnose) {
-				child.add(SWT.LEFT, new TextPrint(Messages.PrescriptionView_chandoan, fontData)); // Chẩn đoán:
+				child.add(SWT.LEFT, newTextPrint(Messages.PrescriptionView_chandoan, fontData)); // Chẩn đoán:
 				firstDiagnose = false;
 			} else {
-				child.add(SWT.LEFT, new TextPrint(StringUtils.EMPTY, fontData));
+				child.add(SWT.LEFT, newTextPrint(StringUtils.EMPTY, fontData));
 			}
-			child.add(SWT.LEFT, new TextPrint("- " + diagnose, boldFontData));
-			child.add(SWT.RIGHT, new TextPrint(StringUtils.EMPTY, fontData));
-			child.add(SWT.RIGHT, new TextPrint(StringUtils.EMPTY, fontData));
+			child.add(SWT.LEFT, newTextPrint("- " + diagnose, boldFontData));
+			child.add(SWT.RIGHT, newTextPrint(StringUtils.EMPTY, fontData));
+			child.add(SWT.RIGHT, newTextPrint(StringUtils.EMPTY, fontData));
 		}
 		
 
@@ -631,16 +629,16 @@ public class PrescriptionView extends PamaFormUI implements IPatientViewPartList
 
 		int index = 1;
 		for (PrescriptionItem item : listItem) {
-			grid.add(SWT.LEFT, new TextPrint(index + Messages.PrescriptionView_17, boldFontData));
-			grid.add(SWT.LEFT, new TextPrint(item.getDrug() + (StringUtils.isBlank(item.getDrugDesc()) ? StringUtils.EMPTY : " " + item.getDrugDesc())
+			grid.add(SWT.LEFT, newTextPrint(index + Messages.PrescriptionView_17, boldFontData));
+			grid.add(SWT.LEFT, newTextPrint(item.getDrug() + (StringUtils.isBlank(item.getDrugDesc()) ? StringUtils.EMPTY : " " + item.getDrugDesc())
 					, boldFontData, GridPrint.REMAINDER), 3);
-			grid.add(SWT.LEFT, new TextPrint(Messages.PrescriptionView_18 + DF.format(item.getTotal()) + Messages.PrescriptionView_19 + item.getUnit(), boldFontData));
+			grid.add(SWT.LEFT, newTextPrint(Messages.PrescriptionView_18 + DF.format(item.getTotal()) + Messages.PrescriptionView_19 + item.getUnit(), boldFontData));
 
-			grid.add(SWT.LEFT, new TextPrint(StringUtils.EMPTY, fontData));
-			grid.add(SWT.LEFT, new TextPrint(Messages.PrescriptionView_ngay + item.getUse(), fontData));
-			grid.add(SWT.LEFT, new TextPrint(String.valueOf(item.getNumSs()) + Messages.PrescriptionView_lanmoilan, fontData));
-			grid.add(SWT.LEFT, new TextPrint(DF.format(item.getPerSs()) + "    " + item.getUnitPer(), fontData)); //$NON-NLS-1$
-			grid.add(SWT.LEFT, new TextPrint(Messages.PrescriptionView_23 + item.getSs() + Messages.PrescriptionView_24 + item.getNote(), fontData));
+			grid.add(SWT.LEFT, newTextPrint(StringUtils.EMPTY, fontData));
+			grid.add(SWT.LEFT, newTextPrint(Messages.PrescriptionView_ngay + item.getUse(), fontData));
+			grid.add(SWT.LEFT, newTextPrint(String.valueOf(item.getNumSs()) + Messages.PrescriptionView_lanmoilan, fontData));
+			grid.add(SWT.LEFT, newTextPrint(DF.format(item.getPerSs()) + "    " + item.getUnitPer(), fontData)); //$NON-NLS-1$
+			grid.add(SWT.LEFT, newTextPrint(Messages.PrescriptionView_23 + item.getSs() + Messages.PrescriptionView_24 + item.getNote(), fontData));
 
 			index++;
 		}
@@ -655,33 +653,46 @@ public class PrescriptionView extends PamaFormUI implements IPatientViewPartList
 		footer.addColumn(new GridColumn(SWT.CENTER, SWT.DEFAULT, 1));
 		grid.add(SWT.CENTER, footer, GridPrint.REMAINDER);
 		
-		footer.add(SWT.LEFT, new TextPrint(StringUtils.EMPTY, fontData));
+		footer.add(SWT.LEFT, newTextPrint(StringUtils.EMPTY, fontData));
 		Date printDate = printDateSelecter.getSelection();
 		int[] dateA = DateUtils.getDate(printDate);
 		if (dateA != null) {
-			footer.add(SWT.CENTER, new TextPrint(Messages.PrescriptionView_tphcmngay + dateA[2] + Messages.PrescriptionView_thang + dateA[1] + Messages.PrescriptionView_nam + dateA[0], fontData));
+			footer.add(SWT.CENTER, newTextPrint(Messages.PrescriptionView_tphcmngay + dateA[2] + Messages.PrescriptionView_thang + dateA[1] + Messages.PrescriptionView_nam + dateA[0], fontData));
 		} else {
-			footer.add(SWT.CENTER, new TextPrint(StringUtils.EMPTY, fontData));
+			footer.add(SWT.CENTER, newTextPrint(StringUtils.EMPTY, fontData));
 		}
-		footer.add(SWT.LEFT, new TextPrint(StringUtils.EMPTY, fontData));
-		footer.add(SWT.CENTER, new TextPrint(Messages.PrescriptionView_bacsy, fontData));
+		footer.add(SWT.LEFT, newTextPrint(StringUtils.EMPTY, fontData));
+		footer.add(SWT.CENTER, newTextPrint(Messages.PrescriptionView_bacsy, fontData));
 		
 		//printBlank(footer, 2, fontData);
-		footer.add(SWT.LEFT, new TextPrint(adviceFromDr, fontData));
+		footer.add(SWT.LEFT, newTextPrint(adviceFromDr, fontData));
 		StyledTextPrint doc = new StyledTextPrint();
 		footer.add(SWT.CENTER, doc, GridPrint.REMAINDER);
 		doc.append(new ImagePrint(new ImageData(StyledTextPrintExample.class
 				.getResourceAsStream("chuki.jpg")), new Point(726, 221)));
 		
-		footer.add(SWT.LEFT, new TextPrint(Messages.PrescriptionView_ngaytaikham + DateUtils.convertDateDataType(appDate), fontData));
-		footer.add(SWT.CENTER, new TextPrint(Messages.PrescriptionView_pgstslehanh, fontData));
+		footer.add(SWT.LEFT, newTextPrint(Messages.PrescriptionView_ngaytaikham + DateUtils.convertDateDataType(appDate), fontData));
+		footer.add(SWT.CENTER, newTextPrint(Messages.PrescriptionView_pgstslehanh, fontData));
 
 		return grid;
 	}
-	
+
+	private static final Print newTextPrint(String text, FontData fontData) {
+		return newTextPrint(text, fontData, null);
+	}
+	private static final Print newTextPrint(String text, FontData fontData, Integer align) {
+		if (StringUtils.isBlank(text)) {
+			text = StringUtils.EMPTY;
+		}
+		if (align != null) {
+			return new TextPrint(text, fontData, align);
+		}
+		return new TextPrint(text, fontData);
+	}
+
 	private void printBlank(GridPrint grid, int numLine, FontData fontData) {
 		for (int i = 0; i < numLine; i++) {
-			grid.add(SWT.CENTER, new TextPrint(StringUtils.EMPTY, fontData), GridPrint.REMAINDER);
+			grid.add(SWT.CENTER, newTextPrint(StringUtils.EMPTY, fontData), GridPrint.REMAINDER);
 		}
 	}
 

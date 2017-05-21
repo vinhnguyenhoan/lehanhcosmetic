@@ -13,47 +13,34 @@ import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Table;
-import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.ToolItem;
 
 import com.lehanh.pama.patientcase.IPatientManager;
 import com.lehanh.pama.patientcase.Patient;
 import com.lehanh.pama.ui.E4LifeCycle;
 import com.lehanh.pama.ui.patientcase.PatientPerspectiveHandler;
-import com.lehanh.pama.ui.util.ACommonComboViewer;
+import com.lehanh.pama.ui.util.TableDataProvider;
 import com.lehanh.pama.util.DateUtils;
 import com.lehanh.pama.util.PamaHome;
 
-class PatientTable extends ACommonComboViewer {
-
-	private TableViewer tableViewer;
+class PatientTable extends TableDataProvider {
 
 	PatientTable(final String uid, Composite composite_1) {
-		this.tableViewer = new TableViewer(composite_1, SWT.H_SCROLL
-		        | SWT.V_SCROLL | SWT.FULL_SELECTION | SWT.BORDER);
-		Table table = tableViewer.getTable();
-		table.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
-		table.setHeaderVisible(true);
-		table.setLinesVisible(true);
+		super(composite_1);
 		
-		newColDef(SWT.LEFT, Messages.PatientTable_soid);
-		newColDef(SWT.LEFT, Messages.PatientTable_tenkhach);
-		newColDef(SWT.CENTER, Messages.PatientTable_ngaysinh);
-		newColDef(SWT.RIGHT, Messages.PatientTable_didong);
-		newColDef(SWT.LEFT, Messages.PatientTable_diachi);
-		newColDef(SWT.CENTER, Messages.PatientTable_gioitinh);
-		
-		this.tableViewer.setContentProvider(this);
-		// set the label providers
-		this.tableViewer.setLabelProvider(this);
-		pack();
+		newColDef(SWT.LEFT, "STT", 10);
+		newColDef(SWT.LEFT, Messages.PatientTable_soid, 20);
+		newColDef(SWT.LEFT, Messages.PatientTable_tenkhach, 60);
+		newColDef(SWT.CENTER, Messages.PatientTable_ngaysinh, 30);
+		newColDef(SWT.LEFT, Messages.PatientTable_didong, 40);
+		newColDef(SWT.LEFT, Messages.PatientTable_diachi, 40);
+		newColDef(SWT.CENTER, Messages.PatientTable_gioitinh, 30);
 		
 		final IPatientManager paManager = (IPatientManager) PamaHome.getService(IPatientManager.class);
 		// initial actions
-		this.tableViewer.addDoubleClickListener(new IDoubleClickListener() {
+		this.getTableViewer().addDoubleClickListener(new IDoubleClickListener() {
 			
 			@Override
 			public void doubleClick(DoubleClickEvent event) {
@@ -110,24 +97,13 @@ class PatientTable extends ACommonComboViewer {
 		});*/
 	}
 	
-	private void pack() {
-		for (TableColumn col : this.tableViewer.getTable().getColumns()) {
-			col.pack();
-		}
-	}
-
-	private void newColDef(int style, String text) {
-		TableColumn sttCol = new TableColumn(tableViewer.getTable(), SWT.CENTER);
-		sttCol.setText(text);
-	}
-
 	Table getTable() {
-		return this.tableViewer.getTable();
+		return this.getTableViewer().getTable();
 	}
 
 	@SuppressWarnings("unchecked")
 	List<Patient> getInput() {
-		return (List<Patient>) this.tableViewer.getInput();
+		return (List<Patient>) this.getTableViewer().getInput();
 	}
 	
 //	@Override
@@ -147,34 +123,46 @@ class PatientTable extends ACommonComboViewer {
         return null;
 	}
 	
+	private int startIndex = 1;
 	/* (non-Javadoc)
 	 * @see org.eclipse.jface.viewers.ITableLabelProvider#getColumnText(java.lang.Object, int)
 	 */
 	public String getColumnText(Object element, int columnIndex) {
 		Patient model = (Patient) element;
-		// newColDef(SWT.LEFT, "Số ID");
-		// newColDef(SWT.LEFT, "Tên khách");
-		// newColDef(SWT.CENTER, "Ngày sinh");
-		// newColDef(SWT.RIGHT, "Di động");
-		// newColDef(SWT.LEFT, "Địa chỉ");
-		// newColDef(SWT.CENTER, "Giới tính");
-		switch (columnIndex) {
+		/*switch (columnIndex) {
 			case 0: return String.valueOf(model.getId());
 			case 1: return model.getName();
 			case 2: return DateUtils.convertDateDataType(model.getBirthDay());
 			case 3: return model.getCellPhone();
 			case 4: return model.getAddress();
 			case 5: return model.getSex();
+		}*/
+		switch (columnIndex) {
+			case 0: return String.valueOf(startIndex++);
+			case 1: return String.valueOf(model.getId());
+			case 2: return model.getName();
+			case 3: return DateUtils.convertDateDataType(model.getBirthDay());
+			case 4: return model.getCellPhone();
+			case 5: return model.getAddress();
+			case 6: return model.getSex();
 		}
 		return ""; //$NON-NLS-1$
 	}
 
 	void addSelectionChangedListener(ISelectionChangedListener listener) {
-		this.tableViewer.addSelectionChangedListener(listener);
+		this.getTableViewer().addSelectionChangedListener(listener);
 	}
 
 	void setInput(List<Patient> data) {
-		this.tableViewer.setInput(data);
+		this.getTableViewer().setInput(data);
+		this.startIndex = 1;
+		//pack();
 	}
+
+	/*private void pack() {
+		for (TableColumn col : this.tableViewer.getTable().getColumns()) {
+			col.pack();
+		}
+	}*/
 
 }

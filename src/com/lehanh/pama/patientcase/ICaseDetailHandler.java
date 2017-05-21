@@ -8,7 +8,7 @@ import com.lehanh.pama.catagory.Catagory;
 
 public interface ICaseDetailHandler {
 
-	void handleCaseDetail(ISurgeryImageList imageList, int indexRoot, int indexDetail, int groupId, int caseDetailId,
+	void caseDetailLoaded(ISurgeryImageList imageList, int indexRoot, int indexDetail, int groupId, int caseDetailId,
 			Date examDate, int afterDay, List<Catagory> allSurCat, Map<String, Map<String, IImageInfo>> allPicInfos);
 
 }

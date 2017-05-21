@@ -14,9 +14,9 @@ import org.eclipse.wb.swt.SWTResourceManager;
 
 import com.lehanh.pama.patientcase.IPatientCaseList;
 import com.lehanh.pama.patientcase.PatientCaseEntity;
-import com.lehanh.pama.ui.util.ACommonComboViewer;
+import com.lehanh.pama.ui.util.ACommonCombositeDataProvider;
 
-class ExamVersionComboViewer extends ACommonComboViewer {
+class ExamVersionComboViewer extends ACommonCombositeDataProvider {
 
 	private final boolean isRoot;
 	private final TableComboViewer tableComboViewer;

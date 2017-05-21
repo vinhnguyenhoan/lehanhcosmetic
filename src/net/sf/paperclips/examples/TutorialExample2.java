@@ -37,7 +37,7 @@ public class TutorialExample2 {
 		GridPrint grid = new GridPrint("p, d:g", new DefaultGridLook(5, 5));
 
 		// Now populate the grid with the text and lines
-		grid.add(SWT.CENTER, new TextPrint("VITAL STATISTICS"),
+		grid.add(SWT.END, new TextPrint("VITAL STATISTICS"),
 				GridPrint.REMAINDER);
 
 		grid.add(new LinePrint(SWT.HORIZONTAL), GridPrint.REMAINDER);

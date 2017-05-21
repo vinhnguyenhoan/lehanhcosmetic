@@ -11,6 +11,6 @@ public interface ISurgeryImageList {
 
 	void deletedImages(List<String> imageNameToDelete);
 
-	IImageInfo addImage(int groupId, int detailId, String sugeryName, String extension);
+	IImageInfo addImage(String filePath, int groupId, int detailId, String sugeryName, String extension);
 
 }

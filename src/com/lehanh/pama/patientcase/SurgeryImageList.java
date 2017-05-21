@@ -1,5 +1,9 @@
 package com.lehanh.pama.patientcase;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.text.ParseException;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -23,22 +27,34 @@ class SurgeryImageList implements ISurgeryImageList {
 
 	private final Long patientId;
 	
+	private static final String surgeryPath;
+	static {
+		surgeryPath = PamaHome.application.getProperty(PamaHome.SURGERY_IMAGE_PATH, PamaHome.DEFAULT_SURGERY_IMAGE_PATH);
+	}
+	
 	private static final String U_DATE = "u_date"; //$NON-NLS-1$
 	private static final String ID = "id"; //$NON-NLS-1$
 	
 	private static final String IMAGE_SURGERY_COUNT = "count"; //$NON-NLS-1$
 	private static final String IMAGE_SURGERY_STATICTIS = "statictis"; //$NON-NLS-1$
-	
+
 	private class ImageInfo implements IImageInfo {
 
 		private TreeMap<String, Object> data;
 		private String imgName;
+		private String surgeryName;
 		
-		private ImageInfo(TreeMap<String, Object> data) {
+		private ImageInfo(String surgeryName, String imgName, TreeMap<String, Object> data) {
+			this.surgeryName = surgeryName;
+			this.imgName = imgName;
 			this.data = data;
 		}
 		
-		private ImageInfo(int index, String convertDateDataType) {
+		/**
+		 * Create when add new image
+		 */
+		private ImageInfo(String surgeryName, int index, String convertDateDataType) {
+			this.surgeryName = surgeryName;
 			data = new TreeMap<String, Object>();
 			data.put(U_DATE, convertDateDataType);
 			data.put(ID, index);
@@ -58,10 +74,10 @@ class SurgeryImageList implements ISurgeryImageList {
 		public Number getId() {
 			return getValue(ID, data, -1);
 		}
-		
+
 		@Override
-		public String generateImageName(long patientId, int rootId, int detailId, String surgerySymbol) {
-			return String.valueOf(patientId) + "-" + String.valueOf(rootId) + "-" + String.valueOf(detailId) + "-" + surgerySymbol + "-" + getId(); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+		public String getFolderName() {
+			return folderNameFromSurgeryAndPatientId(getPatientId(), surgeryName);
 		}
 		
 	}
@@ -79,7 +95,7 @@ class SurgeryImageList implements ISurgeryImageList {
 	}
 	
 	private ICatagoryManager catM;
-	
+
 	SurgeryImageList(Long patientId, List<PatientCaseEntity> patientCases) {
 		this.patientId = patientId;
 		this.patientCases = new TreeMap<Integer, PatientCaseEntity>();
@@ -132,15 +148,13 @@ class SurgeryImageList implements ISurgeryImageList {
 							if (IMAGE_SURGERY_STATICTIS.equals(entryPic.getKey())) {
 								continue;
 							}
-							ImageInfo iII = new ImageInfo(entryPic.getValue());
-							iII.imgName = entryPic.getKey();
+							ImageInfo iII = new ImageInfo(entryPicOfSurgery.getKey(), entryPic.getKey(), entryPic.getValue());
 							picInfos.put(entryPic.getKey(), iII);
 						}
 						allPicInfos.put(entryPicOfSurgery.getKey(), picInfos);
 					}
 				}
-				
-				caseDetailHandler.handleCaseDetail(this, indexRoot, indexDetail, entry.getKey(), detail.getId(), detail.getDate()
+				caseDetailHandler.caseDetailLoaded(this, indexRoot, indexDetail, entry.getKey(), detail.getId(), detail.getDate()
 						, DateUtils.calculateDate(detail.getDate(), beforeDate), allSurCat, allPicInfos);
 				indexDetail++;
 			}
@@ -209,16 +223,22 @@ class SurgeryImageList implements ISurgeryImageList {
 	}
 
 	@Override
-	public IImageInfo addImage(int groupId, int detailId, String sugeryName, String extension) {
+	public IImageInfo addImage(final String filePath, final int groupId, final int detailId, final String surgeryName, final String extension) {
 		PatientCaseEntity root = patientCases.get(groupId);
 		if (root == null) {
 			throw new IllegalArgumentException(Messages.SurgeryImageList_chonbenhanvalankhamcuthe);
 		}
-		Catagory surgeryCat = catM.getCatagoryByTypeAndName(CatagoryType.SURGERY, sugeryName);
+
+		Catagory surgeryCat = catM.getCatagoryByTypeAndName(CatagoryType.SURGERY, surgeryName);
 		if (surgeryCat == null) {
-			throw new IllegalArgumentException(Messages.SurgeryImageList_khongthayphauthuat + sugeryName);
+			throw new IllegalArgumentException(Messages.SurgeryImageList_khongthayphauthuat + surgeryName);
 		}
 		final String surgerySymbol = surgeryCat.getSymbol();
+		
+		String correctedExt = extension;
+		if (!extension.startsWith(".")) { //$NON-NLS-1$
+			correctedExt = "." + extension; //$NON-NLS-1$
+		}
 		
 		List<PatientCaseEntity> details = root.getReExamInfo();
 		for (PatientCaseEntity detail : details) {
@@ -245,13 +265,12 @@ class SurgeryImageList implements ISurgeryImageList {
 				imageSta.put(IMAGE_SURGERY_COUNT, imageCount);
 				
 				// store image date that saved
-				ImageInfo iI = new ImageInfo(imageCount, DateUtils.convertDateDataType(GregorianCalendar.getInstance()));
-				if (!extension.startsWith(".")) { //$NON-NLS-1$
-					extension = "." + extension; //$NON-NLS-1$
-				}
-				String imageName = iI.generateImageName(patientId, groupId, detailId, surgerySymbol) + extension;
+				ImageInfo iI = new ImageInfo(surgerySymbol, imageCount, DateUtils.convertDateDataType(GregorianCalendar.getInstance()));
+				String imageName = generateImageName(patientId, groupId, detailId, surgerySymbol, iI.getId()) + correctedExt;
 				imageBySur.put(imageName, iI.data);
 				iI.imgName = imageName;
+				
+				moveImageFile(filePath, surgerySymbol, iI.getImageName());
 				return iI;//imageName;
 			}
 		}
@@ -259,4 +278,34 @@ class SurgeryImageList implements ISurgeryImageList {
 		return null;
 	}
 
+	private static final String generateImageName(long patientId, int rootId, int detailId, String surgerySymbol, Number id) {
+		return String.valueOf(patientId) + "-" + String.valueOf(rootId) + "-" + String.valueOf(detailId) + "-" + surgerySymbol + "-" + id.toString(); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+	}
+
+	private void moveImageFile(String filePath, String surgerySymbol, String imageName) {
+		final long patientId = this.getPatientId();
+		String toFolder = folderNameFromSurgeryAndPatientId(patientId, surgerySymbol);
+		try {
+			File toFolderFile = new File(toFolder);
+			if (!toFolderFile.exists()) {
+				if (!toFolderFile.mkdirs()) {
+					throw new PamaException("Can not create folder " + toFolder); //$NON-NLS-1$
+				}
+			}
+			Files.copy(new File(filePath).toPath(), new File(toFolder + imageName).toPath(), StandardCopyOption.REPLACE_EXISTING);
+		} catch (IOException e) {
+			throw new PamaException(e);
+		}
+	}
+
+	private static final String folderNameFromSurgeryAndPatientId(long pId, String surgerySymbol) {
+		String pIdPrefix = String.valueOf(pId);
+		if (pIdPrefix.length() > 1) {
+			pIdPrefix = pIdPrefix.substring(0, pIdPrefix.length() - 1);
+		} else {
+			pIdPrefix = StringUtils.EMPTY;
+		}
+		String result = pIdPrefix + "0-" + pIdPrefix + "9"; // example 16945 -> 16940-16949 //$NON-NLS-1$ //$NON-NLS-2$
+		return SurgeryImageList.surgeryPath + "/" + surgerySymbol + "/" + result + "/"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+	}
 }
