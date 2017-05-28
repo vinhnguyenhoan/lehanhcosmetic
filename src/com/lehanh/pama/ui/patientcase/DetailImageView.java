@@ -2,8 +2,6 @@ package com.lehanh.pama.ui.patientcase;
 
 import java.util.Arrays;
 
-import javax.annotation.PostConstruct;
-
 import org.eclipse.e4.ui.di.Focus;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
@@ -20,9 +18,6 @@ import com.lehanh.pama.patientcase.PatientCaseEntity;
 import com.lehanh.pama.ui.PamaFormUI;
 import com.lehanh.pama.ui.util.PamaResourceManager;
 import com.lehanh.pama.util.PamaHome;
-import org.eclipse.swt.widgets.Button;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
 
 public class DetailImageView extends PamaFormUI implements IPatientViewPartListener, IPatientView {
 	
@@ -125,10 +120,10 @@ public class DetailImageView extends PamaFormUI implements IPatientViewPartListe
 		return false;
 	}
 
-	private void showEmptyCasesButton(boolean isShow) {
+/*	private void showEmptyCasesButton(boolean isShow) {
 		gallery.updateFolderEmpty(isShow);
 		canvasPainter.clearImages();
-	}
+	}*/
 
 	/*
 	 * (non-Javadoc)

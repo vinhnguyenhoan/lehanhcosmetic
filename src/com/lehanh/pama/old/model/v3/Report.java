@@ -1,6 +1,5 @@
 package com.lehanh.pama.old.model.v3;
 
-import java.io.IOException;
 import java.text.ParseException;
 import java.util.Calendar;
 import java.util.Collections;
@@ -22,7 +21,7 @@ import com.lehanh.pama.util.DateUtils;
 
 public class Report {
 
-	public static void main(String[] args) throws IOException {
+	public static void main(String[] args) throws Exception {
 		//loadPerYear(1, 6, 2015);
 		
 		loadPerYear();
@@ -43,7 +42,7 @@ public class Report {
 	
 	private static final String filterBySurName = "mũi"; //example "Bơm mỡ"
 	
-	public static void loadPerYear(/*int m, int year*/) throws IOException {
+	public static void loadPerYear(/*int m, int year*/) throws Exception {
 		//List<String[]> listBM = loadFile("olddata//bommo.csv");
 		// phau thuat -> benh nhan, ds lan kham
 		TreeMap<String, List<StatictisBN>> statictis = new TreeMap<>();

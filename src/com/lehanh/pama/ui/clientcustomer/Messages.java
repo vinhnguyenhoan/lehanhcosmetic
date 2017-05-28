@@ -18,6 +18,8 @@ public class Messages extends NLS {
 	public static String TodayUserQueueView_loidb;
 	public static String TodayUserQueueView_ngayhen;
 	public static String UserSearchView_hoten;
+	public static String UserSearchView_ketquatimkiem;
+	public static String UserSearchView_khongthaybenhnhannao;
 	public static String UserSearchView_loidb;
 	public static String UserSearchView_ngaygannhat;
 	public static String UserSearchView_nhapngay;

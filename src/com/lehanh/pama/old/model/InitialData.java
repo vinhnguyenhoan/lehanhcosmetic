@@ -26,7 +26,15 @@ import com.lehanh.pama.util.PamaHome;
 
 public class InitialData {
 
+	private static final String IGNORE_PREFIX = "#";
 	private static TreeMap<CatagoryType, TreeMap<Long, Long>> insertedCat = new TreeMap<>();
+
+	public static void main2(String[] args) throws Exception {
+		CatagoryDao catDao = new CatagoryDao();
+		PamaHome.application = new MainApplication();
+		DatabaseManager.initialize();
+		catDao.internalDeleteAll();
+	}
 	
 	public static void main(String[] args) throws Exception {
 		CatagoryDao catDao = new CatagoryDao();
@@ -63,7 +71,7 @@ public class InitialData {
 		BufferedReader br = new BufferedReader(new InputStreamReader(fis));
 		String line = null;
 		while ((line = br.readLine()) != null) {
-			if (StringUtils.isBlank(line)) {
+			if (StringUtils.isBlank(line) || line.startsWith(IGNORE_PREFIX)) {
 				break;
 			}
 			String[] data = line.split("\t");

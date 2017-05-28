@@ -23,10 +23,10 @@ class GalleryItemData implements Comparable<GalleryItemData> {
 		this.imageName = imageName;
 		this.surSym = surSym;
 		this.date = date;
-		this.afterDays = afterDays;
 		this.groupId = groupId;
 		this.caseDetailId = caseDetailId;
 		this.examDate = examDate;
+		this.afterDays = afterDays;
 		this.allSurCat = allSurCat;
 	}
 

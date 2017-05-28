@@ -1,5 +1,6 @@
 package com.lehanh.pama.ui.clientcustomer;
 
+import java.io.IOException;
 import java.sql.SQLException;
 import java.text.ParseException;
 import java.util.List;
@@ -8,6 +9,8 @@ import javax.annotation.PostConstruct;
 
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.e4.ui.di.Focus;
+import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.nebula.widgets.cdatetime.CDT;
 import org.eclipse.nebula.widgets.cdatetime.CDateTime;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -20,13 +23,16 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 //import org.eclipse.ui.part.ViewPart;
 
+import com.lehanh.pama.old.model.BenhNhan;
+import com.lehanh.pama.old.model.v3.LoadPatientListenner;
+import com.lehanh.pama.old.model.v3.ModelLoaderV3;
 import com.lehanh.pama.patientcase.IPatientManager;
 import com.lehanh.pama.patientcase.IPatientViewPartListener;
 import com.lehanh.pama.patientcase.Patient;
 import com.lehanh.pama.patientcase.PatientCaseEntity;
+import com.lehanh.pama.ui.util.FormManager;
 import com.lehanh.pama.ui.util.UIControlUtils;
 import com.lehanh.pama.util.PamaHome;
-import org.eclipse.nebula.widgets.cdatetime.CDT;
 
 public class UserSearchView implements IPatientViewPartListener /*extends ViewPart*/ {
 
@@ -53,7 +59,6 @@ public class UserSearchView implements IPatientViewPartListener /*extends ViewPa
 		
 		Composite filter_composite = new Composite(content_com, SWT.BORDER);
 		filter_composite.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
-		filter_composite.setLayout(new GridLayout(10, false));
 		
 		Label lblId = new Label(filter_composite, SWT.NONE);
 		lblId.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
@@ -94,7 +99,7 @@ public class UserSearchView implements IPatientViewPartListener /*extends ViewPa
 		
 		Button btnTm = new Button(filter_composite, SWT.FLAT);
 		btnTm.setText(Messages.UserSearchView_timkiem);
-
+		
 		SelectionAdapter searchSelect = new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
@@ -129,6 +134,45 @@ public class UserSearchView implements IPatientViewPartListener /*extends ViewPa
 		});
 		btnClear.setText(Messages.UserSearchView_xoaboloc);
 		
+		if (PamaHome.isAdmin(false)) {
+			Button adminButton = new Button(filter_composite, SWT.FLAT);
+			adminButton.setText("Admin"); //$NON-NLS-1$
+			adminButton.addSelectionListener(new SelectionAdapter() {
+				
+				@Override
+				public void widgetSelected(SelectionEvent e) {
+					boolean result = MessageDialog.openConfirm(adminButton.getShell(), "Confirm", "Run reimport patient info"); //$NON-NLS-1$ //$NON-NLS-2$
+					if (!result) {
+						return;
+					}
+					
+					try {
+						int rs = ModelLoaderV3.loadPatient(new LoadPatientListenner() {
+							
+							@Override
+							public void beforeLoadedOldBN() {
+								FormManager.showMessage(adminButton.getShell(), 
+										"beforeLoadedOldBN", "beforeLoadedOldBN"); //$NON-NLS-1$ //$NON-NLS-2$
+							}
+							
+							@Override
+							public void afterLoadedOldBN(List<BenhNhan> listBN) {
+								FormManager.showMessage(adminButton.getShell(), 
+										"afterLoadedOldBN", "listBN: " + listBN.size()); //$NON-NLS-1$ //$NON-NLS-2$
+							}
+						}, PamaHome.getOldHost(null), PamaHome.getOldDB(null),
+								PamaHome.getOldUser(null), PamaHome.getOldPass(null));
+						FormManager.showMessage(adminButton.getShell(), "Result", "Total " + rs); //$NON-NLS-1$ //$NON-NLS-2$
+					} catch (SQLException | IOException | ClassNotFoundException e1) {
+						e1.printStackTrace();
+						FormManager.showMessage(adminButton.getShell(), "Error", e1.getMessage()); //$NON-NLS-1$
+					}
+				}
+			});
+		}
+		
+		filter_composite.setLayout(new GridLayout(filter_composite.getChildren().length, false));
+
 		this.tableViewer = new PatientTable(ID, content_com);
 		
 		filter_composite.setFocus();
@@ -142,7 +186,7 @@ public class UserSearchView implements IPatientViewPartListener /*extends ViewPa
 	}
 
 	private void search() {
-		List<Patient> paList;
+		List<Patient> paList = null;
 		try {
 			paList = paManager.getPatientSearcher().searchPatient(id_text.getText(), calendarCombo.getSelection(), name_text.getText(), phone_text.getText());
 			this.tableViewer.setInput(paList);
@@ -151,6 +195,10 @@ public class UserSearchView implements IPatientViewPartListener /*extends ViewPa
 			UIControlUtils.openMessageBox(tableViewer.getTable().getShell(), Messages.UserSearchView_loidb, e.getMessage());
 		} catch (ParseException e) {
 			UIControlUtils.openMessageBox(tableViewer.getTable().getShell(), Messages.UserSearchView_loidb, e.getMessage());
+		}
+		
+		if (paList == null || paList.isEmpty()) {
+			MessageDialog.openInformation(tableViewer.getTable().getShell(), Messages.UserSearchView_ketquatimkiem, Messages.UserSearchView_khongthaybenhnhannao);
 		}
 	}
 

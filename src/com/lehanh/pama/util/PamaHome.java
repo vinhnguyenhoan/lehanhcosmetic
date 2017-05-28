@@ -23,6 +23,13 @@ public class PamaHome {
 	public static final String DB_USER_NAME_PRO_NAME = "lh_pama_user_name";
 	public static final String DB_PASS_PRO_NAME = "lh_pama_pass";
 	public static final String DB_IP_PRO_NAME = "lh_pama_db_ip";
+
+	private static final String DB_OLD_HOST = "old_host";
+	private static final String DB_OLD_DB = "old_db";
+	private static final String DB_OLD_PASS = "old_pass";
+	private static final String DB_OLD_USER = "old_user";
+
+	public static final String ADMIN = "admin";
 	
 	public static final String SURGERY_IMAGE_PATH = "lh_pama_surgery_image_path_server";
 	public static final String DEFAULT_SURGERY_IMAGE_PATH = "D:\\Pama\\SharedImage\\Server\\PhauThuat";
@@ -44,6 +51,11 @@ public class PamaHome {
 
 	public static String getDbIp(String defaultIP) {
 		return application.getProperty(DB_IP_PRO_NAME, defaultIP);
+	}
+	
+	public static boolean isAdmin(Boolean defaultIsAdmin) {
+		String isAdminText = application.getProperty(ADMIN, (defaultIsAdmin != null && defaultIsAdmin) ? "true" : null);
+		return "true".equals(isAdminText);
 	}
 	
 	private static final Map<Class<?>, IService> serviceManager = new HashMap<Class<?>, IService>();
@@ -74,5 +86,21 @@ public class PamaHome {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+	}
+
+	public static String getOldHost(String defaultV) {
+		return application.getProperty(DB_OLD_HOST, defaultV);
+	}
+
+	public static String getOldDB(String defaultV) {
+		return application.getProperty(DB_OLD_DB, defaultV);
+	}
+
+	public static String getOldPass(String defaultV) {
+		return application.getProperty(DB_OLD_PASS, defaultV);
+	}
+
+	public static String getOldUser(String defaultV) {
+		return application.getProperty(DB_OLD_USER, defaultV);
 	}
 }

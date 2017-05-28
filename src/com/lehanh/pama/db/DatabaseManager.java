@@ -25,7 +25,8 @@ public class DatabaseManager {
 	
 	public static void initialize() throws SQLException, IOException {
 		if (instance != null) {
-			throw new RuntimeException("DatabaseManager is already initialized."); //$NON-NLS-1$
+			//throw new RuntimeException("DatabaseManager is already initialized."); //$NON-NLS-1$
+			return;
 		}
 		instance = new DatabaseManager();
 		instance.initConnectionIfNeeded();

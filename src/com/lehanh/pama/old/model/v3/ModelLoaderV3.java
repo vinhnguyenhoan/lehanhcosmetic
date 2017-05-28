@@ -52,11 +52,15 @@ public class ModelLoaderV3 {
 	private static final boolean DEBUG_LASTST_LIST = false;
 
 	public static void main(String[] args) throws SQLException, IOException {
-		//loadToaThuocMau();
-		loadPatient();
-		//loadBS();
-		//Exception in thread "main" java.lang.IllegalArgumentException: Infinity is not a valid double value as per JSON specification. To override this behavior, use GsonBuilder.serializeSpecialFloatingPointValues() method.
-		//loadThuoc();
+		try {
+			//loadToaThuocMau();
+			loadPatient(null, HOST, DB_NAME, USER, PASS);
+			//loadBS();
+			//Exception in thread "main" java.lang.IllegalArgumentException: Infinity is not a valid double value as per JSON specification. To override this behavior, use GsonBuilder.serializeSpecialFloatingPointValues() method.
+			//loadThuoc();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 	
 	public static void loadThuoc() {
@@ -133,9 +137,18 @@ public class ModelLoaderV3 {
 		return result;
 	}
 	
-	private static void loadPatient() throws SQLException, IOException {
+	public static int loadPatient(LoadPatientListenner ll, String oldHost, String oldDB, String oldUser, String oldPass) throws SQLException, IOException, ClassNotFoundException {
+		HOST = oldHost;
+		DB_NAME = oldDB;
+		USER = oldUser;
+		PASS = oldPass;
+		
 		PamaHome.application = new MainApplication();
 		DatabaseManager.initialize();
+		
+		PatientDao paDao = new PatientDao();
+		paDao.deleteAll();
+		
 		CatagoryManager catM = new CatagoryManager();
 		catM.initialize();
 		
@@ -157,6 +170,12 @@ public class ModelLoaderV3 {
 			
 			for (Entry<Long, Catagory> entryS : services.entrySet()) {
 				for (Number surFromSerId : entryS.getValue().getRefIds().get(CatagoryType.SURGERY.name())) {
+					
+					//DEBUGING
+					if (sg == null || sg.getId() == null || surFromSerId == null) {
+						System.out.println("sg == null || sg.getId() == null || surFromSerId == null");
+					}
+					
 					if (sg.getId().longValue() == surFromSerId.longValue()) {
 						
 						if (servicesBySur.containsKey(sg.getName()) && "Tổng hợp".equals(entryS.getValue().getName())) {
@@ -174,12 +193,14 @@ public class ModelLoaderV3 {
 			drugsByName.put(cat.getName(), (DrugCatagory) cat);
 		}
 		
+		if (ll != null) ll.beforeLoadedOldBN();
 		List<BenhNhan> listBN = ModelLoaderV3.getDSBenhNhan();
-		PatientDao paDao = new PatientDao();
+		if (ll != null) ll.afterLoadedOldBN(listBN);
 		
 		AppointmentCatagory appointmentCatagory = (AppointmentCatagory) ((LinkedList<Catagory>) new AppointmentCatagory().createCatagoryList()).getLast();
 		List<AppointmentSchedule> appToSave = new LinkedList<>();
 		
+		int[] count = new int[]{0};
 		TreeSet<String> allOldSurgery = new TreeSet<>();
 		listBN.stream()
 			.forEach(new Consumer<BenhNhan>() {
@@ -238,7 +259,10 @@ public class ModelLoaderV3 {
 					System.exit(-1);
 				}
 				try {
-					paDao.insert(pa);
+					boolean rs = paDao.insert(pa);
+					if (rs) {
+						count[0] += 1;
+					}
 				} catch (SQLException e) {
 					throw new PamaException(/*Messages.PatientManager_loicapnhapdb + */e.getMessage());
 				}
@@ -249,6 +273,8 @@ public class ModelLoaderV3 {
 		System.out.println("all surgery non exists: " + Arrays.toString(allOldSurgery.toArray()));
 		
 		System.out.println("-----------------");
+		
+		return count[0];
 	}
 	
 	private static void debugIsNotSur(BenhNhan bn, TreeSet<String> allOldSurgery) {
@@ -290,12 +316,12 @@ public class ModelLoaderV3 {
 		return result;
 	}
 	
-	private static final String HOST = "FBYGRC2\\SQLEXPRESS";
-	private static final String DB_NAME = "LHS";
-	private static final String USER = 
+	private static String HOST = "FBYGRC2\\SQLEXPRESS";
+	private static String DB_NAME = "LHS";
+	private static String USER = 
 //			"KMS\\vinhhnguyen";
 			"sa";
-	private static final String PASS = "kms18955@";
+	private static String PASS = "kms18955@";
 	
 	private static Connection conn;
 	private static Connection getSession() throws SQLException, ClassNotFoundException {
@@ -532,89 +558,88 @@ public class ModelLoaderV3 {
 		return mapThuoc.get(id);
 	}
 
-	public static List<BenhNhan> getDSBenhNhan() {
+	public static List<BenhNhan> getDSBenhNhan() throws ClassNotFoundException, SQLException {
 		Map<Long, LanKhamBenh> mapLanKham = new HashMap<Long, LanKhamBenh>();
 		List<BenhNhan> list = new ArrayList<BenhNhan>();
-		try {
-			Connection conn = getSession();
-			PreparedStatement ps = conn.prepareStatement("SELECT patID,patName,patBirthDate,patAge,patSex,patAddress,patTel,patMobile,patOccupation, "+
-				"case when isnull(patHasPic,0)=1 then "
-				//+ "'PatientPic/'+"
-				+ "patID+'.jpg' else '' end patImg, "+
-				"clrISN,clrMedicalHistory, clr.clrSickHistory,clr.clrSickChange,clr.clrPulse,clr.clrBloodPressure, "+
-				"clr.clrTemperature,clr.clrWeigh,clr.empISN,clr.clrSickNotInList,clr.clrPathologicalSigns, "+
-				"clr.clrSurgery,clr.clrRexamination4Surgery,clr.clrSkill,clr.clrExaminationTimes,clr.clrRexaminationTimes, "+
-				"clr.clrExaminationDate,clr.clrFollowUpExaminationDate,clrMedicalAdvice,clrAppointmentDate "+
-				"FROM Patients pt left join ClinicalRecord clr on pt.patISN = clr.patISN "+
-				"order by patID,clrExaminationTimes,clrRexaminationTimes;");
-			ResultSet re = ps.executeQuery();
-			BenhNhan benhNhan = null;
-			LanKhamBenh lanKham = null;
-			while (re.next()) {
-				if (benhNhan == null || benhNhan.id != re.getLong("patID")) {
-					benhNhan = new BenhNhan(
-							re.getLong("patID"), 
-							re.getString("patName"),		
-							re.getDate("patBirthDate"),
-							re.getInt("patAge"),
-							re.getString("patSex"),		
-							re.getString("patAddress"),		
-							re.getString("patTel"),		
-							re.getString("patMobile"),		
-							re.getString("patOccupation"),		
-							re.getString("patImg")		
-					);
-					list.add(benhNhan);
-				}
-				if (lanKham == null || lanKham.id != re.getLong("clrISN")) {
-					lanKham = new LanKhamBenh(
-							re.getLong("clrISN"), 
-							re.getString("clrMedicalHistory"),
-							false, false, false,
-							re.getString("clrSickHistory"),
-							re.getString("clrSickChange"),
-							re.getString("clrPulse"),		
-							re.getString("clrBloodPressure"),		
-							re.getString("clrTemperature"),		
-							re.getString("clrWeigh"),		
-							getBacSy(re.getLong("empISN")),		
-							re.getString("clrSickNotInList"),	
-							null,
-							re.getString("clrSkill"),		
-							re.getInt("clrExaminationTimes"),		
-							re.getInt("clrRexaminationTimes"),		
-							re.getDate("clrExaminationDate"),		
-							re.getDate("clrFollowUpExaminationDate"),		
-							re.getString("clrMedicalAdvice"),
-							re.getDate("clrAppointmentDate")
-					);
-					benhNhan.addLanKhamBenh(lanKham);
-					mapLanKham.put(lanKham.id, lanKham);
-					
-					
+		Connection conn = getSession();
+		PreparedStatement ps = conn.prepareStatement("SELECT patID,patName,patBirthDate,patAge,patSex,patAddress,patTel,patMobile,patOccupation, "+
+			"case when isnull(patHasPic,0)=1 then "
+			//+ "'PatientPic/'+"
+			+ "patID+'.jpg' else '' end patImg, "+
+			"clrISN,clrMedicalHistory, clr.clrSickHistory,clr.clrSickChange,clr.clrPulse,clr.clrBloodPressure, "+
+			"clr.clrTemperature,clr.clrWeigh,clr.empISN,clr.clrSickNotInList,clr.clrPathologicalSigns, "+
+			"clr.clrSurgery,clr.clrRexamination4Surgery,clr.clrSkill,clr.clrExaminationTimes,clr.clrRexaminationTimes, "+
+			"clr.clrExaminationDate,clr.clrFollowUpExaminationDate,clrMedicalAdvice,clrAppointmentDate "+
+			"FROM Patients pt left join ClinicalRecord clr on pt.patISN = clr.patISN "+
+			"order by patID,clrExaminationTimes,clrRexaminationTimes;");
+		ResultSet re = ps.executeQuery();
+		BenhNhan benhNhan = null;
+		LanKhamBenh lanKham = null;
+		while (re.next()) {
+			if (benhNhan == null || benhNhan.id != re.getLong("patID")) {
+				benhNhan = new BenhNhan(
+						re.getLong("patID"), 
+						re.getString("patName"),		
+						re.getDate("patBirthDate"),
+						re.getInt("patAge"),
+						re.getString("patSex"),		
+						re.getString("patAddress"),		
+						re.getString("patTel"),		
+						re.getString("patMobile"),		
+						re.getString("patOccupation"),		
+						re.getString("patImg")		
+				);
+				list.add(benhNhan);
+			}
+			if (lanKham == null || lanKham.id != re.getLong("clrISN")) {
+				lanKham = new LanKhamBenh(
+						re.getLong("clrISN"), 
+						re.getString("clrMedicalHistory"),
+						false, false, false,
+						re.getString("clrSickHistory"),
+						re.getString("clrSickChange"),
+						re.getString("clrPulse"),		
+						re.getString("clrBloodPressure"),		
+						re.getString("clrTemperature"),		
+						re.getString("clrWeigh"),		
+						getBacSy(re.getLong("empISN")),		
+						re.getString("clrSickNotInList"),	
+						null,
+						re.getString("clrSkill"),		
+						re.getInt("clrExaminationTimes"),		
+						re.getInt("clrRexaminationTimes"),		
+						re.getDate("clrExaminationDate"),		
+						re.getDate("clrFollowUpExaminationDate"),		
+						re.getString("clrMedicalAdvice"),
+						re.getDate("clrAppointmentDate")
+				);
+				benhNhan.addLanKhamBenh(lanKham);
+				mapLanKham.put(lanKham.id, lanKham);
+				
+				
 //					if (benhNhan.id == 11551 && lanKham.lanTaiKham == 0) {
 //						System.out.println("DEBUG");
 //					}
-					
-					
-					String sur = re.getString("clrSurgery");
-					String surRe = re.getString("clrRexamination4Surgery");
-					if (sur != null) {
-						String surs[] = sur.split("[-]");
-						String surRes[] = null;
-						if (surRe != null) {
-							surRes = surRe.split(";");
+				
+				
+				String sur = re.getString("clrSurgery");
+				String surRe = re.getString("clrRexamination4Surgery");
+				if (sur != null) {
+					String surs[] = sur.split("[-]");
+					String surRes[] = null;
+					if (surRe != null) {
+						surRes = surRe.split(";");
+					}
+					for (int i = 0; i <= surs.length - 1; i++) {
+						String st = surs[i].trim();
+						
+						
+						if (DEBUG_LASTST_LIST && (i == surs.length - 1 && st != null && !st.trim().isEmpty())) {
+							System.out.println("DEBUG last st list: " + st);
+							System.out.println("     " + benhNhan.id);
 						}
-						for (int i = 0; i <= surs.length - 1; i++) {
-							String st = surs[i].trim();
-							
-							
-							if (DEBUG_LASTST_LIST && (i == surs.length - 1 && st != null && !st.trim().isEmpty())) {
-								System.out.println("DEBUG last st list: " + st);
-								System.out.println("     " + benhNhan.id);
-							}
-							
-							
+						
+						
 //							if (st.contains(":")) {
 //								
 //								System.out.println("DEBUG st.contains(:)" + st);
@@ -626,110 +651,107 @@ public class ModelLoaderV3 {
 //									st = ss[0].trim();
 //								}
 //							}
-							
-							
-							if (st.isEmpty()) {
-								continue;
-							}
-							DanhMuc s = getPhauThuat(st);
-							PhauThuat pt = new PhauThuat();
-							if (s != null) {
-								pt.id = s.id;
-								pt.ten = s.ten;
-								pt.sym = s.sym;
-							} else {
-								pt.id = 0;
-								pt.ten = st;
-								pt.sym = st;
-							}
-							if (surRes != null && i < surRes.length) {
-								pt.taiKham = surRes[i].trim().equals("1");
-							}
-							lanKham.danhSachPhauThuat.add(pt);
+						
+						
+						if (st.isEmpty()) {
+							continue;
 						}
+						DanhMuc s = getPhauThuat(st);
+						PhauThuat pt = new PhauThuat();
+						if (s != null) {
+							pt.id = s.id;
+							pt.ten = s.ten;
+							pt.sym = s.sym;
+						} else {
+							pt.id = 0;
+							pt.ten = st;
+							pt.sym = st;
+						}
+						if (surRes != null && i < surRes.length) {
+							pt.taiKham = surRes[i].trim().equals("1");
+						}
+						lanKham.danhSachPhauThuat.add(pt);
 					}
 				}
 			}
-			ps = conn.prepareStatement("SELECT OtherID1,colCaoHuyetAp,colTangDuongHuyet,colViemGan FROM tableTienCan_20100210110927625244");
-			re = ps.executeQuery();
-			while (re.next()) {
-				LanKhamBenh lk = mapLanKham.get(re.getLong("OtherID1"));
-				if (lk != null) {
-					lk.caoHuyetAp = re.getBoolean("colCaoHuyetAp");
-					lk.tangDuongHuyet = re.getBoolean("colTangDuongHuyet");
-					lk.viemGan = re.getBoolean("colViemGan");
+		}
+		ps = conn.prepareStatement("SELECT OtherID1,colCaoHuyetAp,colTangDuongHuyet,colViemGan FROM tableTienCan_20100210110927625244");
+		re = ps.executeQuery();
+		while (re.next()) {
+			LanKhamBenh lk = mapLanKham.get(re.getLong("OtherID1"));
+			if (lk != null) {
+				lk.caoHuyetAp = re.getBoolean("colCaoHuyetAp");
+				lk.tangDuongHuyet = re.getBoolean("colTangDuongHuyet");
+				lk.viemGan = re.getBoolean("colViemGan");
+			}
+		}
+		ps = conn.prepareStatement("select  clrISN,plsISN,plsPathologicalSigns,polPathologicalSignsOutList from vw_PathologicalClinical");
+		re = ps.executeQuery();
+		while (re.next()) {
+			LanKhamBenh lk = mapLanKham.get(re.getLong("clrISN"));
+			if (lk != null) {
+				lk.chuanDoanNgoaiDS = re.getString("polPathologicalSignsOutList");
+				DanhMuc cd = getChuanDoan(re.getLong("plsISN"));
+				if (cd != null) {
+					lk.danhSachChuanDoan.add(cd);
+				} else if (re.getLong("plsISN") != 0) {
+					lk.danhSachChuanDoan.add(new DanhMuc(
+							re.getLong("plsISN"), 
+							re.getString("plsPathologicalSigns")
+							));
 				}
 			}
-			ps = conn.prepareStatement("select  clrISN,plsISN,plsPathologicalSigns,polPathologicalSignsOutList from vw_PathologicalClinical");
-			re = ps.executeQuery();
-			while (re.next()) {
-				LanKhamBenh lk = mapLanKham.get(re.getLong("clrISN"));
-				if (lk != null) {
-					lk.chuanDoanNgoaiDS = re.getString("polPathologicalSignsOutList");
-					DanhMuc cd = getChuanDoan(re.getLong("plsISN"));
-					if (cd != null) {
-						lk.danhSachChuanDoan.add(cd);
-					} else if (re.getLong("plsISN") != 0) {
-						lk.danhSachChuanDoan.add(new DanhMuc(
-								re.getLong("plsISN"), 
-								re.getString("plsPathologicalSigns")
-								));
-					}
+		}
+		ps = conn.prepareStatement("select clrISN,sckISN,sckName from vw_ClinicalSicks");
+		re = ps.executeQuery();
+		while (re.next()) {
+			LanKhamBenh lk = mapLanKham.get(re.getLong("clrISN"));
+			if (lk != null) {
+				DanhMuc tc = getTrieuChung(re.getLong("sckISN"));
+				if (tc != null) {
+					lk.danhSachTrieuChung.add(tc);
+				} else if (re.getLong("sckISN") != 0) {
+					lk.danhSachTrieuChung.add(new DanhMuc(
+							re.getLong("sckISN"), 
+							re.getString("sckName")
+							));
 				}
 			}
-			ps = conn.prepareStatement("select clrISN,sckISN,sckName from vw_ClinicalSicks");
-			re = ps.executeQuery();
-			while (re.next()) {
-				LanKhamBenh lk = mapLanKham.get(re.getLong("clrISN"));
-				if (lk != null) {
-					DanhMuc tc = getTrieuChung(re.getLong("sckISN"));
-					if (tc != null) {
-						lk.danhSachTrieuChung.add(tc);
-					} else if (re.getLong("sckISN") != 0) {
-						lk.danhSachTrieuChung.add(new DanhMuc(
-								re.getLong("sckISN"), 
-								re.getString("sckName")
-								));
-					}
-				}
+		}
+		ps = conn.prepareStatement("select clrISN,mesISN,mexMedicineName,mexUsage,mexQuantityPerUnit,mexTakePerDay,mexQuantityPerDay,mexUsagePerDay,mexUsageUnit,mexNote from dbo.MedicineExport");
+		re = ps.executeQuery();
+		while (re.next()) {
+			LanKhamBenh lk = mapLanKham.get(re.getLong("clrISN"));
+			if (lk != null) {
+				ChiTietToaThuoc d = new ChiTietToaThuoc(
+						re.getLong("mesISN"), 
+						re.getString("MexMedicineName"),		
+						re.getString("mesISN"),		
+						re.getInt("mexQuantityPerUnit"), 
+						re.getString("mexUsageUnit"),		
+						re.getInt("mexTakePerDay"), 
+						re.getString("mexQuantityPerDay"), 
+						re.getString("mexUsageUnit"),		
+						re.getString("mexUsagePerDay"),		
+						re.getString("mexUsage"),		
+						re.getString("mexNote")		
+				);
+				lk.danhSachChiTietToaThuoc.add(d);
 			}
-			ps = conn.prepareStatement("select clrISN,mesISN,mexMedicineName,mexUsage,mexQuantityPerUnit,mexTakePerDay,mexQuantityPerDay,mexUsagePerDay,mexUsageUnit,mexNote from dbo.MedicineExport");
-			re = ps.executeQuery();
-			while (re.next()) {
-				LanKhamBenh lk = mapLanKham.get(re.getLong("clrISN"));
-				if (lk != null) {
-					ChiTietToaThuoc d = new ChiTietToaThuoc(
-							re.getLong("mesISN"), 
-							re.getString("MexMedicineName"),		
-							re.getString("mesISN"),		
-							re.getInt("mexQuantityPerUnit"), 
-							re.getString("mexUsageUnit"),		
-							re.getInt("mexTakePerDay"), 
-							re.getString("mexQuantityPerDay"), 
-							re.getString("mexUsageUnit"),		
-							re.getString("mexUsagePerDay"),		
-							re.getString("mexUsage"),		
-							re.getString("mexNote")		
-					);
-					lk.danhSachChiTietToaThuoc.add(d);
-				}
+		}
+		ps = conn.prepareStatement("SELECT clrISN,clpISN,replace(clpPicture,'\','/') clpPicture, clpPicName,clpPicDate FROM [ClinicalPicture]");
+		re = ps.executeQuery();
+		while (re.next()) {
+			LanKhamBenh lk = mapLanKham.get(re.getLong("clrISN"));
+			if (lk != null) {
+				HinhAnh h = new HinhAnh(
+						re.getLong("clpISN"), 
+						re.getString("clpPicName"),		
+						re.getString("clpPicture"),		
+						re.getDate("clpPicDate")		
+				);
+				lk.danhSachHinhAnh.add(h);
 			}
-			ps = conn.prepareStatement("SELECT clrISN,clpISN,replace(clpPicture,'\','/') clpPicture, clpPicName,clpPicDate FROM [ClinicalPicture]");
-			re = ps.executeQuery();
-			while (re.next()) {
-				LanKhamBenh lk = mapLanKham.get(re.getLong("clrISN"));
-				if (lk != null) {
-					HinhAnh h = new HinhAnh(
-							re.getLong("clpISN"), 
-							re.getString("clpPicName"),		
-							re.getString("clpPicture"),		
-							re.getDate("clpPicDate")		
-					);
-					lk.danhSachHinhAnh.add(h);
-				}
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
 		}
 		return list;
 	}

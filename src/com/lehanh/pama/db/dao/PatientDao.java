@@ -36,7 +36,7 @@ public class PatientDao implements IDao {
 //	private static final String `note` VARCHAR(700),
 //	private static final String `medical_personal_info` VARCHAR(5000),
 	
-	public void insert(Patient patient) throws SQLException {
+	public boolean insert(Patient patient) throws SQLException {
 		Connection conn = null;
 		PreparedStatement ps = null;
 		try {
@@ -73,13 +73,13 @@ public class PatientDao implements IDao {
 			System.out.println("SQL: " + ps);
 			int resultUpdate = ps.executeUpdate();
 			if (resultUpdate <= 0) {
-				return;
+				return false;
 			}
 			ResultSet resultIdKey = ps.getGeneratedKeys();
 			if (resultIdKey.next()) {
 				Long resultId = resultIdKey.getLong(1);
 				patient.setId(resultId);
-				return;
+				return true;
 			}
 			throw new SQLException("Insert statement did not generate an AutoID"); //$NON-NLS-1$
 			
@@ -233,6 +233,24 @@ public class PatientDao implements IDao {
 		patient.setMedicalPersonalInfoText(rs.getString("medical_personal_info"));
 		
 		return patient;
+	}
+
+	public void deleteAll() throws SQLException {
+		Connection conn = null;
+		PreparedStatement ps = null;
+		try {
+			conn = DatabaseManager.getInstance().getConn();
+			ps = conn.prepareStatement("delete FROM " + PATIENT_TABLE);
+			System.out.println("SQL: " + ps);
+			ps.executeUpdate();
+		} finally {
+			if (ps != null) {
+				ps.close();
+			}
+			if (conn != null) {
+				conn.close();
+			}
+		}	
 	}
 
 }

@@ -80,7 +80,7 @@ public class Activator implements BundleActivator, PamaApplication, IPatientView
 			initAppProperties();
 		}
 		String result = appProperties.getProperty(name);
-		if (defaultValues != null && result == null) {
+		if (result == null && defaultValues != null) {
 			result = defaultValues;
 		}
 		return result;

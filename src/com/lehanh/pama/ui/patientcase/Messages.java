@@ -126,10 +126,12 @@ public class Messages extends NLS {
 	public static String PrescriptionView_tuoi;
 	public static String PrescriptionView_xemghichuthuoc;
 	public static String PrescriptionView_xoadong;
+	public static String SurgeryGallary_bancochacmuonxoa;
 	public static String SurgeryGallary_benhanthu;
 	public static String SurgeryGallary_gachngang_lankham;
 	public static String SurgeryGallary_themanhba;
 	public static String SurgeryGallary_xoaanh;
+	public static String SurgeryGallary_xoaanhphauthuathoi;
 	public static String SurgeryImageListSelectionDialog_anhphauthuat;
 	public static String SurgeryImageListSelectionDialog_chon;
 	public static String SurgeryImageListSelectionDialog_chonanhchophauthuat;

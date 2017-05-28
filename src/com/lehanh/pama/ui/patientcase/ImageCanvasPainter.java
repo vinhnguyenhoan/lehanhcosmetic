@@ -174,6 +174,10 @@ public class ImageCanvasPainter implements PaintListener {
 	}
 
 	private static Image reloadImage(List<GalleryItemData> imagePaths, Display display, Rectangle clientRect) throws FileNotFoundException, IOException {
+		if (display.isDisposed()) {
+			return null;
+		}
+		
 		Collections.sort(imagePaths);
 		
 		int totalW = 0;
@@ -223,7 +227,7 @@ public class ImageCanvasPainter implements PaintListener {
 		gc.setBackground(PamaResourceManager.getColor(SWT.COLOR_WHITE));
 		gc.fillRectangle(0, 0, canvas.getClientArea().width, canvas.getClientArea().height);
 		
-		if (image == null) {
+		if (image == null || image.isDisposed()) {
 			return;
 		}
 		gc.drawImage(image, origin.x(), origin.y());

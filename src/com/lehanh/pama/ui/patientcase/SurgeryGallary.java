@@ -1,8 +1,6 @@
 package com.lehanh.pama.ui.patientcase;
 
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.text.ParseException;
 import java.util.Arrays;
 import java.util.Date;
@@ -14,14 +12,13 @@ import java.util.TreeMap;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.window.Window;
 import org.eclipse.nebula.widgets.gallery.DefaultGalleryGroupRenderer;
 import org.eclipse.nebula.widgets.gallery.Gallery;
 import org.eclipse.nebula.widgets.gallery.GalleryItem;
 import org.eclipse.nebula.widgets.gallery.ListItemRenderer;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.DisposeEvent;
-import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.SelectionEvent;
@@ -39,7 +36,6 @@ import com.lehanh.pama.patientcase.ICaseDetailHandler;
 import com.lehanh.pama.patientcase.IImageInfo;
 import com.lehanh.pama.patientcase.IPatientManager;
 import com.lehanh.pama.patientcase.ISurgeryImageList;
-import com.lehanh.pama.ui.util.PamaResourceManager;
 import com.lehanh.pama.util.DateUtils;
 import com.lehanh.pama.util.PamaException;
 import com.lehanh.pama.util.PamaHome;
@@ -51,7 +47,7 @@ class SurgeryGallary {
 	private static final int MAX_H = 53 + 20;
 	private static final int MAX_W = 80 + 120;
 
-	private static final String IS_ADD_ITEM = "IS_ADD_ITEM"; //$NON-NLS-1$
+	static final String IS_ADD_ITEM = "IS_ADD_ITEM"; //$NON-NLS-1$
 	// private static final String GROUP_ID = "GROUP_ID";
 	// private static final String DETAIL_ID = "DETAIL_ID";
 	// private static final String ALL_SURGERY = "ALL_SURGERY";
@@ -77,7 +73,6 @@ class SurgeryGallary {
 		this.uid = uid;
 		this.paManager = (IPatientManager) PamaHome.getService(IPatientManager.class);
 		//this.surgeryPath = PamaHome.application.getProperty(PamaHome.SURGERY_IMAGE_PATH, PamaHome.DEFAULT_SURGERY_IMAGE_PATH);
-		this.imageAdd = PamaHome.application.loadImage("icons/addFolder.png"); //$NON-NLS-1$
 		
 		this.gallery = new Gallery(galleryCom, style);
 		this.gallery.setLayoutData(gridData);
@@ -123,30 +118,22 @@ class SurgeryGallary {
 			
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				GalleryItem item = (GalleryItem)e.item;
-				selected(item);
+				selected((GalleryItem)e.item);
 			}
 			
 			@Override
 			public void widgetDefaultSelected(SelectionEvent e) {
-				GalleryItem item = (GalleryItem)e.item;
-				selected(item);
+				selected((GalleryItem)e.item);
 			}
 			
 			private void selected(GalleryItem item ) {
 				if (item == null) {
 					return;
 				}
-				if (isAddItem(item)) {
-					gallery.deselectAll();
-					if (galleryKeyPressed) {
-						galleryKeyPressed = false;
-					} else {
-						addItemBaseOn(item);
-					}
-				} else {
-					viewItem(item);
+				if (addNewItemSelected(item)) {
+					return;
 				}
+				viewItem(new GalleryItem[]{item});				
 			}
 		});
 		
@@ -190,25 +177,23 @@ class SurgeryGallary {
 			
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				linkItems();
+				viewItem(gallery.getSelection());
 			}
 			
 			@Override
 			public void widgetDefaultSelected(SelectionEvent e) {
-				linkItems();
+				viewItem(gallery.getSelection());
 			}
 		});
 
 	    gallery.setMenu(popupMenu);
 	}
-
 	private static final void addTypedListener(Gallery gallery, Listener[] typedListeners) {
 		for (Listener typedListener : typedListeners) {
 			gallery.addListener(SWT.KeyUp, typedListener);
 			gallery.addListener(SWT.KeyDown, typedListener);
 		}
 	}
-	
 	private static final void removeTypedListener(Gallery gallery, Listener[] typedListeners) {
 		for (Listener typedListener : typedListeners) {
 			gallery.removeListener(SWT.KeyUp, typedListener);
@@ -216,16 +201,50 @@ class SurgeryGallary {
 		}
 	}
 	
+	/*
+	 * Call from ViewPart
+	 */
 	void setCanvasPainter(ImageCanvasPainter canvasPainter) {
 		this.canvasPainter = canvasPainter;
 	}
-	
-	private void viewItem(GalleryItem item) {
-		viewItem(new GalleryItem[]{item});
+	void showCase(int caseDetailId, int groupId) {
+		for (GalleryItem itemG : this.gallery.getItems()) {
+			itemG.setExpanded(false);
+			GalleryItemData itemData = (GalleryItemData) itemG.getData();
+			Integer currGroupId = itemData.groupId;
+			Integer currDetailId = itemData.caseDetailId;
+			if (groupId == currGroupId && caseDetailId == currDetailId) {
+				itemG.setExpanded(true);
+			}
+		}
+		this.gallery.redraw();
 	}
-
-	private void linkItems() {
-		viewItem(gallery.getSelection());
+	
+	void updateGallery(ISurgeryImageList imageList, String[] callIds) {
+		this.imageList = imageList;
+//		this.imageLoader.callIds = callIds;
+//		imageLoaderThread.start();
+		if (callIds != null && Arrays.binarySearch(callIds, uid) > -1) {
+			return;
+		}
+		if (SurgeryGallary.this.imageList == null) {
+			return;
+		}
+		
+		gallery.removeAll();
+		// Reload images used by gallery after disposed all
+		this.imageAdd = PamaHome.application.loadImage("icons/addFolder.png");
+		this.oldIndexDetail = -1;
+		try {
+			this.imageList.iteratorCaseDetail(caseDetailHandler);
+		} catch (ParseException e) {
+			throw new PamaException(e);
+		}
+		GalleryItem fItem = gallery.getItem(0);
+		if (fItem != null) {
+			fItem.setExpanded(true);
+		}
+		gallery.redraw();
 	}
 
 	private void viewItem(GalleryItem[] items) {
@@ -253,6 +272,11 @@ class SurgeryGallary {
 	private void deleteSelectedItems() {
 		GalleryItem[] selected = gallery.getSelection();
 		if (selected == null || selected.length == 0) {
+			return;
+		}
+		
+		if (!MessageDialog.openConfirm(gallery.getShell(), Messages.SurgeryGallary_xoaanhphauthuathoi, 
+				String.format(Messages.SurgeryGallary_bancochacmuonxoa, selected.length))) {
 			return;
 		}
 		
@@ -290,20 +314,18 @@ class SurgeryGallary {
 		// TODO notify viewing those images
 	}
 
-	/*private class CatToUI {
-
-		private Catagory cat;
-
-		private CatToUI(Catagory cat) {
-			this.cat = cat;
+	private boolean addNewItemSelected(GalleryItem item) {
+		if (!(isAddItem(item))) {
+			return false;
 		}
-
-		@Override
-		public String toString() {
-			return cat.getName() + " (" + cat.getSymbol() + ")";
+		gallery.deselectAll();
+		if (galleryKeyPressed) {
+			galleryKeyPressed = false;
+			return true;
 		}
-	}*/
-	
+		addItemBaseOn(item);
+		return true;
+	}
 	private void addItemBaseOn(final GalleryItem item) {
 		final GalleryItemData itemData = (GalleryItemData) item.getData();
 		List<Catagory> allSurgeryCat = itemData.allSurCat;
@@ -338,6 +360,9 @@ class SurgeryGallary {
 		// Update DB
 		this.paManager.updatePatient(uid, true);
 		
+		// Show new items added
+		final GalleryCustomGroupItem parentGroup = (GalleryCustomGroupItem) item.getParentItem();
+		
 		for (Entry<String, UpdatedImageData> entry : result.entrySet()) {
 			UpdatedImageData uD = entry.getValue();
 			//String filePath = entry.getKey();
@@ -345,7 +370,7 @@ class SurgeryGallary {
 			int index = 0;
 			int orderAtSur = 0;
 			boolean foundedSur = false;
-			for (GalleryItem peerItem : item.getParentItem().getItems()) {
+			for (GalleryItem peerItem : parentGroup.getItems()) {
 				String surSymCurr = ((GalleryItemData) peerItem.getData()).surSym;
 				if (uD.symbol.equals(surSymCurr)) {
 					foundedSur = true;
@@ -355,23 +380,16 @@ class SurgeryGallary {
 				}
 				index++;
 			}
-			if (index == item.getParentItem().getItemCount()) {
+			if (index == parentGroup.getItemCount()) {
 				index -= 1; 
 			}
 			//String folderName = folderNameFromSurgeryAndPatientId(imageList.getPatientId(), uD.symbol);
-			try {
-				Image itemImage = PamaResourceManager.getImage(uD.iI.getFolderName(), uD.iI.getImageName(), MAX_W, MAX_H);
-				createGallaryItem(index, item.getParentItem(), uD.toFolder, itemImage, orderAtSur + 1, uD.symbol, uD.iI.getImageName(), allSurgeryCat, 
-						itemData.groupId, itemData.caseDetailId, uD.iI.getDate(), itemData.examDate, itemData.afterDays);
-			} catch (FileNotFoundException e) {
-				throw new PamaException(e);
-			} catch (IOException e) {
-				throw new PamaException(e);
-			}
+			parentGroup.createGallaryItem(index, uD.toFolder, orderAtSur + 1, uD.symbol, uD.iI.getImageName(), allSurgeryCat, 
+					itemData.groupId, itemData.caseDetailId, uD.iI.getDate(), itemData.examDate, itemData.afterDays);
 		}
 	}
 	
-	private class UpdatedImageData {
+	private static final class UpdatedImageData {
 
 		private String symbol;
 		private String toFolder;
@@ -384,7 +402,6 @@ class SurgeryGallary {
 		}
 		
 	}
-	
 	private UpdatedImageData updateModel(String filePath, Catagory surgery, GalleryItemData itemData) {
 		if (StringUtils.isEmpty(filePath)) {
 			return null;
@@ -408,29 +425,11 @@ class SurgeryGallary {
 //		} catch (IOException e) {
 //			throw new PamaException(e);
 //		}
-		
-		UpdatedImageData uD = new UpdatedImageData(symbol, iI.getFolderName(), iI);
-		return uD;
+		return new UpdatedImageData(symbol, iI.getFolderName(), iI);
 	}
 
 	private int oldIndexDetail = -1;
-
-	private GroupListener groupListener = new GroupListener() {
-
-		@Override
-		public void beforeExpanded(boolean expanded, boolean redraw, GalleryCustomGroupItem galleryCustomGroupItem) {
-			// TODO Auto-generated method stub
-			
-		}
-
-		@Override
-		public void afterExpanded(boolean expanded, boolean redraw, GalleryCustomGroupItem galleryCustomGroupItem) {
-			// TODO Auto-generated method stub
-			
-		}
-	};
-	
-	private ICaseDetailHandler caseDetailHandler = new ICaseDetailHandler() {
+	private final ICaseDetailHandler caseDetailHandler = new ICaseDetailHandler() {
 		
 		private GalleryCustomGroupItem group;
 		@Override
@@ -438,10 +437,11 @@ class SurgeryGallary {
 				Date examDate, int afterDays, List<Catagory> allSurCat, Map<String, Map<String, IImageInfo>> imageNamesPerSurgery) {
 			if (indexDetail != oldIndexDetail) {
 				oldIndexDetail = indexDetail;
-				group = new GalleryCustomGroupItem(gallery, SWT.NONE, SurgeryGallary.this.groupListener);
+				String groupName = Messages.SurgeryGallary_benhanthu + groupId +
+						Messages.SurgeryGallary_gachngang_lankham + caseDetailId + 
+						" (" + DateUtils.convertDateDataType(examDate) + ")"; //$NON-NLS-3$ //$NON-NLS-4$
+				group = new GalleryCustomGroupItem(gallery, SWT.NONE, groupName, MAX_W, MAX_H, imageAdd);
 				
-				String groupName = Messages.SurgeryGallary_benhanthu + groupId + Messages.SurgeryGallary_gachngang_lankham + caseDetailId + " (" + DateUtils.convertDateDataType(examDate) + ")"; //$NON-NLS-3$ //$NON-NLS-4$
-				group.setText(groupName);
 				if (afterDays == 0) {
 					group.setText(1, "Before");//$NON-NLS-1$
 				} else {
@@ -457,61 +457,17 @@ class SurgeryGallary {
 					int indexImagePerSymbol = 1;
 					for (Entry<String, IImageInfo> aImage : imagePerSur.getValue().entrySet()) {
 						String fileName = aImage.getKey();
-						Image itemImage;
-						try {
-							//String folderName = folderNameFromSurgeryAndPatientId(imageList.getPatientId(), surSym);
-							String folderName = aImage.getValue().getFolderName();
-							itemImage = PamaResourceManager.getImage(folderName, fileName, MAX_W, MAX_H);
-							createGallaryItem(-1, group, folderName, itemImage, indexImagePerSymbol++, surSym, fileName, allSurCat, groupId, caseDetailId
-									, aImage.getValue().getDate(), examDate, afterDays);
-						} catch (FileNotFoundException e) {
-							e.printStackTrace();
-						} catch (IOException e) {
-							e.printStackTrace();
-						}
+						//String folderName = folderNameFromSurgeryAndPatientId(imageList.getPatientId(), surSym);
+						String folderName = aImage.getValue().getFolderName();
+						group.createGallaryItem(-1, folderName, indexImagePerSymbol++, surSym, fileName, allSurCat, groupId, caseDetailId
+								, aImage.getValue().getDate(), examDate, afterDays);
 					}
 				}
 			}
-			createGallaryItem(-1, group, null, imageAdd, -1, null/*"Thêm ảnh"*/, null, allSurCat, groupId, caseDetailId, null, examDate, afterDays)
-					.setData(IS_ADD_ITEM, true);
+			group.createAddNewButtonGallaryItem(-1, null, -1, null, null, allSurCat, groupId, caseDetailId, null, examDate, afterDays);
 		}
 	};
 
-	private static final GalleryItem createGallaryItem(int orderIndex, GalleryItem group, String folder, Image itemImage, int indexImagePerSymbol, String surSym, String imageName, 
-			List<Catagory> allSurCat, int groupId, int caseDetailId, String date, Date examDate, int afterDays) {
-		GalleryItem item = null;
-		if (orderIndex < 0) {
-			item = new GalleryItem(group, SWT.NONE);
-		} else {
-			item = new GalleryItem(group, SWT.NONE, orderIndex);
-		}
-		if (itemImage != null) {
-			item.setImage(itemImage);
-		}
-		if (surSym != null) {
-			item.setText(0, surSym);
-			item.setText(1, "STT: " + indexImagePerSymbol); //$NON-NLS-1$
-		}
-		item.setData(new GalleryItemData(folder, surSym, date, imageName, groupId, caseDetailId, examDate, afterDays, allSurCat));
-		
-		// item.setData(FOLDER_PATH, folder);
-		// item.setData(SUR_SYM, surSym);
-		// item.setData(DATE, date);
-		// item.setData(IMAGE_NAME, imageName);
-		// item.setData(GROUP_ID, groupId);
-		// item.setData(DETAIL_ID, caseDetailId);
-		// item.setData(ALL_SURGERY, allSurCat);
-		item.addDisposeListener(SurgeryGallary.itemDispose);
-		return item;
-	}
-	private static DisposeListener itemDispose = new DisposeListener() {
-		
-		@Override
-		public void widgetDisposed(DisposeEvent e) {
-			((GalleryItem) e.widget).getImage().dispose();
-		}
-	};
-	
 	/*private String folderNameFromSurgeryAndPatientId(long pId, String surgery) {
 		String pIdPrefix = String.valueOf(pId);
 		if (pIdPrefix.length() > 1) {
@@ -522,50 +478,43 @@ class SurgeryGallary {
 		String result = pIdPrefix + "0-" + pIdPrefix + "9"; // example 16945 -> 16940-16949 //$NON-NLS-1$ //$NON-NLS-2$
 		return surgeryPath + "/" + surgery + "/" + result + "/"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	}*/
-	
-	private class ImageLoader implements Runnable {
-
-		private String[] callIds;
-		
-		@Override
-		public void run() {
-			if (callIds != null && Arrays.binarySearch(callIds, uid) > -1) {
-				return;
-			}
-			if (SurgeryGallary.this.imageList == null) {
-				return;
-			}
-			
-			gallery.getDisplay().asyncExec(new Runnable() {
-				
-				@Override
-				public void run() {
-					gallery.removeAll();
-					SurgeryGallary.this.imageAdd = PamaHome.application.loadImage("icons/addFolder.png"); //$NON-NLS-1$
-					SurgeryGallary.this.oldIndexDetail = -1;
-					try {
-						SurgeryGallary.this.imageList.iteratorCaseDetail(caseDetailHandler);
-					} catch (ParseException e) {
-						throw new PamaException(e);
-					}
-					GalleryItem fItem = gallery.getItem(0);
-					if (fItem != null) {
-						fItem.setExpanded(true);
-					}
-					gallery.redraw();
-				}
-			});
-		}
-		
-	}
-
-	private ImageLoader imageLoader = new ImageLoader();
-	
-	void updateGallery(ISurgeryImageList imageList, String[] callIds) {
-		this.imageList = imageList;
-		this.imageLoader.callIds = callIds;
-		new Thread(imageLoader).start();
-	}
+//	private final ImageLoader imageLoader = new ImageLoader();
+//	private final Thread imageLoaderThread = new Thread(imageLoader);
+//	private class ImageLoader implements Runnable {
+//
+//		private String[] callIds;
+//		
+//		@Override
+//		public void run() {
+//			if (callIds != null && Arrays.binarySearch(callIds, uid) > -1) {
+//				return;
+//			}
+//			if (SurgeryGallary.this.imageList == null) {
+//				return;
+//			}
+//			
+//			gallery.getDisplay().asyncExec(new Runnable() {
+//				
+//				@Override
+//				public void run() {
+//					gallery.removeAll();
+//					SurgeryGallary.this.imageAdd = PamaHome.application.loadImage("icons/addFolder.png"); //$NON-NLS-1$
+//					SurgeryGallary.this.oldIndexDetail = -1;
+//					try {
+//						SurgeryGallary.this.imageList.iteratorCaseDetail(caseDetailHandler);
+//					} catch (ParseException e) {
+//						throw new PamaException(e);
+//					}
+//					GalleryItem fItem = gallery.getItem(0);
+//					if (fItem != null) {
+//						fItem.setExpanded(true);
+//					}
+//					gallery.redraw();
+//				}
+//			});
+//		}
+//		
+//	}
 
 	/*private void disposeAllImages() {
 		for (GalleryItem itemG : gallery.getItems()) {
@@ -581,21 +530,8 @@ class SurgeryGallary {
 		}
 	}*/
 
-	private boolean isAddItem(GalleryItem item) {
+	private static final boolean isAddItem(GalleryItem item) {
 		return item.getData(IS_ADD_ITEM) != null;
-	}
-
-	void showCase(int caseDetailId, int groupId) {
-		for (GalleryItem itemG : this.gallery.getItems()) {
-			itemG.setExpanded(false);
-			GalleryItemData itemData = (GalleryItemData) itemG.getData();
-			Integer currGroupId = itemData.groupId;
-			Integer currDetailId = itemData.caseDetailId;
-			if (groupId == currGroupId && caseDetailId == currDetailId) {
-				itemG.setExpanded(true);
-			}
-		}
-		this.gallery.redraw();
 	}
 
 	void updateFolderEmpty(boolean isShow) {
