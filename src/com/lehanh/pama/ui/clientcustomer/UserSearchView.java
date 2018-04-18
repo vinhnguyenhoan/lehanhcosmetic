@@ -26,6 +26,7 @@ import org.eclipse.swt.widgets.Text;
 import com.lehanh.pama.old.model.BenhNhan;
 import com.lehanh.pama.old.model.v3.LoadPatientListenner;
 import com.lehanh.pama.old.model.v3.ModelLoaderV3;
+import com.lehanh.pama.old.model.v3.Report;
 import com.lehanh.pama.patientcase.IPatientManager;
 import com.lehanh.pama.patientcase.IPatientViewPartListener;
 import com.lehanh.pama.patientcase.Patient;
@@ -133,6 +134,28 @@ public class UserSearchView implements IPatientViewPartListener /*extends ViewPa
 			}
 		});
 		btnClear.setText(Messages.UserSearchView_xoaboloc);
+		
+		if (PamaHome.isTempReport(false)) {
+			Button adminButton = new Button(filter_composite, SWT.FLAT);
+			adminButton.setText("isTempReport"); //$NON-NLS-1$
+			adminButton.addSelectionListener(new SelectionAdapter() {
+				
+				@Override
+				public void widgetSelected(SelectionEvent e) {
+					
+					try {
+						
+						ModelLoaderV3.initial(PamaHome.getOldHost(null), PamaHome.getOldDB(null),
+								PamaHome.getOldUser(null), PamaHome.getOldPass(null));
+						String rs = Report.statictisBySurName();
+						name_text.setText(rs);
+						FormManager.showMessage(adminButton.getShell(), "Result", rs);
+					} catch (Exception e1) {
+						FormManager.showMessage(adminButton.getShell(), "Error", e1.getMessage()); //$NON-NLS-1$
+					}
+				}
+			});
+		}
 		
 		if (PamaHome.isAdmin(false)) {
 			Button adminButton = new Button(filter_composite, SWT.FLAT);

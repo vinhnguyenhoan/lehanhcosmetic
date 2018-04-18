@@ -137,6 +137,13 @@ public class ModelLoaderV3 {
 		return result;
 	}
 	
+	public static void initial(String oldHost, String oldDB, String oldUser, String oldPass) {
+		HOST = oldHost;
+		DB_NAME = oldDB;
+		USER = oldUser;
+		PASS = oldPass;
+	}
+	
 	public static int loadPatient(LoadPatientListenner ll, String oldHost, String oldDB, String oldUser, String oldPass) throws SQLException, IOException, ClassNotFoundException {
 		HOST = oldHost;
 		DB_NAME = oldDB;

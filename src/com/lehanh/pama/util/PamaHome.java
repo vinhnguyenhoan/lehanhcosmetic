@@ -58,6 +58,11 @@ public class PamaHome {
 		return "true".equals(isAdminText);
 	}
 	
+	public static boolean isTempReport(Boolean defaultIsTempReport) {
+		String defaultIsTempReportText = application.getProperty("defaultTempReport", (defaultIsTempReport != null && defaultIsTempReport) ? "true" : null);
+		return "true".equals(defaultIsTempReportText);
+	}
+	
 	private static final Map<Class<?>, IService> serviceManager = new HashMap<Class<?>, IService>();
 	private static final List<IService> serviceManagerOrderedList = new LinkedList<IService>();
 
