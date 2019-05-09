@@ -54,7 +54,10 @@ public class ModelLoaderV3 {
 	public static void main(String[] args) throws SQLException, IOException {
 		try {
 			//loadToaThuocMau();
-			loadPatient(null, HOST, DB_NAME, USER, PASS);
+			
+			List<BenhNhan> listBN = ModelLoaderV3.getDSBenhNhan();
+			System.out.println(listBN.size());
+//			loadPatient(null, HOST, DB_NAME, USER, PASS);
 			//loadBS();
 			//Exception in thread "main" java.lang.IllegalArgumentException: Infinity is not a valid double value as per JSON specification. To override this behavior, use GsonBuilder.serializeSpecialFloatingPointValues() method.
 			//loadThuoc();
@@ -316,19 +319,23 @@ public class ModelLoaderV3 {
 		return result;
 	}
 	
-	private static String HOST = "FBYGRC2\\SQLEXPRESS";
+	private static String HOST =
+			"DE-0517-1006";
+//			"FBYGRC2\\SQLEXPRESS";
 	private static String DB_NAME = "LHS";
 	private static String USER = 
-//			"KMS\\vinhhnguyen";
+//			"AzureAD\\vinh.nguyen@hubcba.com";
 			"sa";
-	private static String PASS = "kms18955@";
+	private static String PASS = 
+			"123456789qweQWE!@#";
+//			"kms18955@";
 	
 	private static Connection conn;
 	private static Connection getSession() throws SQLException, ClassNotFoundException {
 		if (conn != null && !conn.isClosed()) {
 			return conn;
 		}
-		String url = String.format("jdbc:sqlserver://%s;databaseName=%s;"
+		String url = String.format("jdbc:sqlserver://%s:1433;databaseName=%s;"
 //				+ "integratedSecurity=true"
 				, HOST, DB_NAME);
 		Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");

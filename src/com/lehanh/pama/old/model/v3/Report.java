@@ -1,5 +1,6 @@
 package com.lehanh.pama.old.model.v3;
 
+import java.sql.SQLException;
 import java.text.ParseException;
 import java.util.Calendar;
 import java.util.Collections;
@@ -21,7 +22,26 @@ import com.lehanh.pama.util.DateUtils;
 
 public class Report {
 
-	public static void main(String[] args) throws Exception {
+	public static void main(String[] args) throws ClassNotFoundException, SQLException {
+		List<BenhNhan> listBN = ModelLoaderV3.getDSBenhNhan();
+		int[] index = new int[] {0};
+		listBN.stream().forEach(new Consumer<BenhNhan>() {
+
+			@Override
+			public void accept(BenhNhan t) {
+				if (t.isCosmetic() && StringUtils.isNotBlank(t.dienThoaiDiDong)) {
+					index[0]++;
+					System.out.println(
+//							index[0] + "\t" + t.ten + "\t" + 
+							t.dienThoaiDiDong);
+				}
+			}
+		});
+	}
+	
+	
+	
+	public static void main2(String[] args) throws Exception {
 		//loadPerYear(1, 6, 2015);
 		
 		loadPerYear();
@@ -40,7 +60,7 @@ public class Report {
 //		loadPerYear(12, 2015);
 	}
 	
-	private static final String filterBySurName = "mũi"; //example "Bơm mỡ"
+	private static final String filterBySurName = ""; //example "Bơm mỡ"
 	
 	public static void loadPerYear(/*int m, int year*/) throws Exception {
 		//List<String[]> listBM = loadFile("olddata//bommo.csv");
@@ -126,7 +146,7 @@ public class Report {
 				}
 			});
 			
-			System.out.println("Phẩu thuật : " + entry.getKey() + " (" + listStatictics.size() + " bệnh)"); //+ "\t" + entry.getValue());
+//			System.out.println("Phẩu thuật : " + entry.getKey() + " (" + listStatictics.size() + " bệnh)"); //+ "\t" + entry.getValue());
 			
 			listStatictics.forEach(new Consumer<StatictisBN>() {
 
@@ -151,7 +171,7 @@ public class Report {
 						}
 					}
 					
-					System.out.println(t.bn.id + " : " + t.bn.ten + " : " + nk);
+					System.out.println(t.bn.id + " : " + t.bn.ten + " : " + t.bn.dienThoaiDiDong/*nk*/);
 				}
 			});
 			System.out.println();

@@ -13,7 +13,6 @@ import java.util.TreeMap;
 import org.apache.commons.lang3.StringUtils;
 
 import com.lehanh.pama.catagory.AppointmentCatagory;
-import com.lehanh.pama.catagory.Catagory;
 import com.lehanh.pama.catagory.DrugCatagory;
 import com.lehanh.pama.catagory.PrescriptionItem;
 import com.lehanh.pama.catagory.ServiceCatagory;
@@ -259,4 +258,25 @@ public class BenhNhan {
 		return result;
 	}
 
+	public boolean isCosmetic() {
+		return danhSachKham.stream()
+			.filter(lkb -> {
+				try {
+					java.util.Date ngayKham = DateUtils.sqlDateToutilDate(lkb.ngayKham);
+					int[] date = DateUtils.getDate(ngayKham);
+					//if (/*(date[0] == 2015 && date[1] <= 6) || */(date[0] != year || date[1] != m)) {
+					if (date[0] < 2000) {
+						return false;
+					}
+				} catch (ParseException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				if (lkb.danhSachPhauThuat.isEmpty()) {
+					return false;
+				}
+				return true;
+			})
+			.findAny().isPresent();
+	}
 }
